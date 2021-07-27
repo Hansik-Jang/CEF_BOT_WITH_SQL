@@ -81,8 +81,6 @@ class Member(commands.Cog):
             else:
                 await ctx.send("```정확한 닉네임 양식을 지켜주세요\n닉네임 양식 : 닉네임[주포지션/부포지션] or 닉네임[주포지션]```")
 
-
-
         conn.close()
 
     @commands.command(name='test', pass_context=True)

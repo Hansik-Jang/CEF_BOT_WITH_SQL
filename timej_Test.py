@@ -15,9 +15,8 @@ async def copy_info(ctx):
     nick = convertNick(ctx)
     jupo = convertJupo(ctx)
     bupo = convertBupo(ctx)
-    exclude = assembleIncludeBupo(nick, jupo, bupo)
-    bupo = ''
-    await ctx.send(f"")
+    exclude = assembleIncludeBupo(ctx)
+    await ctx.send(f"{exclude}")
 
 
 @bot.command(name="로드")
