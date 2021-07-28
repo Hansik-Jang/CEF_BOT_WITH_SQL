@@ -8,10 +8,9 @@ import sqlite3
 bot = commands.Bot(command_prefix="$")
 f = open("key.txt", 'r')
 key = f.readline()
-#key = "NzE2NTEyNDc3MjU2NDgyODk5.XtM2Pg.XUfyXlPSzT59gEhDIU5PxZJI76M"
 
 
-@bot.command(name="닉네임테스트")
+@bot.command(name="테스트")
 async def copy_info(ctx):
     nick = convertNick(ctx)
     jupo = convertJupo(ctx)
