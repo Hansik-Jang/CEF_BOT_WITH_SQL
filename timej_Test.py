@@ -50,11 +50,7 @@ for filename in os.listdir('Cogs'):
         bot.load_extension(f"Cogs.{filename[:-3]}")
         print(f"Cogs.{filename[:-3]} 로드")
 
-
 bot.run(key)
-
-
-
 
 '''
 @bot.command(name="정보이동")
@@ -82,7 +78,3 @@ async def copy_info(ctx):
     cur.close()
     conn.close()
 '''
-
-gc = gspread.service_account(filename='credentials.json')
-sh = gc.open_by_key('1552A1axMJDfxN7kv1TyohmJ3VqKNa7mBeQstHoIRpUQ')
-worksheet_list = sh.worksheet('명단')
