@@ -115,3 +115,4 @@ dmypy.json
 .idea/vcs.xml
 form_info.json
 credentials.json
+key.txt
