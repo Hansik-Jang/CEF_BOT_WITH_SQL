@@ -3192,6 +3192,9 @@ class Draft(commands.Cog):
             if str(reaction.emoji) == "<:RW:706530008201560156>":
                 entry.append("RW/" + user.mention)
                 no_entry.append(user.display_name)
+            if str(reaction.emoji) == "<:CAM:706530008243634176>":
+                entry.append("CAM/" + user.mention)
+                no_entry.append(user.display_name)
             if str(reaction.emoji) == "<:CM:706530007928930386>":
                 entry.append("CM/" + user.mention)
                 no_entry.append(user.display_name)
