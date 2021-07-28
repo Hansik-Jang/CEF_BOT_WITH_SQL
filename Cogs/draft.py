@@ -61,7 +61,7 @@ class Draft(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def 테스트(self, ctx):
+    async def 테스트(ctx):
         entry.clear()
         entry.append("")
         queue.clear()
@@ -867,7 +867,7 @@ class Draft(commands.Cog):
     #각 팀 포지션 개수, 팀 명단 삭제 안됨
 
     @commands.command()
-    async def 테스트1(self, ctx):
+    async def 테스트1(ctx):
         entry.clear()
         entry.append("")
         queue.clear()
@@ -1395,7 +1395,7 @@ class Draft(commands.Cog):
 
 
     @commands.command(pass_context=True)
-    async def 대기초기화(self, ctx):
+    async def 대기초기화(ctx):
         if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
@@ -1417,7 +1417,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 번호삭제(self, ctx, *, text):    #삭제 된 사람의 포지션 목록에서 삭제 필요
+    async def 번호삭제(ctx, *, text):    #삭제 된 사람의 포지션 목록에서 삭제 필요
         role_names = [role.name for role in ctx.author.roles]
         if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
@@ -1439,7 +1439,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 대기참가(self, ctx):
+    async def 대기참가(ctx):
         entry.clear()
         entry.append("")
         no_entry.clear()
@@ -1499,6 +1499,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 st 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("LW"):
                                     lw.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "lw")
@@ -1506,6 +1507,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 lw 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("RW"):
                                     rw.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "rw")
@@ -1513,6 +1515,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 rw 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("CAM"):
                                     cam.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "cam")
@@ -1521,6 +1524,7 @@ class Draft(commands.Cog):
                                             f"경기 대기실 목록에 cam 포지션으로 추가되었습니다")
                                     print(cam)
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("CM"):
                                     cm.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "cm")
@@ -1528,6 +1532,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 cm 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("CDM"):
                                     cdm.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "cdm")
@@ -1535,6 +1540,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 cdm 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("LB"):
                                     lb.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "lb")
@@ -1542,6 +1548,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 lb 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("CB"):
                                     cb.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "cb")
@@ -1549,6 +1556,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 cb 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("RB"):
                                     rb.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "rb")
@@ -1556,6 +1564,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 rb 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                                 if entry[k].startswith("GK"):
                                     gk.append(entry[k])
                                     wait_mem.append(no_entry[k] + "/" + "gk")
@@ -1563,6 +1572,7 @@ class Draft(commands.Cog):
                                     await ctx.send(content=f"{entry[k]}님\n"
                                             f"경기 대기실 목록에 gk 포지션으로 추가되었습니다")
                                     print("a")
+                                    time.sleep(BOT_SLEEP_TIME)
                             else:
                                 await ctx.send(content=f"{entry[k]}중복참가는 불가능합니다!")
                         #이모지로 받기
@@ -1581,7 +1591,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 대기삭제(self, ctx):   #포지션 대기에서도 삭제 필요
+    async def 대기삭제(ctx):   #포지션 대기에서도 삭제 필요
         if str(ctx.message.channel) != "테스트":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
@@ -1658,7 +1668,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 대기목록(self, ctx):
+    async def 대기목록(ctx):
         alert = ""
         try:
             for i in range(1, len(wait_mem)):
@@ -1674,7 +1684,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 대기분배(self, ctx, *, text):
+    async def 대기분배(ctx, *, text):
         queue.clear()
         queue.append("")
         a_team.clear()
@@ -2028,7 +2038,7 @@ class Draft(commands.Cog):
 
                 
     @commands.command()
-    async def 드래프트1(self, ctx):
+    async def 드래프트1(ctx):
         #if str(ctx.message.channel) != "드래프트" or "대기순서":
             #await ctx.send("드래프트 채널에 작성해주세요")
         #else:
@@ -2298,7 +2308,7 @@ class Draft(commands.Cog):
                     await ctx.send("\n\n대기 \n" + temp_w_team)
 
     @commands.command()
-    async def 드래프트2(self, ctx):
+    async def 드래프트2(ctx):
         #if str(ctx.message.channel) != "드래프트" or "대기순서":
             #await ctx.send("드래프트 채널에 작성해주세요")
         #else:
@@ -2674,7 +2684,7 @@ class Draft(commands.Cog):
                     await ctx.send("\n\n대기 \n" + temp_w_team)
 
     @commands.command()
-    async def 드래프트3(self, ctx):
+    async def 드래프트3(ctx):
         #if str(ctx.message.channel) != "드래프트":
             #await ctx.send("드래프트 채널에 작성해주세요")
         #else:
@@ -3129,7 +3139,7 @@ class Draft(commands.Cog):
 
     '''
     @commands.command()
-    async def 대기실분배2(self, ctx, num1, num2):
+    async def 대기실분배2(ctx, num1, num2):
         key = 0
         div = []
         wait_mem_name = []
@@ -3157,7 +3167,7 @@ class Draft(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
+    async def on_reaction_add(reaction, user):
         for i in range(0, len(entry)):
             if user.mention in entry[i]:
                 switch = 1
@@ -3203,7 +3213,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 드래프트4(self, ctx):
+    async def 드래프트4(ctx):
         #if str(ctx.message.channel) != "드래프트":
             #await ctx.send("드래프트 채널에 작성해주세요")
         #else:
@@ -3740,7 +3750,7 @@ class Draft(commands.Cog):
 
     '''
     @bot.command()
-    async def 대기실분배2(self, ctx, num1, num2):
+    async def 대기실분배2(ctx, num1, num2):
         key = 0
         div = []
         wait_mem_name = []
