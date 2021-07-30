@@ -60,7 +60,7 @@ class Draft(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='테스트', pass_context=True)
+    @commands.command(name='테스트2', pass_context=True)
     async def _test(self, ctx):
         entry.clear()
         entry.append("")
@@ -1715,13 +1715,13 @@ class Draft(commands.Cog):
                         if a_queue[0] > 0:                  # 만약 A팀의 ST 수가 0보다 크면,
                             for i in range(a_queue[0]):     # A팀 ST 수만큼
                                 print(st)
-                                temp = random.choice(st)    # 랜덤으로 선발해
+                                temp = st[i]                
                                 a_team.append(temp)         # A팀으로 배분 후
                                 st.remove(temp)             # ST 리스트에서 제거
                         # B팀
                         if b_queue[0] > 0:
                             for i in range(0, b_queue[0]):
-                                temp = random.choice(st)
+                                temp = st[i]
                                 b_team.append(temp)
                                 st.remove(temp)
                         # 대기열 정리
@@ -1736,13 +1736,13 @@ class Draft(commands.Cog):
                         # B팀
                         if b_queue[1] > 0:
                             for i in range(b_queue[1]):
-                                temp = random.choice(lw)
+                                temp = lw[i]
                                 b_team.append(temp)
                                 lw.remove(temp)
                         # A팀
                         if a_queue[1] > 0:
                             for i in range(a_queue[1]):
-                                temp = random.choice(lw)
+                                temp = lw[i]
                                 a_team.append(temp)
                                 lw.remove(temp)
                         # 대기열 정리
@@ -1758,13 +1758,13 @@ class Draft(commands.Cog):
                         # A팀
                         if a_queue[2] > 0:
                             for i in range(a_queue[2]):
-                                temp = random.choice(rw)
+                                temp = rw[i]
                                 a_team.append(temp)
                                 rw.remove(temp)
                         # B팀
                         if b_queue[2] > 0:
                             for i in range(b_queue[2]):
-                                temp = random.choice(rw)
+                                temp = rw[i]
                                 b_team.append(temp)
                                 rw.remove(temp)
                         for j in range(len(rw)):
@@ -1780,13 +1780,13 @@ class Draft(commands.Cog):
                         print(cam)
                         if b_queue[3] > 0:
                             for i in range(b_queue[3]):
-                                temp = random.choice(cam)
+                                temp = cam[i]
                                 b_team.append(temp)
                                 cam.remove(temp)
                         # A팀
                         if a_queue[3] > 0:
                             for i in range(a_queue[3]):
-                                temp = random.choice(cam)
+                                temp = cam[i]
                                 a_team.append(temp)
                                 cam.remove(temp)
 
@@ -1801,13 +1801,13 @@ class Draft(commands.Cog):
                         # A팀
                         if a_queue[4] > 0:
                             for i in range(a_queue[4]):
-                                temp = random.choice(cm)
+                                temp = cm[i]
                                 a_team.append(temp)
                                 cm.remove(temp)
                         # B팀
                         if b_queue[4] > 0:
                             for i in range(b_queue[4]):
-                                temp = random.choice(cm)
+                                temp = cm[i]
                                 b_team.append(temp)
                                 cm.remove(temp)
                         for j in range(len(cm)):
@@ -1821,13 +1821,13 @@ class Draft(commands.Cog):
                         # B팀
                         if b_queue[5] > 0:
                             for i in range(b_queue[5]):
-                                temp = random.choice(cdm)
+                                temp = cdm[i]
                                 b_team.append(temp)
                                 cdm.remove(temp)
                         # A팀
                         if a_queue[5] > 0:
                             for i in range(a_queue[5]):
-                                temp = random.choice(cdm)
+                                temp = cdm[i]
                                 a_team.append(temp)
                                 cdm.remove(temp)
 
@@ -1842,13 +1842,13 @@ class Draft(commands.Cog):
                         # A팀
                         if a_queue[6] > 0:
                             for i in range(a_queue[6]):
-                                temp = random.choice(lb)
+                                temp = lb[i]
                                 a_team.append(temp)
                                 lb.remove(temp)
                         # B팀
                         if b_queue[6] > 0:
                             for i in range(b_queue[6]):
-                                temp = random.choice(lb)
+                                temp = lb[i]
                                 b_team.append(temp)
                                 lb.remove(temp)
                         for j in range(len(lb)):
@@ -1862,13 +1862,13 @@ class Draft(commands.Cog):
                         # B팀
                         if b_queue[7] > 0:
                             for i in range(b_queue[7]):
-                                temp = random.choice(cb)
+                                temp = cb[i]
                                 b_team.append(temp)
                                 cb.remove(temp)
                         # A팀
                         if a_queue[7] > 0:
                             for i in range(a_queue[7]):
-                                temp = random.choice(cb)
+                                temp = cb[i]
                                 a_team.append(temp)
                                 cb.remove(temp)
 
@@ -1884,13 +1884,13 @@ class Draft(commands.Cog):
 
                         if a_queue[8] > 0:
                             for i in range(a_queue[8]):
-                                temp = random.choice(rb)
+                                temp = rb[i]
                                 a_team.append(temp)
                                 rb.remove(temp)
                         # B팀
                         if b_queue[8] > 0:
                             for i in range(b_queue[8]):
-                                temp = random.choice(rb)
+                                temp = rb[i]
                                 b_team.append(temp)
                                 rb.remove(temp)
                         for j in range(len(rb)):
@@ -1904,13 +1904,13 @@ class Draft(commands.Cog):
                         # B팀
                         if b_queue[9] > 0:
                             for i in range(b_queue[9]):
-                                temp = random.choice(gk)
+                                temp = gk[i]
                                 b_team.append(temp)
                                 gk.remove(temp)
                         # A팀
                         if a_queue[9] > 0:
                             for i in range(a_queue[9]):
-                                temp = random.choice(gk)
+                                temp = gk[i]
                                 a_team.append(temp)
                                 gk.remove(temp)
 
