@@ -1336,7 +1336,7 @@ class Draft(commands.Cog):
 
     @commands.command(pass_context=True)
     async def 대기초기화(self, ctx):
-        if str(ctx.message.channel) != "테스트":
+        if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
         else:
@@ -1384,7 +1384,7 @@ class Draft(commands.Cog):
         entry.append("")
         no_entry.clear()
         no_entry.append("")
-        if str(ctx.message.channel) != "테스트":
+        if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
             await ctx.channel.purge(limit=DELETE_AMOUNT)
@@ -1484,7 +1484,7 @@ class Draft(commands.Cog):
 
     @commands.command()
     async def 대기삭제(self, ctx):   
-        if str(ctx.message.channel) != "테스트":
+        if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
             await ctx.channel.purge(limit=DELETE_AMOUNT)
@@ -1581,7 +1581,7 @@ class Draft(commands.Cog):
         a_team.clear()
         b_team.clear()
 
-        if str(ctx.message.channel) != "테스트":
+        if str(ctx.message.channel) != "대기순서":
             await ctx.send("대기순서 채널에 작성해주세요")
             time.sleep(BOT_SLEEP_TIME)
         else: #text가 1,2,3,4가 아닐 때
