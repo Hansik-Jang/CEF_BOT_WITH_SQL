@@ -1379,7 +1379,7 @@ class Draft(commands.Cog):
 
 
     @commands.command()
-    async def 대기참가(self, ctx, *, text):
+    async def 대기참가(self, ctx):
         entry.clear()
         entry.append("")
         no_entry.clear()
@@ -1394,79 +1394,87 @@ class Draft(commands.Cog):
                     await ctx.send("진행중인 게임이 없어 대기가 불가능합니다!")
                     time.sleep(BOT_SLEEP_TIME)
                 else:
-                    for i in range(0, len(wait_mem)):
-                        if ctx.author.display_name in wait_mem[i]:
-                            check_overlap = 1
-                            break
-                        else:
-                            check_overlap = 0
-                    if check_overlap == 0:
-                        if text == 'st' or text == 'ST':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            st.append("ST/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'lw' or text == 'LW':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            lw.append("LW/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'rw' or text == 'RW':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            rw.append("RW/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'cam' or text == 'CAM':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            cam.append("CAM/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'cm' or text == 'CM':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            cm.append("CM/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'cdm' or text == 'CDM':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            cdm.append("CDM/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'lb' or text == 'LB':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            lb.append("LB/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'cb' or text == 'CB':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            cb.append("CB/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'rb' or text == 'RB':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            rb.append("RB/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        elif text == 'gk' or text == 'GK':
-                            wait_mem.append(ctx.author.display_name + "/" + text)
-                            gk.append("GK/" + ctx.author.mention)
-                            await ctx.send(content=f"{ctx.author.display_name}님\n"
-                                            f"경기 대기실 목록에 {text} 포지션으로 추가되었습니다")
-                            time.sleep(BOT_SLEEP_TIME)
-                        else:
-                            await ctx.send(content=f"{ctx.author.mention}님\n"
-                                            f"정확한 포지션을 기입해주세요!")
-                    else:
-                        await ctx.send("중복 등록이므로 불가합니다.")
-                        time.sleep(BOT_SLEEP_TIME)
+                    await ctx.send(content=f"```A팀 : {team_list[1]}, B팀 : {team_list[2]}```")
+                    draft = await ctx.send("희망하는 포지션을 선택해주세요.")
+                    if position_num[0] > 0:
+                        await draft.add_reaction("<:ST:706530008465932299>")
+                    if position_num[1] > 0:
+                        await draft.add_reaction("<:LW:706530007937450036>")
+                    if position_num[2] > 0:
+                        await draft.add_reaction("<:RW:706530008201560156>")
+                    if position_num[3] > 0:
+                        await draft.add_reaction("<:CAM:706530008243634176>")
+                    if position_num[4] > 0:
+                        await draft.add_reaction("<:CM:706530007928930386>")
+                    if position_num[5] > 0:
+                        await draft.add_reaction("<:CDM:706530008289509466>")
+                    if position_num[6] > 0:
+                        await draft.add_reaction("<:LB:706530008369463359>")
+                    if position_num[7] > 0:
+                        await draft.add_reaction("<:CB:706530008113610803>")
+                    if position_num[8] > 0:
+                        await draft.add_reaction("<:RB:706530008100765707>")
+                    if position_num[9] > 0:
+                        await draft.add_reaction("<:GK:706530008088182786>")
+                    time.sleep(1)
+                    cd = await ctx.send("카운트 다운")
+                    for i in range(0, MAX_COUNT):
+                        j = MAX_COUNT - i
+                        await cd.edit(content=f"{j}초 남았습니다")
+                        time.sleep(1)
+                    if j == 1:
+                        await cd.edit(content=f"선택 종료")     #각 포지션 리스트에 저장, 대기목록에 표시
+                        overlaps = len(wait_mem)
+                        for k in range(len(entry)):
+                            overlap = 0    #중복확인
+                            for a in range(1,overlaps): #확인 필요
+                                if wait_mem[a].startswith(no_entry[k]):
+                                    overlap += 1
+                            if overlap == 0:
+                                if entry[k].startswith("ST"):
+                                    st.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "st")
+                                    print("a")
+                                if entry[k].startswith("LW"):
+                                    lw.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "lw")
+                                    print("a")
+                                if entry[k].startswith("RW"):
+                                    rw.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "rw")
+                                    print("a")
+                                if entry[k].startswith("CAM"):
+                                    cam.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "cam")
+                                    print(cam)
+                                    print("a")
+                                if entry[k].startswith("CM"):
+                                    cm.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "cm")
+                                    print("a")
+                                if entry[k].startswith("CDM"):
+                                    cdm.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "cdm")
+                                    print("a")
+                                if entry[k].startswith("LB"):
+                                    lb.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "lb")
+                                    print("a")
+                                if entry[k].startswith("CB"):
+                                    cb.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "cb")
+                                    print("a")
+                                if entry[k].startswith("RB"):
+                                    rb.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "rb")
+                                    print("a")
+                                if entry[k].startswith("GK"):
+                                    gk.append(entry[k])
+                                    wait_mem.append(no_entry[k] + "/" + "gk")
+                                    print("a")
+                            else:
+                                await ctx.send(content=f"{entry[k]}중복참가는 불가능합니다!")
+                        #이모지로 받기
             except:
                 print("aaa")
             alert = ""
@@ -1476,7 +1484,6 @@ class Draft(commands.Cog):
             if alert == "" :
                 await ctx.send("대기열이 존재하지 않습니다. 등록해주세요.")
             else:
-                await ctx.send(content=f"```A팀 : {team_list[1]}, B팀 : {team_list[2]}```")
                 await ctx.send("대기목록 \n")
                 await ctx.send("```" + alert + "```")
     
@@ -1493,7 +1500,8 @@ class Draft(commands.Cog):
                 for i in range(0, len(wait_mem)):
                     if wait_mem[i].startswith(ctx.author.display_name):
                         wait_mem.remove(wait_mem[i])#대기 목록에서 삭제 O
-                        for j in range(0, len(st)):
+                        #포지션 대기 삭제(다시 뜯어 고쳐야함)
+                        for j in range(0, len(st)):#둘다 텍스트 형으로 바꿔서 비교하는 방법 (설정 1)
                             if "ST/" + ctx.author.mention == st[j]:
                                 temp = st[j]
                                 st.remove(temp)
