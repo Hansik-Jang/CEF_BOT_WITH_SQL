@@ -43,8 +43,8 @@ class Member(commands.Cog):
                     conn2 = sqlite3.connect("test.db")
                     cur2 = conn2.cursor()
                     cur2.execute('INSERT INTO Main VALUES (?, ?, ?, ?, ?, ?, ?)', \
-                                (now_time, '0000-00-00 00:00:00', str(ctx.author.id), convertNick(ctx),\
-                                convertJupo(ctx), convertBupo(ctx), '무소속'))
+                                 (now_time, '0000-00-00 00:00:00', str(ctx.author.id), convertNick(ctx),\
+                                  convertJupo(ctx), convertBupo(ctx), '무소속'))
                     conn2.commit()
                     conn2.close()
                     # -----------------------------------------------------------#
