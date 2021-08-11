@@ -5,7 +5,7 @@ from discord.ext import commands
 import gspread
 import sqlite3
 
-bot = commands.Bot(command_prefix="$")
+bot = commands.Bot(command_prefix="!")
 f = open("key.txt", 'r')
 key = f.readline()
 

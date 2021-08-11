@@ -1607,13 +1607,13 @@ class Draft(commands.Cog):
                                 print(st)
                                 temp = st[i]                # 랜덤으로 선발해
                                 a_team.append(temp)         # A팀으로 배분 후
-                                st.remove(temp)             # ST 리스트에서 제거
+                                del st[i]             # ST 리스트에서 제거
                         # B팀
                         if b_queue[0] > 0:
                             for i in range(0, b_queue[0]):
                                 temp = st[i]
                                 b_team.append(temp)
-                                st.remove(temp)
+                                del st[i]
                         # 대기열 정리
                         for j in range(len(st)):
                             queue.append(st[j])
@@ -1628,13 +1628,13 @@ class Draft(commands.Cog):
                             for i in range(b_queue[1]):
                                 temp = lw[i]
                                 b_team.append(temp)
-                                lw.remove(temp)
+                                del lw[i]
                         # A팀
                         if a_queue[1] > 0:
                             for i in range(a_queue[1]):
                                 temp = lw[i]
                                 a_team.append(temp)
-                                lw.remove(temp)
+                                del lw[i]
                         # 대기열 정리
                         for j in range(len(lw)):
                             queue.append(lw[j])
@@ -1650,13 +1650,13 @@ class Draft(commands.Cog):
                             for i in range(a_queue[2]):
                                 temp = rw[i]
                                 a_team.append(temp)
-                                rw.remove(temp)
+                                del rw[i]
                         # B팀
                         if b_queue[2] > 0:
                             for i in range(b_queue[2]):
                                 temp = rw[i]
                                 b_team.append(temp)
-                                rw.remove(temp)
+                                del rw[i]
                         for j in range(len(rw)):
                             queue.append(rw[j])
                     except:
@@ -1672,13 +1672,13 @@ class Draft(commands.Cog):
                             for i in range(b_queue[3]):
                                 temp = cam[i]
                                 b_team.append(temp)
-                                cam.remove(temp)
+                                del cam[i]
                         # A팀
                         if a_queue[3] > 0:
                             for i in range(a_queue[3]):
                                 temp = cam[i]
                                 a_team.append(temp)
-                                cam.remove(temp)
+                                del cam[i]
 
                         for j in range(len(cam)):
                             queue.append(cam[j])
@@ -1693,13 +1693,13 @@ class Draft(commands.Cog):
                             for i in range(a_queue[4]):
                                 temp = cm[i]
                                 a_team.append(temp)
-                                cm.remove(temp)
+                                del cm[i]
                         # B팀
                         if b_queue[4] > 0:
                             for i in range(b_queue[4]):
                                 temp = cm[i]
                                 b_team.append(temp)
-                                cm.remove(temp)
+                                del cm[i]
                         for j in range(len(cm)):
                             queue.append(cm[j])
                     except:
@@ -1713,13 +1713,13 @@ class Draft(commands.Cog):
                             for i in range(b_queue[5]):
                                 temp = cdm[i]
                                 b_team.append(temp)
-                                cdm.remove(temp)
+                                del cdm[i]
                         # A팀
                         if a_queue[5] > 0:
                             for i in range(a_queue[5]):
                                 temp = cdm[i]
                                 a_team.append(temp)
-                                cdm.remove(temp)
+                                del cdm[i]
 
                         for j in range(len(cdm)):
                             queue.append(cdm[j])
@@ -1734,13 +1734,13 @@ class Draft(commands.Cog):
                             for i in range(a_queue[6]):
                                 temp = lb[i]
                                 a_team.append(temp)
-                                lb.remove(temp)
+                                del lb[i]
                         # B팀
                         if b_queue[6] > 0:
                             for i in range(b_queue[6]):
                                 temp = lb[i]
                                 b_team.append(temp)
-                                lb.remove(temp)
+                                del lb[i]
                         for j in range(len(lb)):
                             queue.append(lb[j])
                     except:
@@ -1754,13 +1754,13 @@ class Draft(commands.Cog):
                             for i in range(b_queue[7]):
                                 temp = cb[i]
                                 b_team.append(temp)
-                                cb.remove(temp)
+                                del cb[i]
                         # A팀
                         if a_queue[7] > 0:
                             for i in range(a_queue[7]):
                                 temp = cb[i]
                                 a_team.append(temp)
-                                cb.remove(temp)
+                                del cb[i]
 
                         for j in range(len(cb)):
                             queue.append(cb[j])
@@ -1776,13 +1776,13 @@ class Draft(commands.Cog):
                             for i in range(a_queue[8]):
                                 temp = rb[i]
                                 a_team.append(temp)
-                                rb.remove(temp)
+                                del rb[i]
                         # B팀
                         if b_queue[8] > 0:
                             for i in range(b_queue[8]):
                                 temp = rb[i]
                                 b_team.append(temp)
-                                rb.remove(temp)
+                                del rb[i]
                         for j in range(len(rb)):
                             queue.append(rb[j])
                     except:
@@ -1796,13 +1796,13 @@ class Draft(commands.Cog):
                             for i in range(b_queue[9]):
                                 temp = gk[i]
                                 b_team.append(temp)
-                                gk.remove(temp)
+                                del gk[i]
                         # A팀
                         if a_queue[9] > 0:
                             for i in range(a_queue[9]):
                                 temp = gk[i]
                                 a_team.append(temp)
-                                gk.remove(temp)
+                                del gk[i]
 
                         for j in range(len(gk)):
                             queue.append(gk[j])
