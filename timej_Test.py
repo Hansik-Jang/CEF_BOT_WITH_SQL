@@ -12,10 +12,10 @@ key = f.readline()
 
 @bot.command(name="테스트")
 async def copy_info(ctx):
-    nick = convertNick(ctx)
-    jupo = convertJupo(ctx)
-    bupo = convertBupo(ctx)
-    exclude = assembleIncludeBupo(ctx)
+    nick = getNickFromDisplayname(ctx)(ctx)
+    jupo = getJupoFromDisplayname(ctx)
+    bupo = getBupoFromDisplayname(ctx)
+    exclude = fitIncludeBupo(ctx)
     await ctx.send(f"{exclude}")
 
 

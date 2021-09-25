@@ -1,36 +1,59 @@
-def convertNick(ctx):
+import string
+
+def getNickFromDisplayname(ctx):
     temp = ctx.author.display_name.split('[')
     nickname = temp[0].strip()
     return nickname
 
-def convertJupo(ctx):
+def getJupoFromDisplayname(ctx):
     a = ctx.author.display_name.split('[')
     temp = a[1]
     if '/' in ctx.author.display_name:
         b = temp.split('/')
-        jupo = b[0]
+        jupo = b[0].upper()
         return jupo
     else:
         b = temp.split(']')
-        jupo = b[0]
+        jupo = b[0].upper()
         return jupo
 
-def convertBupo(ctx):
-    a = ctx.author.display_name.split('/')
-    temp = a[1]
-    b = temp.split(']')
-    bupo = b[0]
-    return bupo
+def getBupoFromDisplayname(ctx):
+    if '/' in ctx.author.display_name:
+        a = ctx.author.display_name.split('/')
+        temp = a[1]
+        b = temp.split(']')
+        bupo = b[0].upper()
+        return bupo
+    else:
+        return '없음'
 
-def assembleExcludeBupo(ctx):
-    nickname = convertNick(ctx)
-    jupo = convertJupo(ctx)
+def eraseBlackNick(nickname):
+    if ' ' in nickname:
+        nickname = nickname.replace(' ', '')
+        return nickname
+    else:
+        return nickname
+
+def fitExcludeBupo(ctx):
+    nickname = getNickFromDisplayname(ctx)
+    jupo = getJupoFromDisplayname(ctx)
     result = nickname + "[" + jupo + "]"
     return result
 
-def assembleIncludeBupo(ctx):
-    nickname = convertNick(ctx)
-    jupo = convertJupo(ctx)
-    bupo = convertBupo(ctx)
+def fitIncludeBupo(ctx):
+    nickname = getNickFromDisplayname(ctx)
+    jupo = getJupoFromDisplayname(ctx)
+    bupo = getBupoFromDisplayname(ctx)
     result = nickname + "[" + jupo + "/" + bupo + "]"
     return result
+
+def printDump(conn):
+    # Dump 출력
+    # 데이터베이스 백업
+    with conn:
+        with open('./resource/dump.sql', 'w') as f:
+            for line in conn.iterdump():
+                f.write('%s\n' % line)
+            print('DumpPrint Complete')
+
+    # f.close(), conn.close()
