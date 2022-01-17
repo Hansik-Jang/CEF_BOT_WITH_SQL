@@ -40,7 +40,7 @@ def checkRejoin(ctx):
         cur = conn.cursor()
         cur.execute("SELECT * FROM User_Info")
         for row in cur.fetchall():
-            print(row[0], row[2])
+            print(ctx.author.id, row[0])
             if ctx.author.id == row[0]:
                 result = True           # 중복이면 True
                 break

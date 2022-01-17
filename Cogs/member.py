@@ -15,33 +15,53 @@ class Member(commands.Cog):
     @commands.command(name='가입', pass_context=True, aliases=['join', 'Join'])
     async def _join(self, ctx):
         # 닉네임 양식 검사
+        print("양식 검사", checkFun.checkNicknameForm(ctx))
         if checkFun.checkNicknameForm(ctx):
-            print("양식 검사", checkFun.checkNicknameForm(ctx))
             # 닉네임 중복 여부 검사
+            print("중복 검사", checkFun.checkNicknameOverlap(ctx))
             if not checkFun.checkNicknameOverlap(ctx):
-                print("중복 검사", checkFun.checkNicknameOverlap(ctx))
                 # 신규, 재가입 여부 검사
+                print("재가입 검사", checkFun.checkRejoin(ctx))
                 if not checkFun.checkRejoin(ctx):
-                    print("재가입 검사", checkFun.checkRejoin(ctx))
-                #-------------------- User_Info 테이블 입력 --------------------
-                id = ctx.author.id
-                join_date = int(str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) +\
-                                str(datetime.now().hour) + str(datetime.now().minute) + str(datetime.now().second))
-                nickname = getNickFromDisplayname(ctx)
-                jupo = getJupoFromDisplayname(ctx)
-                bupo = getBupoFromDisplayname(ctx)
-                team = "무소속"
-                Exteam = "없음"
-                absent = ""
-                # DB 작업
-                try:
-                    conn = sqlite3.connect("CEF.db")
-                    cur = conn.cursor()
-                    cur.execute("INSERT INTO User_Info VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (id, join_date, nickname, jupo, bupo, team, Exteam, absent))
-                    print('a')
-                    conn.commit()
-                finally:
-                    conn.close()
+                    # 신규 유저 User_Info 정보 입력
+                    id = ctx.author.id
+                    join_date = int(str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) +\
+                                    str(datetime.now().hour) + str(datetime.now().minute) + str(datetime.now().second))
+                    nickname = getNickFromDisplayname(ctx)
+                    jupo = getJupoFromDisplayname(ctx)
+                    bupo = getBupoFromDisplayname(ctx)
+                    team = "무소속"
+                    Exteam = "없음"
+                    absent = ""
+                    # DB 작업
+                    try:
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO User_Info VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (id, join_date, nickname, jupo, bupo, team, Exteam, absent))
+                        print('가입 성공')
+                        conn.commit()
+                    finally:
+                        conn.close()
+                else:
+                    # 재가입 유저 User_Info 정보 입력
+                    id = ctx.author.id
+                    join_date = int(str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) + \
+                                    str(datetime.now().hour) + str(datetime.now().minute) + str(datetime.now().second))
+                    nickname = getNickFromDisplayname(ctx)
+                    jupo = getJupoFromDisplayname(ctx)
+                    bupo = getBupoFromDisplayname(ctx)
+                    team = "무소속"
+                    Exteam = "없음"
+                    absent = ""
+                    # DB 작업
+                    try:
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        c.execute("UPDATE User_Info SET name=? WHERE id=?", (getNickFromDisplayname(ctx), ctx.author.id))
+                        print('가입 성공')
+                        conn.commit()
+                    finally:
+                        conn.close()
 
     @commands.command(name='탈퇴', pass_context=True, aliases=['Withdrawal', 'withdrawal'])
     async def _withdrawal(self, ctx):
