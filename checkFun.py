@@ -6,27 +6,42 @@ def checkNicknameForm(ctx):
     else:
         return False
 
+def checkEnglish(name1, name2):
+    if str(name1).lower() != str(name2).upper():  # 대소문자가 다르면 영어
+        return True
+    else:                               # 대소문자가 같으면 한글
+        return False
 
 def checkNicknameOverlap(ctx):
     import sqlite3
     result = False
+    temp = ''
     try:
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM User_Info")
         for row in cur.fetchall():
-#           print(row)
-            print(getNickFromDisplayname(ctx), row[2])
-            if getNickFromDisplayname(ctx) == row[2]:
-                result = True           # 중복이면 True
-                break
-                #print('a')
-            else:
-                #print('b')
-                result = False          # 중복 아니면 False
+            #print(row)
+            if checkEnglish(getNickFromDisplayname(ctx), row[2]):  # 영문인지 검사
+                if getNickFromDisplayname(ctx).lower() == row[2].lower():
+                    temp = '중복 O'
+                    result = True           # 중복이면 True
+                    print(getNickFromDisplayname(ctx), row[2], temp)
+                    break
+                    #print('a')
+                else:
+                    #print('b')
+                    temp = '중복 X'
+                    result = False          # 중복 아니면 False
+                    print(getNickFromDisplayname(ctx), row[2], temp)
         #print("----\n")
         #print(result)
-
+            else:
+                pass
+        if result:
+            print("영문 닉")
+        else:
+            print("한글 닉")
         return result
     finally:
         conn.close()
@@ -40,7 +55,7 @@ def checkRejoin(ctx):
         cur = conn.cursor()
         cur.execute("SELECT * FROM User_Info")
         for row in cur.fetchall():
-            print(ctx.author.id, row[0])
+            #print(ctx.author.id, row[0])
             if ctx.author.id == row[0]:
                 result = True           # 중복이면 True
                 break
