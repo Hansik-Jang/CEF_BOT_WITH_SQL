@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-class Body(commands.Cog):
+class Transfer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -11,4 +11,4 @@ class Body(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Body(bot))
+    bot.add_cog(Transfer(bot))

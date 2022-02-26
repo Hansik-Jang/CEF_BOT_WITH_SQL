@@ -1,5 +1,6 @@
 from myfun import *
 
+
 def makeListFromList(li):
     text = ''
     for i in range(len(li)):
@@ -17,10 +18,10 @@ def ForEmbedFromList(li):
     if len(li) == 0:
         temp = 'X'
     else:
-
         for i in range(len(li)):
             if i == len(li):
-                temp = temp + str(i+1) + "." + li[i]
+                temp = temp + str(i + 1) + "." + li[i]
             else:
-                temp = temp + str(i+1) + ". " + li[i] + "\n"
+                temp = temp + str(i + 1) + ". " + li[i] + "\n"
+
     return temp

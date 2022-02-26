@@ -6,6 +6,7 @@ import os
 import discord
 import time
 from discord.ext import commands
+import discord_ui
 import gspread
 import sqlite3
 from datetime import datetime, timedelta
@@ -13,7 +14,6 @@ from datetime import datetime, timedelta
 bot = commands.Bot(command_prefix="$")
 f = open("key.txt", 'r')
 key = f.readline()
-
 
 @bot.command(name="테스트")
 async def copy_info(ctx):
