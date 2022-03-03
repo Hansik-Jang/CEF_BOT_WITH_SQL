@@ -94,9 +94,11 @@ class Draft(commands.Cog):
         global TeamA
         global TeamB
         global CURRENT_DRAFT_COUNT
+        global switch
         CURRENT_DRAFT_COUNT = 2
         CURRENT_DRAFT_PLAYER = 22
         print(entry)
+        switch = 0
 
         entry.clear()
         captain.clear()
