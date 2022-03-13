@@ -1,4 +1,6 @@
 from myfun import *
+from Cogs.draft import *
+import discord
 
 
 def makeListFromList(li):
@@ -25,3 +27,16 @@ def ForEmbedFromList(li):
                 temp = temp + str(i + 1) + ". " + li[i] + "\n"
 
     return temp
+
+def makeListFromList2(li):
+    text = ''
+    for i in range(len(li)):
+        if i == len(li) or i == 0:
+            text = text + getNickFromDisplayname2(li[i].display_name)
+        else:
+            text = text + ', ' + getNickFromDisplayname2(li[i].display_name)
+
+    text = text + ''
+    return text
+
+

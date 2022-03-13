@@ -6,15 +6,17 @@ def checkNicknameForm(ctx):
     else:
         return False
 
-def checkEnglish(name1, name2):
-    if str(name1).lower() != str(name2).upper():  # 대소문자가 다르면 영어
-        return True
-    else:                               # 대소문자가 같으면 한글
+def checkEnglish(ctx):
+    print(getNickFromDisplayname(ctx).lower(), getNickFromDisplayname(ctx).upper())
+    print(getNickFromDisplayname(ctx).lower() == getNickFromDisplayname(ctx).upper())
+    if str(ctx.author.display_name).lower() == str(ctx.author.display_name).upper():  # 대소문자가 같으면 한글
         return False
+    else:                             # 대소문자가 다르면 영어
+        return True
 
 def checkNicknameOverlap(ctx):
     import sqlite3
-    result = False
+    result = True
     temp = ''
     try:
         conn = sqlite3.connect("CEF.db")
@@ -22,26 +24,19 @@ def checkNicknameOverlap(ctx):
         cur.execute("SELECT * FROM User_Info")
         for row in cur.fetchall():
             #print(row)
-            if checkEnglish(getNickFromDisplayname(ctx), row[2]):  # 영문인지 검사
-                if getNickFromDisplayname(ctx).lower() == row[2].lower():
-                    temp = '중복 O'
-                    result = True           # 중복이면 True
-                    print(getNickFromDisplayname(ctx), row[2], temp)
-                    break
-                    #print('a')
-                else:
-                    #print('b')
-                    temp = '중복 X'
-                    result = False          # 중복 아니면 False
-                    print(getNickFromDisplayname(ctx), row[2], temp)
+            if getNickFromDisplayname(ctx).lower() == row[2].lower():
+                temp = '중복 O'
+                result = False           # 중복이면 True
+                print(getNickFromDisplayname(ctx), row[2], temp)
+                break
+                #print('a')
+            else:
+                #print('b')
+                temp = '중복 X'
+                result = True          # 중복 아니면 False
+                print(getNickFromDisplayname(ctx), row[2], temp)
         #print("----\n")
         #print(result)
-            else:
-                pass
-        if result:
-            print("영문 닉")
-        else:
-            print("한글 닉")
         return result
     finally:
         conn.close()
@@ -49,7 +44,7 @@ def checkNicknameOverlap(ctx):
 
 def checkRejoin(ctx):
     import sqlite3
-    result = False
+    result = True
     try:
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
@@ -57,12 +52,12 @@ def checkRejoin(ctx):
         for row in cur.fetchall():
             #print(ctx.author.id, row[0])
             if ctx.author.id == row[0]:
-                result = True           # 중복이면 True
+                result = False           # 중복이면 True
                 break
                 #print('a')
             else:
                 #print('b')
-                result = False          # 중복 아니면 False
+                result = True          # 중복 아니면 False
         #print("----\n")
         #print(result)
 

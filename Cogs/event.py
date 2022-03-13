@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord_components import DiscordComponents
 
 class Event(commands.Cog):
     def __init__(self, bot):
@@ -17,7 +18,6 @@ class Event(commands.Cog):
         print('------')
         game = discord.Game("테스트 봇/개발 중")
         await self.bot.change_presence(status=discord.Status.online, activity=game)
-
 
 def setup(bot):
     bot.add_cog(Event(bot))

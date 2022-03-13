@@ -9,11 +9,29 @@ from discord.ext import commands
 import discord_ui
 import gspread
 import sqlite3
+from discord_components import DiscordComponents, Button, ButtonStyle, Interaction, component
 from datetime import datetime, timedelta
 
 bot = commands.Bot(command_prefix="$")
 f = open("key.txt", 'r')
 key = f.readline()
+
+
+@bot.event
+async def on_ready():
+    DiscordComponents(bot)
+
+@bot.command()
+async def testButton(ctx):
+  ticket = await ctx.send(
+      "_ _",
+      components = [
+          Button(label = "Test", style=ButtonStyle.blue, custom_id="test")
+      ]
+  )
+  interaction = await bot.wait_for("button_click", check = lambda i: i.custom_id == "test")
+  embed=discord.Embed(title="Test")
+  await interaction.respond(embed=embed)
 
 @bot.command(name="테스트")
 async def copy_info(ctx):

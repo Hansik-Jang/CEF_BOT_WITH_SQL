@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+
 class Transfer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
