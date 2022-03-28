@@ -17,21 +17,15 @@ f = open("key.txt", 'r')
 key = f.readline()
 
 
-@bot.event
-async def on_ready():
-    DiscordComponents(bot)
 
-@bot.command()
-async def testButton(ctx):
-  ticket = await ctx.send(
-      "_ _",
-      components = [
-          Button(label = "Test", style=ButtonStyle.blue, custom_id="test")
-      ]
-  )
-  interaction = await bot.wait_for("button_click", check = lambda i: i.custom_id == "test")
-  embed=discord.Embed(title="Test")
-  await interaction.respond(embed=embed)
+
+
+@bot.command(name='스위치조회')
+async def _testS(ctx):
+    if DEVELOPER_SWITCH:
+        await ctx.send("현재 상태 True")
+    else:
+        await ctx.send("현재 상태 False")
 
 @bot.command(name="테스트")
 async def copy_info(ctx):
@@ -54,129 +48,6 @@ async def copy_info(ctx):
                    f"초 : {str(datetime.now().second)}\n"
                    f"{temp}")
     print(type(datetime.now().year))
-    '''jupo = ''
-    bupo = ''
-    pos_li = ['st', 'lw', 'rw', 'cam', 'cm', 'cdm', 'lb', 'cb', 'rb', 'gk']
-    # ------------------------- 주포지션 ----------------------------------
-    jupo_msg = await ctx.channel.send("```주포지션을 입력하세요. 아래에 표기된 포지션만 입력 가능합니다.\n"
-                           "ST, LW, RW, CAM, CM, CDM, LB, CB, RB, GK```")
-    try:
-        msg = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
-                                 timeout=10.0)
-
-    except asyncio.TimeoutError:
-        await ctx.channel.send("시간 초과")
-    else:
-        if msg.content.lower() == 'st':
-            await msg.delete()
-            await ctx.send("ST 선택")
-            jupo = 'ST'
-        elif msg.content.lower() == 'lw':
-            await msg.delete()
-            await ctx.send("LW 선택")
-            jupo = 'LW'
-        elif msg.content.lower() == 'rw':
-            await msg.delete()
-            await ctx.send("RW 선택")
-            jupo = 'RW'
-        elif msg.content.lower() == 'cam':
-            await msg.delete()
-            await ctx.send("CAM 선택")
-            jupo = 'CAM'
-        elif msg.content.lower() == 'CM':
-            await msg.delete()
-            await ctx.send("CM 선택")
-            jupo = 'CM'
-        elif msg.content.lower() == 'cdm':
-            await msg.delete()
-            await ctx.send("CDM 선택")
-            jupo = 'CDM'
-        elif msg.content.lower() == 'lb':
-            await msg.delete()
-            await ctx.send("LB 선택")
-            jupo = 'LB'
-        elif msg.content.lower() == 'cb':
-            await msg.delete()
-            await ctx.send("CB 선택")
-            jupo = 'CB'
-        elif msg.content.lower() == 'rb':
-            await msg.delete()
-            await ctx.send("RB 선택")
-            jupo = 'RB'
-        elif msg.content.lower() == 'gk':
-            await msg.delete()
-            await ctx.send("GK 선택")
-            jupo = 'GK'
-        else:
-            await ctx.send("잘못 입력")
-    await jupo_msg.delete()
-    # ------------------------- 부포지션 ----------------------------------
-    bupo_msg = await ctx.channel.send("```부포지션을 입력하세요. 아래에 표기된 포지션만 입력 가능합니다.\n"
-                           "ST, LW, RW, CAM, CM, CDM, LB, CB, RB, GK```")
-    try:
-        msg = await bot.wait_for("message", check=lambda m: m.author == ctx.author and m.channel == ctx.channel,
-                                 timeout=10.0)
-    except asyncio.TimeoutError:
-        await ctx.channel.send("시간 초과")
-    else:
-        if msg.content.lower() == 'st':
-            await msg.delete()
-            await ctx.send("ST 선택")
-            bupo = 'ST'
-        elif msg.content.lower() == 'lw':
-            await msg.delete()
-            await ctx.send("LW 선택")
-            bupo = 'LW'
-        elif msg.content.lower() == 'rw':
-            await msg.delete()
-            await ctx.send("RW 선택")
-            bupo = 'RW'
-        elif msg.content.lower() == 'cam':
-            await msg.delete()
-            await ctx.send("CAM 선택")
-            bupo = 'CAM'
-        elif msg.content.lower() == 'cm':
-            await msg.delete()
-            await ctx.send("CM 선택")
-            bupo = 'CM'
-        elif msg.content.lower() == 'cdm':
-            await msg.delete()
-            await ctx.send("CDM 선택")
-            bupo = 'CDM'
-        elif msg.content.lower() == 'lb':
-            await msg.delete()
-            await ctx.send("LB 선택")
-            bupo = 'LB'
-        elif msg.content.lower() == 'cb':
-            await msg.delete()
-            await ctx.send("CB 선택")
-            bupo = 'CB'
-        elif msg.content.lower() == 'rb':
-            await msg.delete()
-            await ctx.send("RB 선택")
-            bupo = 'RB'
-        elif msg.content.lower() == 'gk':
-            await msg.delete()
-            await ctx.send("GK 선택")
-            bupo = 'GK'
-        elif msg.content.lower() == 'x' or msg.content == '없음':
-            await msg.delete()
-            await ctx.send("없음 선택")
-            bupo = '없음'
-        else:
-            await ctx.send("잘못 입력")
-    await bupo_msg.delete()
-    await ctx.send(content=f"```<입력한 정보>\n"
-                           f"주포지션 : {jupo}\n"
-                           f"부포지션 : {bupo}```")
-    # ------------------------- 닉네임 변환 ----------------------------------
-    if bupo == '':
-        nickname = myfun.getNickFromDisplayname(ctx) + "[" + jupo + "]" + myfun.getImojiFromDisplayname(ctx)
-    else:
-        nickname = myfun.getNickFromDisplayname(ctx) + "[" + jupo + "/" + bupo + "]" + myfun.getImojiFromDisplayname(ctx)
-    await ctx.send(nickname)
-    user = ctx.author
-    await user.edit(nick=nickname)'''
 
 
 @bot.command(name="로드", aliases=["load"])

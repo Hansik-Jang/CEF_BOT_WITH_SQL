@@ -2,12 +2,13 @@ import discord
 from datetime import datetime, timedelta
 import sqlite3
 import checkFun
+import asyncio
 from myfun import *
 from discord.ext import commands
 from discord.utils import get
 import string
 import config
-
+global DEVELOPER_SWITCH
 
 class Member(commands.Cog):
     def __init__(self, bot):
@@ -125,19 +126,123 @@ class Member(commands.Cog):
         finally:
             conn.close()
 
-    @commands.command(name='리셋', pass_context=True, aliases=['reset', 'Reset'])
-    async def _reset(self, ctx):
-        try :
-            conn = sqlite3.connect("CEF.db")
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM User_Info")
-            for row in cur.fetchall() :
-                print(row[2])
-        finally :
-            conn.close()
+    @commands.command(name='포지션변경', pass_context=True, aliases=['reset', 'Reset'])
+    async def _changeJupo(self, ctx):
 
-    @commands.command(name='삭제', pass_context=True)
-    async def _search(self, ctx):
+        if DEVELOPER_SWITCH and ctx.author.id in config.DEVELOPER_LIST:
+            jupo = ''
+            bupo = ''
+            checkJupo = True
+            checkBupo = True
+            await ctx.send(content=f"{ctx.author.mention}\n"
+                                   f"```주포지션 정보를 변경합니다.\n"
+                                   f"주포지션을 선택해주세요\n"
+                                   "1. ST\n"
+                                   "2. LW\n"
+                                   "3. RW\n"
+                                   "4. CAM\n"
+                                   "5. CM\n"
+                                   "6. CDM\n"
+                                   "7. LB\n"
+                                   "8. CB\n"
+                                   "9. RB\n"
+                                   "10. GK\n```")
+            try:
+                msg = await self.bot.wait_for("message", check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
+                                             timeout=10.0)
+            except asyncio.TimeoutError:
+                checkJupo = False
+                await ctx.channel.send("시간 초과")
+            else:
+                if msg.content.lower() == '1' :
+                    jupo = 'ST'
+                elif msg.content.lower() == '2' :
+                    jupo = 'LW'
+                elif msg.content.lower() == '3' :
+                    jupo = 'RW'
+                elif msg.content.lower() == '4' :
+                    jupo = 'CAM'
+                elif msg.content.lower() == '5' :
+                    jupo = 'CM'
+                elif msg.content.lower() == '6' :
+                    jupo = 'CDM'
+                elif msg.content.lower() == '7' :
+                    jupo = 'LB'
+                elif msg.content.lower() == '8' :
+                    jupo = 'CB'
+                elif msg.content.lower() == '9' :
+                    jupo = 'RB'
+                elif msg.content.lower() == '10' :
+                    jupo = 'GK'
+            if checkJupo:
+                await msg.reply(content=f"```입력하신 주포지션은 '{jupo}'입니다.\n"
+                                        f"부포지션을 선택해주세요.\n"
+                                        "1. ST\n"
+                                        "2. LW\n"
+                                        "3. RW\n"
+                                        "4. CAM\n"
+                                        "5. CM\n"
+                                        "6. CDM\n"
+                                        "7. LB\n"
+                                        "8. CB\n"
+                                        "9. RB\n"
+                                        "10. GK\n"
+                                        "11. 없음```")
+                try:
+                    msg2 = await self.bot.wait_for("message",
+                                                  check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
+                                                  timeout=10.0)
+                except asyncio.TimeoutError:
+                    checkBupo = False
+                    await ctx.channel.send("시간 초과")
+                else :
+                    if msg2.content.lower() == '1':
+                        bupo = 'ST'
+                    elif msg2.content.lower() == '2':
+                        bupo = 'LW'
+                    elif msg2.content.lower() == '3':
+                        bupo = 'RW'
+                    elif msg2.content.lower() == '4':
+                        bupo = 'CAM'
+                    elif msg2.content.lower() == '5':
+                        bupo = 'CM'
+                    elif msg2.content.lower() == '6':
+                        bupo = 'CDM'
+                    elif msg2.content.lower() == '7':
+                        bupo = 'LB'
+                    elif msg2.content.lower() == '8':
+                        bupo = 'CB'
+                    elif msg2.content.lower() == '9':
+                        bupo = 'RB'
+                    elif msg2.content.lower() == '10':
+                        bupo = 'GK'
+                    elif msg2.content.lower() == '11':
+                        bupo = '없음'
+            else:
+                await ctx.send(content=f"{ctx.author.mention}\n"
+                                       f"처음부터 다시 시도해주세요.")
+            if checkBupo:
+                if jupo == bupo:
+                    await ctx.send(content=f"{ctx.author.mention}\n"
+                                           f"입력한 주포지션과 부포지션이 같습니다.\n"
+                                           f"처음부터 다시 시도해주세요")
+                else:
+                    if bupo == '없음':
+                        nick = getNickFromDisplayname(ctx) + "[" + jupo + "]" + getImojiFromDisplayname(ctx)
+                    else:
+                        nick = getNickFromDisplayname(ctx) + "[" + jupo + "/" + bupo + "]" + getImojiFromDisplayname(ctx)
+                    user = ctx.author
+                    await user.edit(nick=nick)
+
+
+            else :
+                await ctx.send(content=f"{ctx.author.mention}\n"
+                                       f"처음부터 다시 시도해주세요.")
+        else:
+            await ctx.send("현재 개발자모드로 개발자만 사용가능합니다.")
+
+    @commands.command(name='데이터삭제', pass_context=True)
+    async def _deleteData(self, ctx):
         try:
             conn = sqlite3.connect("CEF.db")
             cur = conn.cursor()
