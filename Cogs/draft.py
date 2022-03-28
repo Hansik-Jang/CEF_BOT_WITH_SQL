@@ -79,19 +79,19 @@ class Draft(commands.Cog) :
 
 
     def editSwitchTwo(self):
-        if switch == True:
+        if self.DraftSwitchTwo:
             self.DraftSwitchTwo = False
         else:
             self.DraftSwitchTwo = True
 
     def editSwitchThree(self):
-        if switch == True:
+        if self.DraftSwitchThree:
             self.DraftSwitchThree = False
         else:
             self.DraftSwitchThree = True
 
     def editSwitchFour(self):
-        if switch == True:
+        if self.DraftSwitchFour:
             self.DraftSwitchFour = False
         else:
             self.DraftSwitchFour = True
@@ -231,6 +231,9 @@ class Draft(commands.Cog) :
         print(tempNumList)
         print(captainmention)
 
+        for i in range(len(captainmention)):
+            await ctx.send(content=f"{captainmention[i].mention} - {tempNumList[i]}")
+
         if self.DraftSwitchTwo :
             FirstNum = max(tempNumList)
             tempNumList.remove(FirstNum)
@@ -311,7 +314,7 @@ class Draft(commands.Cog) :
                 await draft.add_reaction(pos)
 
             cd = await ctx.send("카운트 다운")
-            for i in range(0, DRAFT_TIME) :
+            for i in range(0, DRAFT_TIME):
                 j = DRAFT_TIME - i
                 await cd.edit(content=f"{j}초 남았습니다. 누른 사람 : {len(testentry)}명")
                 time.sleep(1)
@@ -344,7 +347,6 @@ class Draft(commands.Cog) :
     async def _선택(self, ctx, member: discord.Member):
         global CURRENT_DRAFT_COUNT
         global CURRENT_DRAFT_PLAYER_MAX
-        await ctx.message.delete()
         print(testentry)
         for name in testentry:
             print(name)
@@ -835,7 +837,7 @@ class Draft(commands.Cog) :
         count = await ctx.send("카운트 다운")
         #for i in range(0, CAP_TIME) :
         for i in range(0, 5) :
-            j = CAP_TIME - i
+            j = 5 - i
             await count.edit(content=f"{j}초 남았습니다.")
             time.sleep(1)
 

@@ -7,12 +7,10 @@ def checkNicknameForm(ctx):
         return False
 
 def checkEnglish(ctx):
-    print(getNickFromDisplayname(ctx).lower(), getNickFromDisplayname(ctx).upper())
-    print(getNickFromDisplayname(ctx).lower() == getNickFromDisplayname(ctx).upper())
-    if str(ctx.author.display_name).lower() == str(ctx.author.display_name).upper():  # 대소문자가 같으면 한글
-        return False
-    else:                             # 대소문자가 다르면 영어
+    if 'a' <= getNickFromDisplayname(ctx)[0].lower() <= 'z':
         return True
+    else:                             # 대소문자가 다르면 영어
+        return False
 
 def checkNicknameOverlap(ctx):
     import sqlite3
