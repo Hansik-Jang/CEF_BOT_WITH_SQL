@@ -16,7 +16,7 @@ bot = commands.Bot(command_prefix="$")
 f = open("key.txt", 'r')
 key = f.readline()
 
-
+DEVELOPER_SWITCH = True
 
 
 

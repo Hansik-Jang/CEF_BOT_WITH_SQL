@@ -77,3 +77,17 @@ def printDump(conn):
             print('DumpPrint Complete')
 
     # f.close(), conn.close()
+
+def teamNameConvert(name):
+    if name == "A" or name == 'a' or name == 'TEAM_A':
+        return 'TEAM_A'
+    elif name == "B" or name == 'b' or name == 'TEAM_B':
+        return 'TEAM_B'
+    elif name == "C" or name == 'c' or name == 'TEAM_C':
+        return 'TEAM_C'
+    elif name == "D" or name == 'd' or name == 'TEAM_D':
+        return 'TEAM_D'
+    elif name == "E" or name == 'e' or name == 'TEAM_E':
+        return 'TEAM_E'
+    else:
+        return 'error'
