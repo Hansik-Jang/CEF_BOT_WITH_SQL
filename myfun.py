@@ -24,6 +24,19 @@ def getJupoFromDisplayname(ctx):
         jupo = b[0].upper()
         return jupo
 
+# display_name으로부터 주포지션 정보 얻기
+def getJupoFromDisplayname2(name):
+    a = name.split('[')
+    temp = a[1]
+    if '/' in name:
+        b = temp.split('/')
+        jupo = b[0].upper()
+        return jupo
+    else:
+        b = temp.split(']')
+        jupo = b[0].upper()
+        return jupo
+
 # display_name으로부터 부포지션 정보 얻기
 def getBupoFromDisplayname(ctx):
     if '/' in ctx.author.display_name:

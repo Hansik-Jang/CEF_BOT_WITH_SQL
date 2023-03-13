@@ -27,28 +27,6 @@ async def _testS(ctx):
     else:
         await ctx.send("현재 상태 False")
 
-@bot.command(name="테스트")
-async def copy_info(ctx):
-    nick = getNickFromDisplayname(ctx)
-    jupo = getJupoFromDisplayname(ctx)
-    bupo = getBupoFromDisplayname(ctx)
-    if bupo == '없음':
-        exclude = fitExcludeBupo(ctx)
-    else:
-        exclude = fitIncludeBupo(ctx)
-    temp = int(
-        str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) + str(datetime.now().hour) + str(
-            datetime.now().minute) + str(datetime.now().second))
-    await ctx.send(f"{exclude}\n")
-    await ctx.send(f"년 : {str(datetime.now().year)}\n"
-                   f"월 : {str(datetime.now().month)}\n"
-                   f"일 : {str(datetime.now().day)}\n"
-                   f"시 : {str(datetime.now().hour)}\n"
-                   f"분 : {str(datetime.now().minute)}\n"
-                   f"초 : {str(datetime.now().second)}\n"
-                   f"{temp}")
-    print(type(datetime.now().year))
-
 
 @bot.command(name="로드", aliases=["load"])
 async def load_commands(ctx, extension):
