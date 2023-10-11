@@ -19,7 +19,6 @@ key = f.readline()
 DEVELOPER_SWITCH = True
 
 
-
 @bot.command(name='스위치조회')
 async def _testS(ctx):
     if DEVELOPER_SWITCH:
@@ -60,30 +59,3 @@ for filename in os.listdir('Cogs'):
         print(f"Cogs.{filename[:-3]} 로드")
 
 bot.run(key)
-
-'''
-@bot.command(name="정보이동")
-async def copy_info(ctx):
-    cell = worksheet_list.acell('a1').value
-    join = worksheet_list.range('B2:B' + cell)
-    id = worksheet_list.range('D2:D' + cell)
-    name = worksheet_list.range('E2:E' + cell)
-    jupo = worksheet_list.range('F2:F' + cell)
-    bupo = worksheet_list.range('G2:G' + cell)
-    team = worksheet_list.range('H2:H' + cell)
-
-    conn = sqlite3.connect('test.db')
-    cur = conn.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS Main(Join_Date TEXT, ID_Num TEXT, Nickname TEXT, \
-                Jupo TEXT, Bupo TEXT, Team TEXT)')
-
-    for i in range(len(id)):
-        cur.execute('insert into Main(Join_Date, ID_Num, Nickname, Jupo, Bupo, Team) values(?, ?, ?, ?, ?, ?)',
-                    (join[i].value, id[i].value, name[i].value, jupo[i].value, bupo[i].value, team[i].value))
-        print(i, join[i].value, id[i].value, name[i].value, jupo[i].value, bupo[i].value, team[i].value)
-
-    conn.commit()
-    print('a')
-    cur.close()
-    conn.close()
-'''

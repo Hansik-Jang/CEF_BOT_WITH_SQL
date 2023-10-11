@@ -3,6 +3,8 @@ from discord.ext import commands
 from discord.utils import get
 import random
 import myfun
+import config
+import sqlite3
 
 
 class Others(commands.Cog):
@@ -13,82 +15,79 @@ class Others(commands.Cog):
     async def _copypermission(self, ctx, name):
         pass
 
-    @commands.command(name='포지션현황', aliases=["현황"], pass_context=True)
-    async def _postionStatus(self, ctx, *, role_name):
-        st_count = 0
-        lw_count = 0
-        rw_count = 0
-        cam_count = 0
-        cm_count = 0
-        cdm_count = 0
-        lb_count = 0
-        cb_count = 0
-        rb_count = 0
-        gk_count = 0
-        num = 0
-        total = 0
-        newbie_count = 0
-        role = get(ctx.guild.roles, name=role_name)
+    @commands.command(name='테스트', pass_context=True)
+    async def _test(self, ctx) :
+        await ctx.send(content=f"디스플레이 네임 {ctx.author.display_name}")
+        await ctx.send(content=f"네임 {ctx.author.name}")
+        if ctx.author.display_name == ctx.author.name:
+            await ctx.send("동일")
+        else:
+            await ctx.send("다름")
 
-        if role_name == "FA (무소속)" :
-            fa_role = get(ctx.guild.roles, name="FA (무소속)")
-            for member in fa_role.members :
-                role_names = [role.name for role in member.roles]
-                if "신규" in role_names :
-                    newbie_count += 1
+    @commands.command(name='바꿔', pass_context=True)
+    async def _test2(self, ctx, *, name):
+        if config.devlopCheck(ctx):
+            user = ctx.author
+            await user.edit(nick=name)
+            await ctx.send(content=f"{name}으로 변환 완료")
+        else:
+            await ctx.send("개발자 전용 명령어")
 
-        for member in role.members :
-            total += 1
-            if "[" in member.display_name :
-                print(member.display_name, myfun.getJupoFromDisplayname2(member.display_name))
-                if myfun.getJupoFromDisplayname2(member.display_name) == 'ST' :
-                    st_count = st_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'LW' :
-                    lw_count = st_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'RW' :
-                    rw_count = rw_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'CAM' :
-                    cam_count = cam_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'CM' :
-                    cm_count = cm_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'CDM' :
-                    cdm_count = cdm_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'LB' :
-                    lb_count = lb_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'CB' :
-                    cb_count = cb_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'RB' :
-                    rb_count = rb_count + 1
-                    num = num + 1
-                elif myfun.getJupoFromDisplayname2(member.display_name) == 'GK' :
-                    gk_count = gk_count + 1
-                    num = num + 1
+    @commands.command(name='문자비교', pass_context=True)
+    async def _test3(self, ctx, *, text):
+        temp = text.split("/")
+        text1 = temp[0].replace(" ", "")
+        text2 = temp[1].replace(" ", "")
+        if text1.lower() == text2.lower():
+            await ctx.send(content=f"{temp[0], temp[1]} 일치")
+        else:
+            await ctx.send(content=f"{temp[0], temp[1]} 불일치")
 
-        embed = discord.Embed(title=f"{role_name} 역할 주포지션 현황", description=f"총원 : {total} 명", color=0xFF007F)
-        embed.add_field(name="ST", value=str(st_count) + " 명", inline=True)
-        embed.add_field(name="LW", value=str(lw_count) + " 명", inline=True)
-        embed.add_field(name="RW", value=str(rw_count) + " 명", inline=True)
-        embed.add_field(name="CAM", value=str(cam_count) + " 명", inline=True)
-        embed.add_field(name="CM", value=str(cm_count) + " 명", inline=True)
-        embed.add_field(name="CDM", value=str(cdm_count) + " 명", inline=True)
-        embed.add_field(name="LB", value=str(lb_count) + " 명", inline=True)
-        embed.add_field(name="CB", value=str(cb_count) + " 명", inline=True)
-        embed.add_field(name="RB", value=str(rb_count) + " 명", inline=True)
-        embed.add_field(name="GK", value=str(gk_count) + " 명", inline=True)
-        if role_name == "FA (무소속)" :
-            embed.add_field(name="신규", value=str(newbie_count) + " 명", inline=True)
-            embed.add_field(name="기존", value=str(total - newbie_count) + " 명", inline=True)
-        embed.set_footer(text="Copyright ⓒ 2020-2023 타임제이(TimeJ) in C.E.F All Right Reserved.")
-        await ctx.message.delete()
-        await ctx.send(embed=embed)
+    @commands.command(name='포함검사', pass_context=True)
+    async def _test4(self, ctx, *, text):
+        dbCheck = True
+        temp = text.split("/")
+        text1 = temp[0].replace(" ", "").lower()
+        text2 = temp[1].replace(" ", "").lower()
+
+        if text1 in text2:
+            await ctx.send(content=f"{text1, text2} 앞에가 뒤에꺼에 포함됨")
+        elif text2 in text1:
+            await ctx.send(content=f"{text1, text2} 뒤에가 앞에꺼에 포함됨")
+        elif text1 == text2:
+            await ctx.send(content=f"{text1, text2} 일치함")
+        else:
+            await ctx.send(content=f"{text1, text2} 포함 안됨")
+
+
+    @commands.command(name='DB검사', pass_context=True)
+    async def _test6(self, ctx, *, text):
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM NICKNAME_EXCEPTION")
+        inName = ''
+        rows = cur.fetchall()
+        for row in rows:
+            temp1 = row[0]
+            temp2 = temp1.replace(" ", "").lower()
+            text2 = text.replace(" ", "").lower()
+            print(temp1, text2)
+            if text2 == temp2:
+                dbCheck = False
+                inName = temp1
+                break
+            else :
+                dbCheck = True
+
+        if dbCheck:
+            await ctx.send(content=f"{text} 는 DB에 존재하지 않음")
+        else:
+            await ctx.send(content=f"{inName}, {text} 는 DB에 존재하므로 예외 가능")
+
+    @commands.command(name='임시', pass_context=True)
+    async def _test7(self, ctx, *, text):
+        pass
+
 
 def setup(bot):
     bot.add_cog(Others(bot))

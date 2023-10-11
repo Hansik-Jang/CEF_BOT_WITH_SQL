@@ -1,16 +1,27 @@
 from myfun import *
 
-def checkNicknameForm(ctx):
-    if '[' in ctx.author.display_name and ']' in ctx.author.display_name:
+
+def checkDisplayNameChange(ctx):
+    if ctx.author.dispay_name != ctx.author.name:
         return True
     else:
         return False
 
+def checkNicknameForm(ctx):
+    if '[' in ctx.author.display_name and ']ㅇㄻㄴㅇㄹㄴㅇㅁㄹ' in ctx.author.display_name:
+        return True
+    else:
+        return False
+
+
 def checkEnglish(ctx):
-    if 'a' <= getNickFromDisplayname(ctx)[0].lower() <= 'z':
+    import string
+    nickname = getNickFromDisplayname(ctx)
+    if nickname.upper() != nickname.lower():
         return True
     else:                             # 대소문자가 다르면 영어
         return False
+
 
 def checkEnglishFromText(text):
     if 'a' <= text.lower() <= 'z':
@@ -18,20 +29,26 @@ def checkEnglishFromText(text):
     else:                             # 대소문자가 다르면 영어
         return False
 
+
 def checkNicknameOverlap(ctx):
     import sqlite3
     result = True
     temp = ''
+    ownNickname = getNickFromDisplayname(ctx).replace(" ", "")
+    ownNickname = ownNickname.lower()
     try:
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM User_Info")
+        cur.execute("SELECT * FROM USER_INFORMATION")
         for row in cur.fetchall():
             #print(row)
-            if getNickFromDisplayname(ctx).lower() == row[2].lower():
+            nicknameData = row[1].lower()
+            nicknameData = nicknameData.replace(" ", "")
+
+            if getNickFromDisplayname(ctx).lower() == row[1].lower():
                 temp = '중복 O'
                 result = False           # 중복이면 True
-                print(getNickFromDisplayname(ctx), row[2], temp)
+                print(getNickFromDisplayname(ctx), row[1], temp)
                 break
                 #print('a')
             else:

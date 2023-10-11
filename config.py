@@ -1,8 +1,10 @@
 import discord
+from discord.ext import commands
 from discord.utils import get
 
 # 베이스
-BASE_ROLE_NAME = '테스트용'
+baseRoleName = "테스트용"
+totalCommunityRoleNameList = ["테스트용", "RFA", "KPA", "EVT", "SNI"] # 나중에 테스트용은 CEF로 변경 필수
 
 # 상태
 DEVELOPER_SWITCH = True     # True이면 개발자만 사용 가능, DB에선 1
@@ -19,3 +21,9 @@ NAEJEON_TEAM_D = '내전-d-하양🤍'
 # 개발자 리스트
 DEVELOPER_LIST = [146549960312225792,   # 타임제이
                   790243958071492648]   # 테스트계정
+
+def devlopCheck(ctx):
+    if ctx.author.id in DEVELOPER_LIST:
+        return True
+    else:
+        return False

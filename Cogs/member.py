@@ -8,354 +8,113 @@ from discord.ext import commands
 from discord.utils import get
 import string
 import config
+import myfun
+
 global DEVELOPER_SWITCH
 
-class Member(commands.Cog):
-    def __init__(self, bot):
+
+class Member(commands.Cog) :
+    def __init__(self, bot) :
         self.bot = bot
 
     @commands.command(name='가입', pass_context=True, aliases=['join', 'Join'])
-    async def _join(self, ctx):
-        ctxRoles = [role.name for role in ctx.author.roles]
-        print(ctxRoles)
-        if config.BASE_ROLE_NAME not in ctxRoles:                # 중복 가입 여부 검사
-            print("중복 가입 검사 - 정상")
-            print("닉네임 검사 결과 : ")
-            print(checkFun.checkEnglish(ctx))
-            if checkFun.checkEnglish(ctx) or '스태프' in ctxRoles:                       # 닉네임 한글 검사
-                print("닉네임 한글 검사 - 정상")
-                if checkFun.checkNicknameForm(ctx):              # 닉네임 양식 검사
-                    print("닉네임 양식 검사 - 정상")
-                    if checkFun.checkNicknameOverlap(ctx):       # 닉네임 중복 검사
-                        print("닉네임 중복 검사 - 정상")
-                        if checkFun.checkRejoin(ctx):            # 재가입 여부 검사
-                            # 신규가입
-                            # 신규 유저 User_Info 정보 입력
-                            id = ctx.author.id
-                            join_date = int(
-                                str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) + \
-                                str(datetime.now().hour) + str(datetime.now().minute) + str(datetime.now().second))
-                            nickname = getNickFromDisplayname(ctx)
-                            jupo = getJupoFromDisplayname(ctx)
-                            bupo = getBupoFromDisplayname(ctx)
-                            team = "무소속"
-                            Exteam = "없음"
-                            absent = ""
-                            # DB 작업
-                            try :
-                                conn = sqlite3.connect("CEF.db")
-                                cur = conn.cursor()
-                                cur.execute("INSERT INTO User_Info VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
-                                            (id, join_date, nickname, jupo, bupo, team, Exteam, absent))
-                                cur.execute("INSERT INTO Career VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                            (id, 0, 0, 0, 0, 0, 0, 0, 0))
-                                cur.execute("INSERT INTO Judge VALUES(?, ?, ?, ?)",
-                                            (id, 0, 0, 0))
-                                cur.execute("INSERT INTO League_Member VALUES(?, ?, ?)",
-                                            (id, 0, 0))
-                                print('신규가입 성공')
-                                await ctx.reply(content=f"신규가입 성공")
-                                conn.commit()
-                            finally :
-                                conn.close()
-                            # 역할 부여
-                            user = ctx.author
-                            role = get(ctx.guild.roles, name='테스트용')
-                            await user.add_roles(role)
-                        else:
-                            # 재가입
-                            # print("재가입 여부 검사", checkFun.checkRejoin(ctx))
-                            await ctx.send(content=f"재가입 여부 검사 - 재가입")
-                            # 재가입 유저 User_Info 정보 입력
-                            id = ctx.author.id
-                            join_date = int(
-                                str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day) + \
-                                str(datetime.now().hour) + str(datetime.now().minute) + str(datetime.now().second))
-                            nickname = getNickFromDisplayname(ctx)
-                            jupo = getJupoFromDisplayname(ctx)
-                            bupo = getBupoFromDisplayname(ctx)
-                            team = "무소속"
-                            Exteam = "없음"
-                            absent = ""
-                            # DB 작업
-                            try :
-                                conn = sqlite3.connect("CEF.db")
-                                cur = conn.cursor()
-                                cur.execute("UPDATE User_Info SET nickname=? WHERE id=?",
-                                            (getNickFromDisplayname(ctx), ctx.author.id))
-                                # print('재가입 성공')
-                                await ctx.reply(content=f"재가입 성공")
-                                conn.commit()
-                            finally :
-                                conn.close()
-                            # 역할 부여
-                            user = ctx.author
-                            role = get(ctx.guild.roles, name='테스트용')
-                            await user.add_roles(role)
-                    else:
-                        print("닉네임 중복 검사 - 중복")
-                        await ctx.reply("```해당 닉네임은 이미 다른 유저가 사용 중입니다.\n"
-                                       "다른 닉네임으로 수정 후 다시 시도해주세요.```")
-                else:
-                    print("닉네임 양식 검사 - 일치하지 않음")
-                    await ctx.reply("```닉네임 양식이 일치하지 않습니다.\n"
-                                   "닉네임[주포지션/부포지션] or 닉네임[주포지션] 으로 수정 후 다시 시도해주세요.```")
-            else:
-                print("영어 아님")
-                await ctx.reply("```현 규정상 한글 닉네임은 스태프만 사용이 가능합니다.\n"
-                               "영문으로 수정 후 다시 시도해주세요.```")
-        else:
-            print("이미 가입됨")
-            await ctx.reply("```이미 가입되었습니다.```")
+    async def _join(self, ctx) :
+        joinSwitch = True  # Switch가 True면 가입 명령어 가능 상태
+        nicknameFormatSwitch = True     # True이면 가입 절차 진행
+        ownRoles = [role.name for role in ctx.author.roles]
+        nickname = ''
 
+        if config.baseRoleName in config.totalCommunityRoleNameList :  # CEF, RFA, KPA, EVT, SNI 역할이 있으면
+            if config.baseRoleName in ownRoles :  # CEF 역할을 갖고 있으면
+                await ctx.reply(content=f"이미 가입되었습니다.")
+                joinSwitch = False  # 스위치 False로 변경
+            else :  # CEF 역할을 안 갖고 있으면(타 커뮤니티 유저) 모든 역할 회수 후 스위치 True
+                department = ""
+                user = ctx.author
+                for role in ownRoles :
+                    if role.name == "EVT" :
+                        department = "EVT"
+                    elif role.name == 'RFA' :
+                        department = "RFA"
+                    elif role.name == "KPA" :
+                        department = "KPA"
+                    elif role.name == "SNI" :
+                        department = "SNI"
+                    await user.remove_roles(role)
+                await ctx.send(content=f"```기존 역할 '{department}'를 회수하였습니다.```", delete_after=5)
+                joinSwitch = True
+
+        if joinSwitch :  # Switch가 True이면 가입 진행
+            # 닉네임 양식 체크 -> 영어, 한글 검사 -> 중복 검사
+            if checkFun.checkNicknameForm(ctx):  # 닉네임 양식 검사 (별명 안에 '[', ']'가 있으면
+                nicknameFormatSwitch = True
+            else :  # 닉네임 양식 검사 (별명 안에 '[', ']'가 없으면
+                await ctx.send(content=f"CEF 서버는 디스코드 내 별명을 기준으로 활동하게 됩니다.\n"
+                                       f"디스코드 닉네임은 **'{ctx.author.name}'**, "
+                                       f"서버 내 별명은 **'{myfun.getNickFromDisplayname(ctx)}'**으로 ")
+                if checkFun.checkDisplayNameChange(ctx):
+                    # 디스코드 닉네임과 서버 별명이 다를 경우
+                    try:
+                        await ctx.send(content=f"현재 서버 내 별명인 **'{myfun.getNickFromDisplayname(ctx)}'**으로 가입을 진행하시겠습니까?\n"
+                                               f"10초 이내에 원하는 번호를 입력해주세요.\n"
+                                               f"1. 현재 닉네임으로 진행\n"
+                                               f"2. 닉네임 수정 후 다시 진행")
+                        msg = await self.bot.wait_for("message",
+                                                      check=lambda
+                                                          m : m.author == ctx.author and m.channel == ctx.channel,
+                                                      timeout=10.0)
+                    except asyncio.TimeoutError:
+                        await ctx.channel.send("시간 초과")
+                    else :
+                        if msg.content.lower() == '1':
+                            nicknameFormatSwitch = True
+                            nickname = myfun.getNickFromDisplayname(ctx)
+                        elif msg.content.lower() == '2':
+                            nicknameFormatSwitch = False
+                            await ctx.send(content=f"{ctx.author.mention}, 서버 별명하기를 통해 닉네임 수정 후 다시 %가입 명령어를 입력해주세요.")
+                else:
+                    # 디스코드 닉네임과 서버 별명이 같을 경우
+                    try:
+                        await ctx.send(
+                            content=f"서버 내 별명을 변경하지 않은 것으로 확인됩니다.\n"
+                                    f"현재 닉네임으로 가입을 진행하시겠습니까? 10초 이내에 원하는 번호를 입력해주세요.\n"
+                                    f"1. 현재 닉네임으로 진행\n"
+                                    f"2. 닉네임 수정 후 다시 진행")
+                        msg = await self.bot.wait_for("message",
+                                                      check=lambda
+                                                          m : m.author == ctx.author and m.channel == ctx.channel,
+                                                      timeout=10.0)
+                    except asyncio.TimeoutError:
+                        await ctx.channel.send("시간 초과")
+                    else:
+                        if msg.content.lower() == '1':
+                            nicknameFormatSwitch = True
+                            nickname = myfun.getNickFromDisplayname(ctx)
+                        elif msg.content.lower() == '2':
+                            nicknameFormatSwitch = False
+                            await ctx.send(content=f"{ctx.author.mention}, 서버 별명하기를 통해 닉네임 수정 후 다시 %가입 명령어를 입력해주세요.")
+
+        if nicknameFormatSwitch:    # 닉네임 문제 해결되어 가입 절차 진행
+            if checkFun.checkEnglish(myfun.getNickFromDisplayname(ctx)):    # 닉네임 내 한글이 있는지 검사
+                if checkFun.checkNicknameOverlap:   # 닉네임 중복 여부 검사
+                    pass
+                else:
+                    pass
+            else :
+                pass
 
     @commands.command(name='탈퇴', pass_context=True, aliases=['Withdrawal', 'withdrawal'])
-    async def _withdrawal(self, ctx):
-        # 모든 역할 제거
-        roleli = []
-        role_names = ["CEF", "신규", '감독', "TEAM_A", "TEAM_B", "TEAM_C", "TEAM_D", "TEAM_E", "A Coach", "B Coach", "C Coach",
-                      "D Coach", "E Coach"]
-        for rolename in role_names:
-            roleli.append(get(ctx.guild.roles, name=rolename))
-        for role in roleli:
-            await ctx.author.remove_roles(role)
-        # DB 작업
-        try:
-            conn = sqlite3.connect("CEF.db")
-            # 탈퇴 전 정보 백업
-            cur = conn.cursor()
-            conn.commit()
-        finally:
-            conn.close()
+    async def _withdrawal(self, ctx) :
+        pass
 
     @commands.command(name='포지션변경', pass_context=True, aliases=['chanegePosition'])
-    async def _changePos(self, ctx):
-        jupo = ''
-        bupo = ''
-        checkJupo = True
-        checkBupo = True
-        await ctx.send(content=f"{ctx.author.mention}\n"
-                               f"```주포지션 정보를 변경합니다.\n"
-                               f"주포지션을 선택해주세요\n"
-                               "1. ST\n"
-                               "2. LW\n"
-                               "3. RW\n"
-                               "4. CAM\n"
-                               "5. CM\n"
-                               "6. CDM\n"
-                               "7. LB\n"
-                               "8. CB\n"
-                               "9. RB\n"
-                               "10. GK\n```")
-        try:
-            msg = await self.bot.wait_for("message", check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
-                                         timeout=10.0)
-        except asyncio.TimeoutError:
-            checkJupo = False
-            await ctx.channel.send("시간 초과")
-        else:
-            if msg.content.lower() == '1' :
-                jupo = 'ST'
-            elif msg.content.lower() == '2' :
-                jupo = 'LW'
-            elif msg.content.lower() == '3' :
-                jupo = 'RW'
-            elif msg.content.lower() == '4' :
-                jupo = 'CAM'
-            elif msg.content.lower() == '5' :
-                jupo = 'CM'
-            elif msg.content.lower() == '6' :
-                jupo = 'CDM'
-            elif msg.content.lower() == '7' :
-                jupo = 'LB'
-            elif msg.content.lower() == '8' :
-                jupo = 'CB'
-            elif msg.content.lower() == '9' :
-                jupo = 'RB'
-            elif msg.content.lower() == '10' :
-                jupo = 'GK'
-        if checkJupo:
-            await msg.reply(content=f"```입력하신 주포지션은 '{jupo}'입니다.\n"
-                                    f"부포지션을 선택해주세요.\n"
-                                    "1. ST\n"
-                                    "2. LW\n"
-                                    "3. RW\n"
-                                    "4. CAM\n"
-                                    "5. CM\n"
-                                    "6. CDM\n"
-                                    "7. LB\n"
-                                    "8. CB\n"
-                                    "9. RB\n"
-                                    "10. GK\n"
-                                    "11. 없음```")
-            try:
-                msg2 = await self.bot.wait_for("message",
-                                              check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
-                                              timeout=10.0)
-            except asyncio.TimeoutError:
-                checkBupo = False
-                await ctx.channel.send("시간 초과")
-            else :
-                if msg2.content.lower() == '1':
-                    bupo = 'ST'
-                elif msg2.content.lower() == '2':
-                    bupo = 'LW'
-                elif msg2.content.lower() == '3':
-                    bupo = 'RW'
-                elif msg2.content.lower() == '4':
-                    bupo = 'CAM'
-                elif msg2.content.lower() == '5':
-                    bupo = 'CM'
-                elif msg2.content.lower() == '6':
-                    bupo = 'CDM'
-                elif msg2.content.lower() == '7':
-                    bupo = 'LB'
-                elif msg2.content.lower() == '8':
-                    bupo = 'CB'
-                elif msg2.content.lower() == '9':
-                    bupo = 'RB'
-                elif msg2.content.lower() == '10':
-                    bupo = 'GK'
-                elif msg2.content.lower() == '11':
-                    bupo = '없음'
-        else:
-            await ctx.send(content=f"{ctx.author.mention}\n"
-                                   f"처음부터 다시 시도해주세요.")
-        if checkBupo:
-            if jupo == bupo:
-                await ctx.send(content=f"{ctx.author.mention}\n"
-                                       f"입력한 주포지션과 부포지션이 같습니다.\n"
-                                       f"처음부터 다시 시도해주세요")
-            else:
-                if bupo == '없음':
-                    nick = getNickFromDisplayname(ctx) + "[" + jupo + "]" + getImojiFromDisplayname(ctx)
-                else:
-                    nick = getNickFromDisplayname(ctx) + "[" + jupo + "/" + bupo + "]" + getImojiFromDisplayname(ctx)
-                try:
-                    conn = sqlite3.connect("CEF.db")
-                    cur = conn.cursor()
-                    cur.execute("UPDATE User_Info SET ")
-                finally:
-                    cur.commit()
-                    cur.close()
-                user = ctx.author
-                await user.edit(nick=nick)
-                await ctx.reply(content=f"{ctx.author.mention}\n"
-                                        f"```포지션 정보가 변경되었습니다.\n"
-                                        f"주포지션 - {jupo},\n"
-                                        f"부포지션 - {bupo}```")
-
-        else:
-            await ctx.reply(content=f"{ctx.author.mention}\n"
-                                   f"처음부터 다시 시도해주세요.")
-#        else:
-#            await ctx.send("현재 개발자모드로 개발자만 사용가능합니다.")
+    async def _changePos(self, ctx) :
+        pass
 
     @commands.command(name='닉네임변경', pass_context=True, aliases=['changeNickname'])
-    async def _changeNick(self, ctx, *, nickname):
-        ex_nickname = getNickFromDisplayname(ctx)
-        temp = ctx.author.display_name.split("[")
-        await ctx.send(content=f"```변경하려는 닉네임이 '{nickname}'이(가) 맞나요?\n"
-                               f"맞으면 1, 틀리면 2를 입력해주세요.```")
-
-        try:
-            msg2 = await self.bot.wait_for("message",
-                                           check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
-                                           timeout=10.0)
-        except asyncio.TimeoutError:
-            await ctx.channel.send("시간 초과")
-        else:
-            if msg2.content.lower() == '1':
-                ownRoles = [role.name for role in ctx.author.roles]
-                if checkFun.checkEnglishFromText(nickname) or '스태프' in ownRoles:
-                    if checkFun.checkNicknameOverlapFromText(nickname):
-                        user = ctx.author
-                        nick = nickname + "[" + temp[1]
-                        await user.edit(nick=nick)
-                        try:
-                            conn = sqlite3.connect("CEF.db")
-                            cur = conn.cursor()
-                            cur.execute("UPDATE User_Info SET nickname=? WHERE id=?",
-                                        (nickname, ctx.author.id))
-                        finally:
-                            conn.commit()
-                            conn.close()
-                        await ctx.reply(content=f"{ctx.author.mention}\n"
-                                                f"```정상적으로 변경되었습니다.\n"
-                                                f"이전 닉네임 - {ex_nickname}\n"
-                                                f"변경 닉네임 - {nickname}```")
-                    else:
-                        await ctx.reply("해당 닉네임은 이미 사용 중입니다.")
-                else:
-                    await ctx.reply("현 닉네임 규정 상 한글 닉네임은 스태프만 사용 가능합니다.")
+    async def _changeNick(self, ctx, *, nickname) :
+        pass
 
 
-    @commands.command(name='데이터삭제', pass_context=True)
-    async def _deleteData(self, ctx):
-        try:
-            conn = sqlite3.connect("CEF.db")
-            cur = conn.cursor()
-            cur.execute("DELETE FROM User_Info WHERE id=?", (ctx.author.id,))
-            cur.execute("DELETE FROM Career WHERE id=?", (ctx.author.id,))
-            cur.execute("DELETE FROM Judge WHERE id=?", (ctx.author.id,))
-            conn.commit()
-        finally:
-            conn.close()
-        user = ctx.author
-        role = get(ctx.guild.roles, name='테스트용')
-        await user.remove_roles(role)
-
-    @commands.command(name='테', pass_context=True, aliases=['te'])
-    async def _test(self, ctx):
-        nick_ovl = True
-        id_ovl = True
-        try:
-            conn = sqlite3.connect("CEF.db")
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM User_Info")
-            #cur.execute("SELECT * FROM User_Info WHERE id=?", (ctx.author.id, ))
-            data = cur.fetchall()
-            print(data)
-            #await ctx.send(content=f"{data}")
-            print(len(data))
-            print(data[0][0])
-            print(data[1][0])
-            print(data[0][1])
-
-            # 전체 리스트에 있는지 체크
-            for i in range(len(data)):
-                if ctx.author.id == data[i][0]:     # 리스트 안에 있음 (재가입자)
-                    await ctx.send("등록 되어있음")
-                    break
-                else:                               # 리스트 안에 없음 (신규가입)
-                    await ctx.send("미등록자")
-            #if data[0][1]
-            #    await ctx.send("이력 없음")
-            #else:
-            #    await ctx.send(content=f"{cur.fetchone()}")
-        finally:
-            conn.close()
-
-    @commands.command(name='제거', pass_context=True)
-    async def _delete(self, ctx):
-        roleli = []
-        role_names = ["테스트용"]
-        for rolename in role_names:
-            roleli.append(get(ctx.guild.roles, name=rolename))
-        for role in roleli:
-            for member in role.members:
-                await member.remove_roles(role)
-                await ctx.send(content=f"{member.display_name} - {role} 제거")      # 메시지 닉네임 출력
-                #await ctx.send(content=f"{member.mention} - {role} 제거")            메시지 멘션 출력
-
-    @commands.command(name='이모지부여', pass_context=True, aliases=['giveimoji'])
-    async def _giveImogi(self, ctx, member:discord.Member):
-        role_names = [role.name for role in ctx.author.roles]
-        if '내전 관리' in role_names or '스태프' in role_names:
-            nick = member.display_name + ""
-            await member.edit(nick=nick)
-            await ctx.send("정상 적용")
-
-
-def setup(bot):
+def setup(bot) :
     bot.add_cog(Member(bot))
