@@ -1,22 +1,22 @@
 from myfun import *
-
+import myfun
+import string
 
 def checkDisplayNameChange(ctx):
-    if ctx.author.dispay_name != ctx.author.name:
+    if ctx.author.display_name != ctx.author.name:
         return True
     else:
         return False
 
 def checkNicknameForm(ctx):
-    if '[' in ctx.author.display_name and ']ㅇㄻㄴㅇㄹㄴㅇㅁㄹ' in ctx.author.display_name:
+    if '[' in ctx.author.display_name and ']' in ctx.author.display_name:
         return True
     else:
         return False
 
 
 def checkEnglish(ctx):
-    import string
-    nickname = getNickFromDisplayname(ctx)
+    nickname = myfun.getNickFromDisplayname(ctx)
     if nickname.upper() != nickname.lower():
         return True
     else:                             # 대소문자가 다르면 영어
@@ -69,7 +69,7 @@ def checkNicknameOverlapFromText(text):
     try:
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM User_Info")
+        cur.execute("SELECT * FROM USER_INFORMATION")
         for row in cur.fetchall():
             #print(row)
             if text == row[2].lower():
@@ -92,7 +92,7 @@ def checkRejoin(ctx):
     try:
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM User_Info")
+        cur.execute("SELECT * FROM USER_INFORMATION")
         for row in cur.fetchall():
             #print(ctx.author.id, row[0])
             if ctx.author.id == row[0]:

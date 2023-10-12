@@ -84,9 +84,10 @@ class Others(commands.Cog):
         else:
             await ctx.send(content=f"{inName}, {text} 는 DB에 존재하므로 예외 가능")
 
-    @commands.command(name='임시', pass_context=True)
-    async def _test7(self, ctx, *, text):
+    @commands.command(name='출력비교', pass_context=True)
+    async def _test7(self, ctx):
         pass
+
 
 
 def setup(bot):

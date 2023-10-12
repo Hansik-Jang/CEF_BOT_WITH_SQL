@@ -1,4 +1,6 @@
 import string
+
+
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname2(name):
     temp = name.split('[')
@@ -7,9 +9,12 @@ def getNickFromDisplayname2(name):
 
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname(ctx):
-    temp = ctx.author.display_name.split('[')
-    nickname = temp[0].strip()
-    return nickname
+    if '[' in ctx.author.display_name:
+        temp = ctx.author.display_name.split('[')
+        nickname = temp[0].strip()
+        return nickname
+    else:
+        return ctx.author.display_name
 
 # display_name으로부터 주포지션 정보 얻기
 def getJupoFromDisplayname(ctx):

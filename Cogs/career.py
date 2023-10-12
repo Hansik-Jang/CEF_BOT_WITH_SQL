@@ -15,13 +15,26 @@ class Body(commands.Cog):
         try:
             conn = sqlite3.connect("CEF.db")
             cur = conn.cursor()
-            cur.execute("SELECT * FROM User_Info WHERE id=?", (ctx.author.id, ))
+            cur.execute("SELECT * FROM USER_INFORMATION WHERE id=?", (ctx.author.id, ))
             temp = cur.fetchall()
             print(temp)
-            await ctx.send(content=f"닉네임 : {temp[0][2]}\n"
-                                   f"소속 : {temp[0][5]}\n"
-                                   f"주포 : {temp[0][3]}, 부포 : {temp[0][4]}\n"
-                                   f"닉네임 변경권 : {temp[0][7]} 개")
+            idNum = "ID : " + str(temp[0][0])
+            nickname = temp[0][1].replace("'", "")
+            count = str(temp[0][6]) + " 회"
+            history = "24-1 OOOOO\n" \
+                      "24-2 00000\n" \
+                      "24-3 00000\n" \
+                      "(임시값)"
+            embed = discord.Embed(title=nickname, description=temp[0][0])
+            embed.add_field(name="소속", value=temp[0][4], inline=True)
+            embed.add_field(name="신분", value=temp[0][5], inline=True)
+            embed.add_field(name="닉네임 변경권", value=count, inline=True)
+            embed.add_field(name="주포지션", value=temp[0][5], inline=True)
+            embed.add_field(name="부포지션", value=temp[0][5], inline=True)
+            embed.add_field(name="히스토리", value=history, inline=False)
+
+
+            embed2_msg = await ctx.send(embed=embed)
         finally:
             conn.close()
         print(temp)

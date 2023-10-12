@@ -8,6 +8,8 @@ totalCommunityRoleNameList = ["테스트용", "RFA", "KPA", "EVT", "SNI"] # 나�
 
 # 상태
 DEVELOPER_SWITCH = True     # True이면 개발자만 사용 가능, DB에선 1
+global NICKNAME_FORMAT_CHECK_SWITCH
+NICKNAME_FORMAT_CHECK_SWITCH = True
 
 # 채널명
 JOIN_CHANNEL = 'cef-가입신청❕'
