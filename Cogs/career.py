@@ -39,5 +39,7 @@ class Body(commands.Cog):
             conn.close()
         print(temp)
 
+
+
 def setup(bot):
     bot.add_cog(Body(bot))

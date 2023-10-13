@@ -8,7 +8,6 @@ class AboutDB(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(name='예외추가', pass_context=True)
     async def _insertNicknameException(self, ctx, *, text) :
         li = [text]
@@ -24,7 +23,6 @@ class AboutDB(commands.Cog):
         finally :
             conn.close()
 
-
     @commands.command(name='예외목록', pass_context=True)
     async def _showNicknameException(self, ctx):
         conn = sqlite3.connect("CEF.db")
@@ -34,6 +32,14 @@ class AboutDB(commands.Cog):
         rows = cur.fetchall()
         print(rows)
         await ctx.send(content=f"{rows}")
+
+    @commands.command(name='팀리스트', pass_context=True)
+    async def _showTeamLIst(self, ctx):
+        try:
+            conn = sqlite3.connect("CEF.db")
+            cur = conn.cursor()
+        finally:
+            conn.close()
 
 
 def setup(bot):

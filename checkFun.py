@@ -1,6 +1,7 @@
 from myfun import *
 import myfun
 import string
+import discord
 
 def checkDisplayNameChange(ctx):
     if ctx.author.display_name != ctx.author.name:
@@ -16,11 +17,15 @@ def checkNicknameForm(ctx):
 
 
 def checkEnglish(ctx):
-    nickname = myfun.getNickFromDisplayname(ctx)
-    if nickname.upper() != nickname.lower():
+    role_names = [role.name for role in ctx.author.roles]
+    if "스태프" in role_names:
         return True
-    else:                             # 대소문자가 다르면 영어
-        return False
+    else:
+        nickname = myfun.getNickFromDisplayname(ctx)
+        if nickname.upper() != nickname.lower():
+            return True
+        else:                             # 대소문자가 다르면 영어
+            return False
 
 
 def checkEnglishFromText(text):
