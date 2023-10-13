@@ -50,14 +50,12 @@ class Member(commands.Cog) :
         if config.baseRoleName in config.totalCommunityRoleNameList :  # CEF, RFA, KPA, EVT, SNI 역할이 있으면
             if config.baseRoleName in ownRoles :  # CEF 역할을 갖고 있으면
                 await ctx.reply(content=f"이미 가입되었습니다.", delete_after=10)
-                await thread.send(content=f"시간이 초과되었습니다. 다시 %가입 명령어를 입력해주세요.\n"
-                                          f"{joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
-                                          f"해당 스레드는 30초 후 자동 삭제됩니다.")
+                await thread.send(content=f"해당 스레드는 30초 후 자동 삭제됩니다.")
                 joinSwitch = False  # 스위치 False로 변경
                 await asyncio.sleep(30)
                 await thread.delete()
             else :  # CEF 역할을 안 갖고 있으면(타 커뮤니티 유저) 모든 역할 회수 후 스위치 True
-                announcement = await thread.send("```EAFC 프로클럽 커뮤니티 CEF**에 오신 것을 환영합니다.\n"
+                announcement = await thread.send("```EAFC 프로클럽 커뮤니티 CEF에 오신 것을 환영합니다.\n"
                                                  "봇을 통해 아래와 같은 가입 과정을 진행하게 됩니다.\n"
                                                  "1. 역할 소유 검사\n"
                                                  "2. 영문 닉네임 검사\n"
@@ -125,7 +123,7 @@ class Member(commands.Cog) :
                                                               m : m.author == ctx.author and m.channel == thread,
                                                           timeout=10.0)
                         except asyncio.TimeoutError :
-                            await thread.send(content=f"시간이 초과되었습니다. 다시 %가입 명령어를 입력해주세요.\n"
+                            await thread.send(content=f"시간이 초과되었습니다.\n"
                                                       f"{joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                                       f"해당 스레드는 30초 후 자동 삭제됩니다.")
                             await asyncio.sleep(30)
@@ -260,7 +258,7 @@ class Member(commands.Cog) :
 
                 await embed_msg.delete()
                 if MAIN_POSITION_CHECK_SWITCH :
-                    embed = discord.Embed(title="메인 포지션을 선택합니다.", description="본인이 희망하는 '메인' 포지션의 번호를 10 초내에 입력해주세요.")
+                    embed = discord.Embed(title="서브 포지션을 선택합니다.", description="본인이 희망하는 '서브' 포지션의 번호를 10 초내에 입력해주세요.")
                     embed.add_field(name="**1**", value="LW", inline=True)
                     embed.add_field(name="**2**", value="ST", inline=True)
                     embed.add_field(name="**3**", value="RW", inline=True)
@@ -378,16 +376,21 @@ class Member(commands.Cog) :
                 finally :
                     conn.close()
                 # CEF, 신규 역할 부여
+                if subPostion == '':
+                    postion_text = mainPostion
+                else:
+                    postion_text = mainPostion + "/" + subPostion
+
                 user = ctx.author
                 CEF_ROLE = get(ctx.guild.roles, name="테스트용")
                 # NEW_ROLE = get(ctx.guild.roles, name="신규")
                 await user.add_roles(CEF_ROLE)
                 # await user.add_roles(NEW_ROLE)
-                await ctx.send(content=f"가입 절차가 완료되었습니다.\n"
+                await thread.send(content=f"가입 절차가 완료되었습니다.\n"
                                        f"해당 스레드는 30초 후 자동 삭제됩니다.")
                 await ctx.reply(content=f"{ctx.author.mention}, 모든 가입 절차가 완료되었습니다.\n"
                                         f"닉네임 : {nickname}\n"
-                                        f"포지션 : {mainPostion}/{subPostion}\n"
+                                        f"포지션 : {postion_text}\n"
                                         f"신규 가입을 환영합니다.")
 
                 await asyncio.sleep(30)
@@ -414,14 +417,18 @@ class Member(commands.Cog) :
                 finally :
                     conn.close()
                 # CEF 역할 부여
+                if subPostion == '':
+                    postion_text = mainPostion
+                else:
+                    position_text = mainPostion + "/" + subPostion
                 user = ctx.author
                 CEF_ROLE = get(ctx.guild.roles, name="테스트용")
                 await user.add_roles(CEF_ROLE)
-                await ctx.send(content=f"가입 절차가 완료되었습니다.\n"
+                await thread.send(content=f"가입 절차가 완료되었습니다.\n"
                                        f"해당 스레드는 30초 후 자동 삭제됩니다.")
                 await ctx.reply(content=f"{ctx.author.mention}, 모든 가입 절차가 완료되었습니다.\n"
                                         f"닉네임 : {nickname}\n"
-                                        f"포지션 : {mainPostion}/{subPostion}\n"
+                                        f"포지션 : {postion_text}\n"
                                         f"재가입을 환영합니다.")
                 await asyncio.sleep(30)
                 await thread.delete()

@@ -21,10 +21,9 @@ class Body(commands.Cog):
             idNum = "ID : " + str(temp[0][0])
             nickname = temp[0][1].replace("'", "")
             count = str(temp[0][6]) + " 회"
-            history = "24-1 OOOOO\n" \
-                      "24-2 00000\n" \
-                      "24-3 00000\n" \
-                      "(임시값)"
+            history = "24-1 '소속팀' '직책' '순위' 中 '전체 팀 수'\n" \
+                      "(예시)\n" \
+                      "24-1 FCB 감독 5위 中 16팀"
             embed = discord.Embed(title=nickname, description=temp[0][0])
             embed.add_field(name="소속", value=temp[0][4], inline=True)
             embed.add_field(name="신분", value=temp[0][5], inline=True)
