@@ -1,5 +1,5 @@
 import string
-
+import forAccessDB
 
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname2(name):
@@ -60,30 +60,40 @@ def getImojiFromDisplayname(ctx):
     imoji = temp[1]
     return imoji
 
-# display_name 내 공백 삭제
-def eraseBlackNick(nickname):
-    if ' ' in nickname:
-        nickname = nickname.replace(' ', '')
-        return nickname
+
+def getImoji(ctx):
+    imoji = ""
+    role_names = [role.name for role in ctx.author.roles]
+    if "TOTS🥇" in role_names:
+        imoji = imoji + "🥇"
+    if "TOTS Nomi🥈" in role_names:
+        imoji = imoji + "🥈"
+    if "Valondor👑" in role_names:
+        imoji = imoji + "👑"
+    if "Server Booster⭐" in role_names:
+        imoji = imoji + "⭐"
+    if "Golden Rookey🐔" in role_names:
+        imoji = imoji + "🐔"
+    if "신규🐤" in role_names:
+        imoji = imoji + "🐤"
+    if "내전리그 1위🌺" in role_names:
+        imoji = imoji + "🌺"
+    if "내전리그 2위🍀" in role_names:
+        imoji = imoji + "🍀"
+    if "내전리그 3위☘" in role_names:
+        imoji = imoji + "☘"
+
+    return imoji
+
+
+def recombinationNickname(nickname, mainPos, subPos, imoji):
+
+    if subPos == "":
+        result = nickname + "[" + mainPos + "]" + imoji
     else:
-        return nickname
-
-# 주포, 이모지를 display_name으로 재조립
-def fitExcludeBupo(ctx):
-    nickname = getNickFromDisplayname(ctx)
-    jupo = getJupoFromDisplayname(ctx)
-    imoji = getImojiFromDisplayname(ctx)
-    result = nickname + "[" + jupo + "]" + imoji
+        result = nickname + "[" + mainPos + "/" + subPos + "]" + imoji
     return result
 
-# 주포, 부포, 이모지를 display_name으로 재조립
-def fitIncludeBupo(ctx):
-    nickname = getNickFromDisplayname(ctx)
-    jupo = getJupoFromDisplayname(ctx)
-    bupo = getBupoFromDisplayname(ctx)
-    imoji = getImojiFromDisplayname(ctx)
-    result = nickname + "[" + jupo + "/" + bupo + "]" + imoji
-    return result
 
 def printDump(conn):
     # Dump 출력

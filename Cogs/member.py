@@ -9,6 +9,7 @@ from discord.utils import get
 import string
 import config
 import myfun
+import forAccessDB
 
 global DEVELOPER_SWITCH
 
@@ -24,8 +25,8 @@ class Member(commands.Cog) :
         # DB 입력 값 -----------------
         myID = ctx.author.id
         nickname = ''
-        mainPostion = ''
-        subPostion = ''
+        mainPosition = ''
+        subPosition = ''
         teamNumber = 0
         rank = "선수"
         nicknameChangeCoupon = 1
@@ -42,6 +43,8 @@ class Member(commands.Cog) :
             name="example",
             type=discord.ChannelType.private_thread
         )
+        msg10 = await ctx.send(content=f"{ctx.author.mention}\n"
+                                       f"{thread.mention}을 확인하여 가입을 진행주세요.")
         await thread.send(content=f"{ctx.author.mention}")
 
         # ===============================================================================================================
@@ -55,6 +58,7 @@ class Member(commands.Cog) :
                 await asyncio.sleep(30)
                 await thread.delete()
             else :  # CEF 역할을 안 갖고 있으면(타 커뮤니티 유저) 모든 역할 회수 후 스위치 True
+
                 announcement = await thread.send("```EAFC 프로클럽 커뮤니티 CEF에 오신 것을 환영합니다.\n"
                                                  "봇을 통해 아래와 같은 가입 과정을 진행하게 됩니다.\n"
                                                  "1. 역할 소유 검사\n"
@@ -123,6 +127,7 @@ class Member(commands.Cog) :
                                                               m : m.author == ctx.author and m.channel == thread,
                                                           timeout=10.0)
                         except asyncio.TimeoutError :
+                            await msg10.delete()
                             await thread.send(content=f"시간이 초과되었습니다.\n"
                                                       f"{joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                                       f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -134,6 +139,7 @@ class Member(commands.Cog) :
                                 nickname = myfun.getNickFromDisplayname(ctx)
                             elif msg.content.lower() == '2' :  # 닉네임 변경 후 재시도
                                 NICKNAME_FORMAT_CHECK_SWITCH = False
+                                await msg10.delete()
                                 await thread.send(content=f"{ctx.author.mention}, 서버 별명하기를 통해 닉네임 수정 후"
                                                           f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                                           f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -161,12 +167,17 @@ class Member(commands.Cog) :
                                 nickname = myfun.getNickFromDisplayname(ctx)
                             elif msg.content.lower() == '2' :  # 닉네임 변경 후 시도
                                 NICKNAME_FORMAT_CHECK_SWITCH = False
-                                await thread.send(content=f"{ctx.author.mention}, 서버 별명하기를 통해 닉네임 수정 후 다시 %가입"
-                                                          f" 명령어를 입력해주세요.", delete_after=10)
+                                await msg10.delete()
+                                await thread.send(content=f"{ctx.author.mention}, 서버 별명하기를 통해 닉네임 수정 후"
+                                                          f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
+                                                          f"해당 스레드는 30초 후 자동 삭제됩니다.")
+                                await asyncio.sleep(30)
+                                await thread.delete()
                         finally :
                             await msg1.delete()
                             await msg2.delete()
             else :
+                await msg10.delete()
                 await thread.send("닉네임은 영문만 사용이 가능합니다.\n"
                                   f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                   f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -182,13 +193,13 @@ class Member(commands.Cog) :
                                             "5. 포지션 정보 입력\n"
                                             "6. 신규/재가입 검사```")
             await thread.send("영문 닉네임 확인, 닉네임 확인 완료", delete_after=10)
-            # ========= 닉네임 중복 검사 =============================================================================================
-            if checkFun.checkNicknameOverlap(ctx) :  # 닉네임 중복 검사
-                # ============= 포지션 선택 =============================================================================================
+            # 닉네임 중복 검사 =============================================================================================
+            if checkFun.checkNicknameOverlap(ctx):  # 닉네임 중복 검사
+                # 포지션 선택 =============================================================================================
                 await announcement.edit(content=f"```EAFC 프로클럽 커뮤니티, CEF에 오신 것을 환영합니다.\n"
                                                 f"봇을 통해 아래와 같은 가입 과정을 진행하게 됩니다.\n"
                                                 f"1. 역할 소유 검사 - {department} (○)\n"
-                                                f"2. 영문 닉네임 검사 - {nickname} (○)"
+                                                f"2. 영문 닉네임 검사 - {nickname} (○)\n"
                                                 "3. 닉네임 양식 검사 - (○)\n"
                                                 "4. 닉네임 중복 검사 - 중복 없음 (○)\n"
                                                 "5. 포지션 정보 입력\n"
@@ -213,6 +224,7 @@ class Member(commands.Cog) :
                                                       m : m.author == ctx.author and m.channel == thread,
                                                   timeout=10.0)
                 except asyncio.TimeoutError :
+                    await msg10.delete()
                     await thread.send("시간이 초과되었습니다.\n"
                                       f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                       f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -220,36 +232,37 @@ class Member(commands.Cog) :
                     await thread.delete()
                 else :
                     if msg.content.lower() == '1' :
-                        mainPostion = "LW"
+                        mainPosition = "LW"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '2' :
-                        mainPostion = "ST"
+                        mainPosition = "ST"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '3' :
-                        mainPostion = "RW"
+                        mainPosition = "RW"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '4' :
-                        mainPostion = "CAM"
+                        mainPosition = "CAM"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '5' :
-                        mainPostion = "CM"
+                        mainPosition = "CM"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '6' :
-                        mainPostion = "CDM"
+                        mainPosition = "CDM"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '7' :
-                        mainPostion = "LB"
+                        mainPosition = "LB"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '8' :
-                        mainPostion = "CB"
+                        mainPosition = "CB"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '9' :
-                        mainPostion = "RB"
+                        mainPosition = "RB"
                         MAIN_POSITION_CHECK_SWITCH = True
                     elif msg.content.lower() == '10' :
-                        mainPostion = "GK"
+                        mainPosition = "GK"
                         MAIN_POSITION_CHECK_SWITCH = True
                     else :
+                        await msg10.delete()
                         await thread.send("잘못 입력하였습니다..\n"
                                           f"{joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                           f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -278,6 +291,7 @@ class Member(commands.Cog) :
                                                           m : m.author == ctx.author and m.channel == thread,
                                                       timeout=10.0)
                     except asyncio.TimeoutError :
+                        await msg10.delete()
                         await thread.send("시간이 초과되었습니다.\n"
                                           f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                           f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -286,62 +300,65 @@ class Member(commands.Cog) :
 
                     else :
                         if msg.content.lower() == '1' :
-                            subPostion = "LW"
+                            subPosition = "LW"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '2' :
-                            subPostion = "ST"
+                            subPosition = "ST"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '3' :
-                            subPostion = "RW"
+                            subPosition = "RW"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '4' :
-                            subPostion = "CAM"
+                            subPosition = "CAM"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '5' :
-                            subPostion = "CM"
+                            subPosition = "CM"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '6' :
-                            subPostion = "CDM"
+                            subPosition = "CDM"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '7' :
-                            subPostion = "LB"
+                            subPosition = "LB"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '8' :
-                            subPostion = "CB"
+                            subPosition = "CB"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '9' :
-                            subPostion = "RB"
+                            subPosition = "RB"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '10' :
-                            subPostion = "GK"
+                            subPosition = "GK"
                             SUB_POSITION_CHECK_SWITCH = True
                         elif msg.content.lower() == '0' :
-                            subPostion = ""
+                            subPosition = ""
                             SUB_POSITION_CHECK_SWITCH = True
                         else :
                             await thread.send("잘못 입력하였습니다..\n"
                                               f"{joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
                                               f"해당 스레드는 30초 후 자동 삭제됩니다.")
+                            await msg10.delete()
                             await asyncio.sleep(30)
                             await thread.delete()
 
                 await embed2_msg.delete()
 
                 # ==== 주포, 부포 같을 시 부포 삭제
-                if mainPostion == subPostion :
-                    subPostion = ''
+                if mainPosition == subPosition :
+                    subPosition = ''
 
                 if MAIN_POSITION_CHECK_SWITCH and SUB_POSITION_CHECK_SWITCH :
-                    if subPostion != "" :
-                        edit_nickname = nickname + "[" + mainPostion + "/" + subPostion + "]"
+                    if subPosition != "" :
+                        edit_nickname = nickname + "[" + mainPosition + "/" + subPosition + "]"
                     else :
-                        edit_nickname = nickname + "[" + mainPostion + "]"
+                        edit_nickname = nickname + "[" + mainPosition + "]"
                     user = ctx.author
                     await user.edit(nick=edit_nickname)
                     RE_JOIN_CHECK_SWITCH = True
-            else :
-                await thread.send(content=f"{ctx.author.mention}, '{nickname}'은 현재 사용 중입니다.\n"
-                                          f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요\n"
+            else:
+                await msg10.delete()
+                await thread.send(content=f"{ctx.author.mention}, 현재 '{nickname}'와(과) 동일한 닉네임 혹은 유사한 닉네임이 사용 중입니다..\n"
+                                          f"닉네임 수정 후 {joinChannel.mention}에 다시 가입 명령어를 입력해주세요.\n"
+                                          f"닉네임 중복 문제의 경우 '스태프'에게 문의해주세요.\n"
                                           f"해당 스레드는 30초 후 자동 삭제됩니다.")
                 await asyncio.sleep(30)
                 await thread.delete()
@@ -353,7 +370,7 @@ class Member(commands.Cog) :
                                             f"2. 영문 닉네임 검사 - {nickname} (○)\n"
                                             f"3. 닉네임 양식 검사 - (○)\n"
                                             f"4. 닉네임 중복 검사 - 중복 없음 (○)\n"
-                                            f"5. 포지션 정보 입력 - {mainPostion}/{subPostion} (○)\n"
+                                            f"5. 포지션 정보 입력 - {mainPosition}/{subPosition} (○)\n"
                                             f"6. 신규/재가입 검사```")
             # ========= 닉네임 양식 검사 =============================================================================================
             if checkFun.checkRejoin(ctx) :  # 재가입 체크, 참이면 중복 없음 -> 신규 가입
@@ -364,22 +381,22 @@ class Member(commands.Cog) :
                                                 f"2. 영문 닉네임 검사 - {nickname} (○)\n"
                                                 f"3. 닉네임 양식 검사 - (○)\n"
                                                 f"4. 닉네임 중복 검사 - 중복 없음 (○)\n"
-                                                f"5. 포지션 정보 입력 - {mainPostion}/{subPostion} (○)\n"
+                                                f"5. 포지션 정보 입력 - {mainPosition}/{subPosition} (○)\n"
                                                 f"6. 신규/재가입 검사 - {rejoin_text} (○)```")
                 # DB 추가
                 try :
                     conn = sqlite3.connect("CEF.db")
                     cur = conn.cursor()
                     cur.execute("INSERT INTO USER_INFORMATION VALUES(?, ?, ?, ?, ?, ?, ?);",
-                                (myID, nickname, mainPostion, subPostion, teamNumber, rank, nicknameChangeCoupon))
+                                (myID, nickname, mainPosition, subPosition, teamNumber, rank, nicknameChangeCoupon))
                     conn.commit()
                 finally :
                     conn.close()
                 # CEF, 신규 역할 부여
-                if subPostion == '':
-                    postion_text = mainPostion
+                if subPosition == '':
+                    postion_text = mainPosition
                 else:
-                    postion_text = mainPostion + "/" + subPostion
+                    postion_text = mainPosition + "/" + subPosition
 
                 user = ctx.author
                 CEF_ROLE = get(ctx.guild.roles, name="테스트용")
@@ -388,11 +405,11 @@ class Member(commands.Cog) :
                 # await user.add_roles(NEW_ROLE)
                 await thread.send(content=f"가입 절차가 완료되었습니다.\n"
                                        f"해당 스레드는 30초 후 자동 삭제됩니다.")
+                await msg10.delete()
                 await ctx.reply(content=f"{ctx.author.mention}, 모든 가입 절차가 완료되었습니다.\n"
                                         f"닉네임 : {nickname}\n"
                                         f"포지션 : {postion_text}\n"
                                         f"신규 가입을 환영합니다.")
-
                 await asyncio.sleep(30)
                 await thread.delete()
             # 재가입
@@ -404,7 +421,7 @@ class Member(commands.Cog) :
                                                 f"2. 영문 닉네임 검사 - {nickname} (○)\n"
                                                 f"3. 닉네임 양식 검사 - (○)\n"
                                                 f"4. 닉네임 중복 검사 - 중복 없음 (○)\n"
-                                                f"5. 포지션 정보 입력 - {mainPostion}/{subPostion} (○)\n"
+                                                f"5. 포지션 정보 입력 - {mainPosition}/{subPosition} (○)\n"
                                                 f"6. 신규/재가입 검사 - {rejoin_text} (○)```")
                 # DB 업데이트
                 try :
@@ -412,30 +429,73 @@ class Member(commands.Cog) :
                     cur = conn.cursor()
                     cur.execute("UPDATE USER_INFORMATION SET Nickname=?, MainPosition=?, SubPosition=?,"
                                 "TeamNumber=?, Rank=? WHERE id=?",
-                                (nickname, mainPostion, subPostion, teamNumber, rank, myID))
+                                (nickname, mainPosition, subPosition, teamNumber, rank, myID))
                     conn.commit()
                 finally :
                     conn.close()
                 # CEF 역할 부여
-                if subPostion == '':
-                    postion_text = mainPostion
+                if subPosition == '':
+                    position_text = mainPosition
                 else:
-                    position_text = mainPostion + "/" + subPostion
+                    position_text = mainPosition + "/" + subPosition
                 user = ctx.author
                 CEF_ROLE = get(ctx.guild.roles, name="테스트용")
                 await user.add_roles(CEF_ROLE)
                 await thread.send(content=f"가입 절차가 완료되었습니다.\n"
                                        f"해당 스레드는 30초 후 자동 삭제됩니다.")
+                await msg10.delete()
                 await ctx.reply(content=f"{ctx.author.mention}, 모든 가입 절차가 완료되었습니다.\n"
                                         f"닉네임 : {nickname}\n"
-                                        f"포지션 : {postion_text}\n"
+                                        f"포지션 : {position_text}\n"
                                         f"재가입을 환영합니다.")
                 await asyncio.sleep(30)
                 await thread.delete()
 
+    @commands.command(name='닉네임변경', pass_context=True, aliases=['닉변'])
+    async def _changeNick(self, ctx, *, insert_nickname):
+        ex_nickname = myfun.getNickFromDisplayname(ctx)
+        # 닉네임 중복 검사
+        if checkFun.checkNicknameOverlap(ctx):
+            result = forAccessDB.getUserInformation(ctx)
+            # 닉변권 개수 검사
+            if result[6] > 0:   # 1개 이상일 경우에만 가능
+                # 입력 데이터 정리
+                myID = ctx.author.id
+                nickname = insert_nickname
+                reduceCount = result[6] - 1
+                # DB 업데이트
+                try :
+                    conn = sqlite3.connect("CEF.db")
+                    cur = conn.cursor()
+                    cur.execute("UPDATE USER_INFORMATION SET Nickname=?, NickChangeCoupon=? WHERE id=?", (nickname, reduceCount, myID))
+                    conn.commit()
+                finally :
+                    conn.close()
 
-    @commands.command(name='닉네임변경', pass_context=True, aliases=['changeNickname'])
-    async def _changeNick(self, ctx, *, nickname):
+                # 디스코드 닉네임 수정
+                result = forAccessDB.getUserInformation(ctx)
+                nickname = result[1]
+                mainPos = result[2]
+                subPos = result[3]
+                imoji = getImoji(ctx)
+                edit_nickname = myfun.recombinationNickname(nickname, mainPos, subPos, imoji)
+                user = ctx.author
+                await user.edit(nick=edit_nickname)
+                await ctx.reply(content=f"닉네임 변경이 완료되었습니다.\n"
+                                        f"{ex_nickname} -> {edit_nickname}\n"
+                                        f"남은 닉변권 개수 : {reduceCount}")
+
+
+            else:               # 닉변권이 0개일 경우
+                await ctx.reply(content=f"닉변권 개수가 {result[6]} 입니다.")
+        else:
+            await ctx.reply(content=f"{ctx.author.mention}, 현재 '{insert_nickname}'와(과) 동일한 닉네임 혹은 유사한 닉네임이 사용 중입니다..\n"
+                                    f"닉네임 수정 후 다시 명령어를 입력해주세요.\n"
+                                    f"닉네임 중복 문제의 경우 '스태프'에게 문의해주세요.\n"
+                                    f"해당 스레드는 30초 후 자동 삭제됩니다.")
+
+    @commands.command(name='포지션변경', pas_context=True, aliases=['포변'])
+    async def _changePos(self, ctx, *, nickname):
         pass
 
 
