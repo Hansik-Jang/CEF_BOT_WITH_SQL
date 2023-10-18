@@ -1,6 +1,4 @@
-from myfun import *
-from Cogs.draft import *
-import discord
+from draft import *
 
 
 def makeListFromList(li):

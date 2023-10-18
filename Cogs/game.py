@@ -22,5 +22,5 @@ class Game(commands.Cog):
                                           f"금일 21시에 내전리그 예정이니 참고바랍니다.")
 
 
-def setup(bot):
-    bot.add_cog(Game(bot))
+async def setup(bot):
+    await bot.add_cog(Game(bot))

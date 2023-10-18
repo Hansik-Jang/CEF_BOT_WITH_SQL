@@ -229,5 +229,5 @@ class OtherClub(commands.Cog):
 
 
 
-def setup(bot):
-    bot.add_cog(OtherClub(bot))
+async def setup(bot):
+    await bot.add_cog(OtherClub(bot))

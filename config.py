@@ -5,6 +5,8 @@ from discord.utils import get
 # 베이스
 baseRoleName = "테스트용"
 totalCommunityRoleNameList = ["테스트용", "RFA", "KPA", "EVT", "SNI"] # 나중에 테스트용은 CEF로 변경 필수
+CEF_SERVER_ID = 706480732477849650
+TEST_SERVER_ID = 1114943322201526272
 
 # 상태
 DEVELOPER_SWITCH = True     # True이면 개발자만 사용 가능, DB에선 1
@@ -19,6 +21,9 @@ NAEJEON_TEAM_B = '내전-b-빨강💖'
 NAEJEON_TEAM_C = '내전-c-노랑💛'
 NAEJEON_TEAM_D = '내전-d-하양🤍'
 
+# 텍스트 문구
+notJoinText = "등록된 인원만 사용 가능한 명령어입니다.\n" \
+              "$가입 명령어를 사용하여 등록을 먼저 해주세요."
 
 # 개발자 리스트
 DEVELOPER_LIST = [146549960312225792,   # 타임제이

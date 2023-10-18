@@ -42,5 +42,5 @@ class AboutDB(commands.Cog):
             conn.close()
 
 
-def setup(bot):
-    bot.add_cog(AboutDB(bot))
+async def setup(bot):
+    await bot.add_cog(AboutDB(bot))

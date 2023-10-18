@@ -10,5 +10,5 @@ class Mark(commands.Cog):
         await ctx.send("출석테스트")
 
 
-def setup(bot):
-    bot.add_cog(Mark(bot))
+async def setup(bot):
+    await bot.add_cog(Mark(bot))

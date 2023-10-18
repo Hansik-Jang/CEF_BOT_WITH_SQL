@@ -3,15 +3,21 @@ import time
 import random
 from FunForDraft import *
 from discord.ext import commands
-from discord_components import DiscordComponents, Button, ButtonStyle, Interaction, component
-from discord_buttons_plugin import *
-from discord.utils import get
+import discord
 # from discord.ui import Button, View
 import asyncio
 import draftclass
 import sqlite3
 import myfun
 import config
+
+class Draft(commands.Cog) :
+    def __init__(self, bot) :
+        self.bot = bot
+
+async def setup(bot):
+    await bot.add_cog(Draft(bot))
+
 
 switch = 0
 entry = []
@@ -1160,5 +1166,4 @@ class Draft(commands.Cog) :
 '''
 
 
-def setup(bot):
-    bot.add_cog(Draft(bot))
+

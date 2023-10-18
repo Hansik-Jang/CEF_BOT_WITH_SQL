@@ -16,5 +16,5 @@ class Transfer(commands.Cog):
             print(data_list)
 
 
-def setup(bot):
-    bot.add_cog(Transfer(bot))
+async def setup(bot):
+    await bot.add_cog(Transfer(bot))

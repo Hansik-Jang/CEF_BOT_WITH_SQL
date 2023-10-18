@@ -100,5 +100,5 @@ class ControlSwitch(commands.Cog):
         conn.commit()
         conn.close()
 
-def setup(bot):
-    bot.add_cog(ControlSwitch(bot))
+async def setup(bot):
+    await bot.add_cog(ControlSwitch(bot))

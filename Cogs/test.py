@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
+from discord import app_commands
 import random
 import myfun
 import config
@@ -8,24 +9,62 @@ import sqlite3
 import asyncio
 import checkFun
 import forAccessDB
+from forAccessDB import *
+
+from typing import Literal, Optional
+from discord.ext import commands
+from discord.ext.commands import Greedy, Context # or a subclass of yours
 
 
 class Test(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
+    '''
+    @commands.Cog.listener()
+    async def on_ready(self):
+        await self.bot.tree.sync()
 
-    @commands.command(name='임시용', pass_context=True)
-    async def _copypermission(self, ctx):
-        result = checkFun.checkNicknameOverlap(ctx)
-        await ctx.send(content=f"가입 가능 여부 : {result[0]}\n"
-                               f"INFO 중복 여부 : {result[1]}\n"
-                               f"EXCEP 중복 여부 : {result[2]}")
+    @app_commands.command(name="슬래시", description="슬래시 테스트 중")
+    async def tree(
+            self,
+            interaction: discord.Interaction,
+            nickname: str,
+            mainPos: str,
+            subPos: str) -> None:
+        await interaction.respons.send_message(f"ID : {interaction.user.id}\n"
+                                               f"닉네임 : {nickname}\n"
+                                               f"주포지션 : {mainPos}, 부포지션 : {subPos}")
 
+    @app_commands.command(name="테스트1", description="테스트 1번")
+    async def slasytest1(self, interaction: discord.Interaction) -> None:
+        await interaction.response.send_message("테스트1")'''
 
     @commands.command(name='테스트', pass_context=True)
-    async def _test(self, ctx) :
-        result = forAccessDB.getUserInformation(ctx)
-        await ctx.send(content=f"{result}")
+    async def _test1(self, ctx):
+        li = []
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
+        data_list = cur.fetchall()
+        data_list.sort(key=lambda x : x[1])  # Season 순으로 정렬
+        data_list.append((0, "", "", "", "", 0))
+        print(data_list)
+        for data in data_list:
+            print(data)
+            text = ""
+            season = str(data[1])
+            abbName = str(data[2])
+            job = str(data[3])
+            pos = str(data[4])
+            rank = str(data[5])
+            host = str(getHostFromSeasonTeamCount(season))
+            totalCount = str(getTotalCountFromSeasonTeamCount(season))
+            print(type(season), type(abbName), type(job), type(pos), type(rank), type(host), type(totalCount))
+            text = text + season + abbName + job + pos + rank + host + totalCount
+            print(text)
+            li.append(text)
+            print(li)
+        print(li)
 
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
@@ -49,10 +88,11 @@ class Test(commands.Cog):
         finally:
             conn.close()
         await ctx.send("닉변권 1회 추가")
+
     @commands.command(name='테스트4', pass_context=True)
     async def _test4(self, ctx):
-        result2 = myfun.recombinationNickname(ctx)
-        await ctx.send(content=f"{result2}")
+        print(type(forAccessDB.get))
+        print(type(forAccessDB.getTotalCountFromSeasonTeamCount("24-1")))
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):
@@ -71,5 +111,5 @@ class Test(commands.Cog):
 
 
 
-def setup(bot):
-    bot.add_cog(Test(bot))
+async def setup(bot):
+    await bot.add_cog(Test(bot))
