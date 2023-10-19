@@ -1,6 +1,3 @@
-from draft import *
-
-
 def makeListFromList(li):
     text = ''
     for i in range(len(li)):

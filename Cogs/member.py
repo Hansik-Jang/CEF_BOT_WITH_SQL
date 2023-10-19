@@ -27,7 +27,7 @@ class Member(commands.Cog) :
         nickname = ''
         mainPosition = ''
         subPosition = ''
-        teamNumber = 0
+        teamNumber = "FA"
         rank = "선수"
         nicknameChangeCoupon = 1
         # ----------------------------
@@ -496,7 +496,7 @@ class Member(commands.Cog) :
                     else:               # 닉변권이 0개일 경우
                         await ctx.reply(content=f"닉변권 개수가 {result[6]} 입니다.")
                 else:
-                    await ctx.reply(content=f"{ctx.author.mention}, 현재 '{insert_nickname}'와(과) 동일한 닉네임 혹은 유사한 닉네임이 사용 중입니다..\n"
+                    await ctx.reply(content=f"{ctx.author.mention}, 현재 '{insert_nickname}'와(과) 동일한 닉네임 혹은 유사한 닉네임이 사용 중입니다.\n"
                                             f"닉네임 수정 후 다시 명령어를 입력해주세요.\n"
                                             f"닉네임 중복 문제의 경우 '스태프'에게 문의해주세요.\n"
                                             f"해당 스레드는 30초 후 자동 삭제됩니다.")
@@ -506,8 +506,10 @@ class Member(commands.Cog) :
         else:
             await ctx.reply(config.notJoinText)
 
-    @commands.command(name='포지션변경', pas_context=True, aliases=['포변'])
+    @commands.command(name='포지션변경', pass_context=True, aliases=['포변'])
     async def _changePos(self, ctx):
+        mainPosition = 'X'
+        subPosition = 'X'
         if checkUseJoinCommand(ctx):
             name = myfun.getNickFromDisplayname(ctx)
             channel = get(ctx.guild.channels, id=ctx.channel.id)
@@ -517,7 +519,10 @@ class Member(commands.Cog) :
             )
             msg10 = await ctx.send(content=f"{ctx.author.mention}\n"
                                            f"{thread.mention}을 확인하여 가입을 진행주세요.")
-
+            annMessage = await thread.send(f"{ctx.author.mention}\n"
+                                           f"```포지션 선택 현황\n"
+                                           f"주포지션 : {mainPosition}\n"
+                                           f"부포지션 : {subPosition}```")
             embed = discord.Embed(title="메인 포지션을 선택합니다.", description="본인이 희망하는 '메인' 포지션의 번호를 30 초내에 입력해주세요.")
             embed.add_field(name="**1**", value="LW", inline=True)
             embed.add_field(name="**2**", value="ST", inline=True)
@@ -582,25 +587,30 @@ class Member(commands.Cog) :
                                       f"해당 스레드는 30초 후 자동 삭제됩니다.")
                     await asyncio.sleep(30)
                     await thread.delete()
-
+            print(mainPosition, subPosition, MAIN_POSITION_CHECK_SWITCH)
             await embed_msg.delete()
-            if MAIN_POSITION_CHECK_SWITCH :
-                embed = discord.Embed(title="서브 포지션을 선택합니다.", description="본인이 희망하는 '서브' 포지션의 번호를 30 초내에 입력해주세요.")
-                embed.add_field(name="**1**", value="LW", inline=True)
-                embed.add_field(name="**2**", value="ST", inline=True)
-                embed.add_field(name="**3**", value="RW", inline=True)
-                embed.add_field(name="**4**", value="CAM", inline=True)
-                embed.add_field(name="**5**", value="CM", inline=True)
-                embed.add_field(name="**6**", value="CDM", inline=True)
-                embed.add_field(name="**7**", value="LB", inline=True)
-                embed.add_field(name="**8**", value="CB", inline=True)
-                embed.add_field(name="**9**", value="RB", inline=True)
-                embed.add_field(name="", value="", inline=True)
-                embed.add_field(name="**10**", value="GK", inline=True)
-                embed.add_field(name="**0**", value="없음", inline=True)
-                embed2_msg = await thread.send(embed=embed)
+
+            if MAIN_POSITION_CHECK_SWITCH:
+                await annMessage.edit(content=f"```포지션 선택 현황\n"
+                                              f"주포지션 : {mainPosition}\n"
+                                              f"부포지션 : {subPosition}```")
+
+                embed2 = discord.Embed(title="서브 포지션을 선택합니다.", description="본인이 희망하는 '서브' 포지션의 번호를 30 초내에 입력해주세요.")
+                embed2.add_field(name="**1**", value="LW", inline=True)
+                embed2.add_field(name="**2**", value="ST", inline=True)
+                embed2.add_field(name="**3**", value="RW", inline=True)
+                embed2.add_field(name="**4**", value="CAM", inline=True)
+                embed2.add_field(name="**5**", value="CM", inline=True)
+                embed2.add_field(name="**6**", value="CDM", inline=True)
+                embed2.add_field(name="**7**", value="LB", inline=True)
+                embed2.add_field(name="**8**", value="CB", inline=True)
+                embed2.add_field(name="**9**", value="RB", inline=True)
+                embed2.add_field(name="", value="", inline=True)
+                embed2.add_field(name="**10**", value="GK", inline=True)
+                embed2.add_field(name="**0**", value="없음", inline=True)
+                embed2_msg = await thread.send(embed=embed2)
                 try :
-                    msg = await self.bot.wait_for("message",
+                    msg2 = await self.bot.wait_for("message",
                                                   check=lambda
                                                       m : m.author == ctx.author and m.channel == thread,
                                                   timeout=30.0)
@@ -613,66 +623,74 @@ class Member(commands.Cog) :
                     await thread.delete()
 
                 else :
-                    if msg.content.lower() == '1' :
+                    if msg2.content.lower() == '1' :
                         subPosition = "LW"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '2' :
+                    elif msg2.content.lower() == '2' :
                         subPosition = "ST"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '3' :
+                    elif msg2.content.lower() == '3' :
                         subPosition = "RW"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '4' :
+                    elif msg2.content.lower() == '4' :
                         subPosition = "CAM"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '5' :
+                    elif msg2.content.lower() == '5' :
                         subPosition = "CM"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '6' :
+                    elif msg2.content.lower() == '6' :
                         subPosition = "CDM"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '7' :
+                    elif msg2.content.lower() == '7' :
                         subPosition = "LB"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '8' :
+                    elif msg2.content.lower() == '8' :
                         subPosition = "CB"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '9' :
+                    elif msg2.content.lower() == '9' :
                         subPosition = "RB"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '10' :
+                    elif msg2.content.lower() == '10' :
                         subPosition = "GK"
                         SUB_POSITION_CHECK_SWITCH = True
-                    elif msg.content.lower() == '0' :
+                    elif msg2.content.lower() == '0' :
                         subPosition = ""
                         SUB_POSITION_CHECK_SWITCH = True
                     else :
+                        await msg10.delete()
                         await thread.send("잘못 입력하였습니다..\n"
                                           f"다시 명령어를 입력해주세요\n"
                                           f"해당 스레드는 30초 후 자동 삭제됩니다.")
-                await msg10.delete()
-                await asyncio.sleep(30)
-                await thread.delete()
-
-                await embed2_msg.delete()
-
+                        await asyncio.sleep(30)
+                        await thread.delete()
+            print(mainPosition, subPosition, SUB_POSITION_CHECK_SWITCH)
+            await embed2_msg.delete()
+            await annMessage.edit(content=f"```포지션 선택 현황\n"
+                                          f"주포지션 : {mainPosition}\n"
+                                          f"부포지션 : {subPosition}```")
             # ==== 주포, 부포 같을 시 부포 삭제
             if mainPosition == subPosition :
                 subPosition = ''
-
+            print(mainPosition, subPosition)
             # DB 업데이트
             nickname = myfun.getNickFromDisplayname(ctx)
-            imoji = myfun.getimoji(ctx)
+            print(nickname)
+            imoji = myfun.getImoji(ctx)
+            print(imoji)
             edit_nickname = myfun.recombinationNickname(nickname, mainPosition, subPosition, imoji)
+            print(edit_nickname)
             ex_mainPos = forAccessDB.getMainPositionFromUserInfo(ctx)
+            print(ex_mainPos)
             ex_subPos = forAccessDB.getSubPositionFromUserInfo(ctx)
+            print(ex_subPos)
             try:
                 conn = sqlite3.connect("CEF.db")
                 cur = conn.cursor()
-                cur.execute("UPDATE USER_INFORMATION SET  MainPosition=?, SubPosition=?, WHERE id=?",
+                cur.execute("UPDATE USER_INFORMATION SET  MainPosition=?, SubPosition=? WHERE id=?",
                             (mainPosition, subPosition, ctx.author.id))
                 print("DB 업데이트 완료")
             finally:
+                conn.commit()
                 conn.close()
             user = ctx.author
             await user.edit(nick=edit_nickname)
@@ -680,7 +698,84 @@ class Member(commands.Cog) :
                             f"주포지션 : {ex_mainPos} -> {mainPosition}\n"
                             f"부포지션 : {ex_subPos} -> {subPosition}")
 
+            await thread.send(content=f"가입 절차가 완료되었습니다.\n"
+                                      f"해당 스레드는 30초 후 자동 삭제됩니다.")
+            await msg10.delete()
+            await asyncio.sleep(30)
+            await thread.delete()
+
+
         else:
+            await ctx.reply(config.notJoinText)
+
+
+    @commands.command(name="닉변권부여", pass_context=True, aliases=['닉변권'])
+    async def _giveNickChagneCoupon(self, ctx, member:discord.Member, count:int):
+        if count is None:
+            count = 1
+        role_names = [role.name for role in ctx.author.roles]
+        if "스태프" in role_names:
+            if 0 < count < 11:
+                if checkUseJoinCommandWithID(member.id) :
+                    print("A")
+                    ex_changeCoupon = getNickChangeCouponFromUserInfoWithID(member.id)
+                    new_changeCoupon = ex_changeCoupon + count
+                    try:
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        cur.execute("UPDATE USER_INFORMATION SET NickChangeCoupon=? WHERE ID=?", (new_changeCoupon, member.id))
+
+                    finally:
+                        conn.commit()
+                        conn.close()
+                    await ctx.send(f"{member.mention}\n"
+                                   f"{myfun.getNickFromDisplayname2(member.display_name)} 닉변권 {count} 회 추가되었습니다.\n"
+                                   f"{ex_changeCoupon} 회 -> {new_changeCoupon} 회")
+                else :
+                    await ctx.reply("해당 인원은 등록되지 않는 인원입니다.")
+            else:
+                await ctx.reply("1 이상, 10 이하의 숫자만 입력 가능합니다.")
+        else:
+            await ctx.reply("해당 명령어는 스태프만 사용 가능합니다.")
+
+    @commands.command(name="닉네임검색", pass_context=True, aliases=['검색'])
+    async def _searchNickname(self, ctx, *, searchNickname:str):
+        li = []
+        searchingSwitch = 0
+        text = ''
+        if checkUseJoinCommand(ctx):
+            if searchNickname is not None:
+                searchNickname2 = searchNickname.replace(" ", "").lower()
+                conn = sqlite3.connect("CEF.db")
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM USER_INFORMATION")
+                result = cur.fetchall()
+                conn.close()
+                for row in result:
+                    nicknameInDB = row[1]
+                    nicknameInDB2 = row[1].replace(" ", "").lower()
+                    if nicknameInDB2 == searchNickname2:
+                        searchingSwitch = 1                    # 일치
+                        #li.append((searchingSwitch, nicknameInDB))
+                        text = text + "일치 | " + nicknameInDB + "\n"
+                    elif nicknameInDB2 in searchNickname2:
+                        searchingSwitch = 2                    # 검색 닉네임 ⊃ DB 내 닉네임
+                        #li.append((searchingSwitch, nicknameInDB))
+                        text = text + "포함 | " + nicknameInDB + "\n"
+                    elif searchNickname2 in nicknameInDB2:
+                        searchingSwitch = 3                    # DB 내 닉네임 ⊃ 검색 닉네임
+                        #li.append((searchingSwitch, nicknameInDB))
+                        text = text + "포함 | " + nicknameInDB + "\n"
+
+                if text == '':
+                    text = "없음"
+                await ctx.send(f"**<검색 결과>**\n"
+                               f"```{text}```")
+
+            else:
+                await ctx.reply("검색할 닉네임을 작성해주세요\n"
+                                "사용법 : $닉네임검색 '닉네임' or $검색 '닉네임")
+        else :
             await ctx.reply(config.notJoinText)
 
 

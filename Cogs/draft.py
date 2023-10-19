@@ -3,7 +3,7 @@ import time
 import random
 from FunForDraft import *
 from discord.ext import commands
-import discord
+from discord.utils import get
 # from discord.ui import Button, View
 import asyncio
 import draftclass
@@ -64,20 +64,6 @@ draftclass.TeamD()
 class Draft(commands.Cog) :
     def __init__(self, bot) :
         self.bot = bot
-        self.buttons = ButtonsClient(bot)
-        self.buttonST = Button(label='ST', custom_id='st', style=ButtonType().Danger)
-        self.buttonLW = Button(label='LW', custom_id='lw', style=ButtonType().Danger)
-        self.buttonRW = Button(label='RW', custom_id='rw', style=ButtonType().Danger)
-        self.buttonCAM = Button(label='CAM', custom_id='cam', style=ButtonType().Success)
-        self.buttonCM = Button(label='CM', custom_id='cm', style=ButtonType().Success)
-        self.buttonCDM = Button(label='CDM', custom_id='cdm', style=ButtonType().Success)
-        self.buttonLB = Button(label='LB', custom_id='lb', style=ButtonType().Primary)
-        self.buttonCB = Button(label='CB', custom_id='cb', style=ButtonType().Primary)
-        self.buttonRB = Button(label='RB', custom_id='rb', style=ButtonType().Primary)
-        self.buttonGK = Button(label='GK', custom_id='gk', style=ButtonType().Secondary)
-        self.button_li = [self.buttonST, self.buttonLW, self.buttonRW,
-                          self.buttonCAM, self.buttonCM, self.buttonCDM,
-                          self.buttonLB, self.buttonCB, self.buttonRB, self.buttonGK]
 
         self.DraftSwitchTwo = False
         self.DraftSwitchThree = False
@@ -320,7 +306,7 @@ class Draft(commands.Cog) :
                 await draft.add_reaction(pos)
 
             cd = await ctx.send("카운트 다운")
-            for i in range(0, DRAFT_TIME):
+            for i in range(0, 10):
                 j = DRAFT_TIME - i
                 await cd.edit(content=f"{j}초 남았습니다. 누른 사람 : {len(testentry)}명")
                 time.sleep(1)
@@ -665,10 +651,6 @@ class Draft(commands.Cog) :
                     await ctx.send(content=f"올바르지 않은 순서입니다.\n"
                                            f"현재 {TeamD.getCapData().mention} 차례입니다.")
 
-    @commands.Cog.listener()
-    async def on_ready(self) :
-        DiscordComponents(self.bot)
-
     @commands.command(name='버튼', pass_context=True)
     async def 버튼(self, ctx) :
         switch = True
@@ -735,7 +717,7 @@ class Draft(commands.Cog) :
         summary = temp[3]
         detail = temp[5]
 
-        conn = sqlite3.connect("CEF.db")
+        conn = sqlite3.connect("../CEF.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM Nae")
         count = 1
@@ -744,7 +726,7 @@ class Draft(commands.Cog) :
                 count += 1
 
         try:
-            conn = sqlite3.connect("CEF.db")
+            conn = sqlite3.connect("../CEF.db")
             cur = conn.cursor()
             cur.execute("INSERT INTO Nae VALUES(?, ?, ?, ?, ?, ?)",
                         (idnum, name, count, formation, summary, detail))
@@ -790,7 +772,7 @@ class Draft(commands.Cog) :
     async def _임시주장3(self, ctx):
         temp = []
         try:
-            conn = sqlite3.connect("CEF.db")
+            conn = sqlite3.connect("../CEF.db")
             cur = conn.cursor()
             cur.execute("SELECT * FROM Nae")
             for row in cur.fetchall():
@@ -811,7 +793,7 @@ class Draft(commands.Cog) :
         temp = []
         id = member.id
         try:
-            conn = sqlite3.connect("CEF.db")
+            conn = sqlite3.connect("../CEF.db")
             cur = conn.cursor()
             cur.execute("SELECT * FROM Nae WHERE id=?", (id, ))
             for row in cur.fetchall():
@@ -857,7 +839,7 @@ class Draft(commands.Cog) :
         print(captainID)
         for ids in captainID:
             temp.clear()
-            conn = sqlite3.connect("CEF.db")
+            conn = sqlite3.connect("../CEF.db")
             cur = conn.cursor()
             cur.execute("SELECT * FROM Nae WHERE id=?", (ids, ))
             for row in cur.fetchall():
@@ -1165,5 +1147,5 @@ class Draft(commands.Cog) :
                 gk.append(user.mention)
 '''
 
-
-
+async def setup(bot):
+    await bot.add_cog(Draft(bot))

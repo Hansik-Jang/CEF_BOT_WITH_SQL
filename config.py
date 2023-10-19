@@ -34,3 +34,15 @@ def devlopCheck(ctx):
         return True
     else:
         return False
+
+
+'''
+        role_names = [role.name for role in ctx.author.roles]
+        if "스태프" in role_names :
+            if checkUseJoinCommandWithID(member.id):
+                pass
+            else :
+                await ctx.reply("해당 인원은 등록되지 않는 인원입니다.")
+        else:
+            await ctx.reply("해당 명령어는 스태프만 사용 가능합니다.")
+'''

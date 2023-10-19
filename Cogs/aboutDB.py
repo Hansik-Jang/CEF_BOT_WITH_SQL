@@ -33,14 +33,6 @@ class AboutDB(commands.Cog):
         print(rows)
         await ctx.send(content=f"{rows}")
 
-    @commands.command(name='팀리스트', pass_context=True)
-    async def _showTeamLIst(self, ctx):
-        try:
-            conn = sqlite3.connect("CEF.db")
-            cur = conn.cursor()
-        finally:
-            conn.close()
-
 
 async def setup(bot):
     await bot.add_cog(AboutDB(bot))

@@ -1,6 +1,7 @@
 import string
 import forAccessDB
 
+
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname2(name):
     temp = name.split('[')
@@ -64,6 +65,7 @@ def getImojiFromDisplayname(ctx):
 def getImoji(ctx):
     imoji = ""
     role_names = [role.name for role in ctx.author.roles]
+    print(role_names)
     if "TOTS🥇" in role_names:
         imoji = imoji + "🥇"
     if "TOTS Nomi🥈" in role_names:
@@ -119,3 +121,8 @@ def teamNameConvert(name):
         return 'TEAM_E'
     else:
         return 'error'
+
+def getRoleCount(ctx, roleName):
+    from discord.utils import get
+    discordRole = get(ctx.guild.roles, name=roleName)
+    return str(len(discordRole.members))

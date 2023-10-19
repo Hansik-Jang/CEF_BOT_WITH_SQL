@@ -15,11 +15,30 @@ def checkUseJoinCommand(ctx):
     else:
         return False
 
+def checkUseJoinCommandWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
+    result = cur.fetchone()
+    conn.close()
+    if result is not None:
+        return True
+    else:
+        return False
+
 
 def getUserInformation(ctx):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (ctx.author.id,))
+    result = cur.fetchone()
+    conn.close()
+    return result
+
+def getUserInformationWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
     result = cur.fetchone()
     conn.close()
     return result
@@ -30,6 +49,15 @@ def getNicknameFromUserInfo(ctx):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (ctx.author.id,))
+    result = cur.fetchone()
+    nickname = result[1]
+    conn.close()
+    return nickname
+
+def getNicknameFromUserInfoWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", id)
     result = cur.fetchone()
     nickname = result[1]
     conn.close()
@@ -46,6 +74,16 @@ def getMainPositionFromUserInfo(ctx):
     return mainPosition
 
 
+def getMainPositionFromUserInfoWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
+    result = cur.fetchone()
+    mainPosition = result[2]
+    conn.close()
+    return mainPosition
+
+
 def getSubPositionFromUserInfo(ctx):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
@@ -55,11 +93,30 @@ def getSubPositionFromUserInfo(ctx):
     conn.close()
     return subPosition
 
+def getSubPositionFromUserInfoWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
+    result = cur.fetchone()
+    subPosition = result[3]
+    conn.close()
+    return subPosition
 
-def getTeamNumberFromUserInfo(ctx):
+
+def getTeamNameFromUserInfo(ctx):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (ctx.author.id,))
+    result = cur.fetchone()
+    TeamNumber = result[4]
+    conn.close()
+    return TeamNumber
+
+
+def getTeamNameFromUserInfoWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
     result = cur.fetchone()
     TeamNumber = result[4]
     conn.close()
@@ -75,39 +132,57 @@ def getRankFromUserInfo(ctx):
     conn.close()
     return rank
 
+def getRankFromUserInfoWithID(id):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
+    result = cur.fetchone()
+    rank = result[5]
+    conn.close()
+    return rank
+
 
 def getNickChangeCouponFromUserInfo(ctx):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (ctx.author.id,))
     result = cur.fetchone()
-    nickChangeCoupon = result[1]
+    nickChangeCoupon = result[6]
     conn.close()
     return nickChangeCoupon
 
-# ------------- USER_INFORMATION -------------
-
-def getTeamAbbNameFromTeamInfor(ctx):
+def getNickChangeCouponFromUserInfoWithID(id):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Number=?", (getTeamNumberFromUserInfo(ctx), ))
+    cur.execute("SELECT * FROM USER_INFORMATION WHERE ID=?", (id,))
     result = cur.fetchone()
-    abbName = result[1]
-    return abbName
+    nickChangeCoupon = result[6]
+    conn.close()
+    return nickChangeCoupon
+
+# ------------- TEAM_INFORMATION -------------
 
 
-def getTeamFullNameFromTeamInfor(ctx):
+def getTeamFullNameFromTeamInfor(abbTeamName):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Number=?", (getTeamNumberFromUserInfo(ctx), ))
+    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName, ))
     result = cur.fetchone()
-    fullName = result[2]
+    fullName = result[1]
     return fullName
 
-def getColorCodeFromTeamInfor(ctx):
+def getColorCodeFromTeamInfor(abbTeamName):
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
-    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Number=?", (getTeamNumberFromUserInfo(ctx), ))
+    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName, ))
+    result = cur.fetchone()
+    colorCode = result[2]
+    return colorCode
+
+def getLastRankFromTeamInfor(abbTeamName):
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName, ))
     result = cur.fetchone()
     colorCode = result[3]
     return colorCode

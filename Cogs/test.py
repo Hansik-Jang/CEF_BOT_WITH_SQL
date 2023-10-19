@@ -41,30 +41,7 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True)
     async def _test1(self, ctx):
-        li = []
-        conn = sqlite3.connect("CEF.db")
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
-        data_list = cur.fetchall()
-        data_list.sort(key=lambda x : x[1])  # Season 순으로 정렬
-        data_list.append((0, "", "", "", "", 0))
-        print(data_list)
-        for data in data_list:
-            print(data)
-            text = ""
-            season = str(data[1])
-            abbName = str(data[2])
-            job = str(data[3])
-            pos = str(data[4])
-            rank = str(data[5])
-            host = str(getHostFromSeasonTeamCount(season))
-            totalCount = str(getTotalCountFromSeasonTeamCount(season))
-            print(type(season), type(abbName), type(job), type(pos), type(rank), type(host), type(totalCount))
-            text = text + season + abbName + job + pos + rank + host + totalCount
-            print(text)
-            li.append(text)
-            print(li)
-        print(li)
+        print(myfun.getRoleCount(ctx, "CEF"))
 
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
@@ -91,8 +68,8 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트4', pass_context=True)
     async def _test4(self, ctx):
-        print(type(forAccessDB.get))
-        print(type(forAccessDB.getTotalCountFromSeasonTeamCount("24-1")))
+        pass
+
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):
