@@ -266,45 +266,30 @@ def getInforFromTotsFW(ctx) :
 
 # ------------- HISTORY -------------
 
-def getInfoFromSeasonUserHistory(ctx) :
-    text = ''
-    text_li = []
+def getHystoryFromSeasonUserHistory(ctx) :
     conn = sqlite3.connect("CEF.db")
     cur = conn.cursor()
     cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
-    data_list = cur.fetchall()
-    data_list.sort(key=lambda x : x[1])  # Season 순으로 정렬
-    print(data_list)
-    for data in data_list :
-        text = ''
-        # print("C - ", data)
-        # data / 1 : 시즌, 2 : 팀약자, 3 : 직책, 4 : 포지션, 5 : 순위(int)
-        # text = text + getHostFromSeasonTeamCount(data[1]) + " " + data[1] + " 시즌 " + data[2] + " " + data[3] + " "\
-        #       + data[4] + " " + str(data[5]) + "위 (" + str(getTotalCountFromSeasonTeamCount(data[1])) + "팀)\n"
-        # print(text)
-        text = text + getHostFromSeasonTeamCount(data[1]) + " " + data[1] + " 시즌 " + data[2] + " " + data[3] + " " \
-               + data[4] + " " + str(data[5]) + "위 (" + str(getTotalCountFromSeasonTeamCount(data[1])) + "팀)\n"
+    result = cur.fetchall()
+    nickname = getNicknameFromUserInfoWithID(ctx.author.id)
+    text = ''
+    for row in result :
+        season = row[1]
+        print(season, type(season))
+        team = row[2]
+        print(team, type(team))
+        job = row[3]
+        print(job, type(job))
+        position = row[4]
+        print(position, type(position))
+        rank = row[5]
+        print(rank, type(rank))
+        totalcount = getTotalCountFromSeasonTeamCount(season)
+        print(totalcount, type(totalcount))
+        text = text + season + " 시즌 | " + team + " (" + job + ") 포지션 : " + position + " | 총 " + str(
+            totalcount) + "팀 중 " + str(rank) + "위\n"
         print(text)
-        text_li.append(text)
 
-    print(text_li)
-    '''
-            for data in data_list:
-            text = ''
-            print(data)
-            host = str(getHostFromSeasonTeamCount(data[1]))
-            season = str(data[1])
-            abbName = str(data[2])
-            job = str(data[3])
-            pos = str(data[4])
-            rank = str(data[5])
-            totalCount = str(getHostFromSeasonTeamCount(season))
-            text = text + host + " " + season + " 시즌 " + abbName + " " + job + " " \
-                   + pos + " " + rank + "위 (" + totalCount + "팀)\n"
-            print(text)
-            li.append(text)
-            print(li)
-            '''
     return text
 
 
@@ -362,6 +347,7 @@ def getStartDateFromContract(ctx) :
     cur = conn.cursor()
     cur.execute("SELECT StartDate FROM CONTRACT WHERE ID=?", (ctx.author.id,))
     startDate = cur.fetchone()
+    print(startDate)
     return startDate[0]
 
 
