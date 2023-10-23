@@ -10,7 +10,7 @@ import asyncio
 import checkFun
 import forAccessDB
 from forAccessDB import *
-
+from datetime import datetime, timedelta
 from typing import Literal, Optional
 from discord.ext import commands
 from discord.ext.commands import Greedy, Context # or a subclass of yours
@@ -41,8 +41,15 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True)
     async def _test1(self, ctx):
-        print(myfun.getRoleCount(ctx, "CEF"))
+        from table2ascii import table2ascii as t2a, PresetStyle
 
+        output = t2a(
+            header=["닉네임", "계약 시작일", "계약기간", "계약 종료일"],
+            body=[["테스트1", 20231021, 30, 20231119], ["테스트2", 20231021, 20, 20231109],
+                  ["테스트3", 20231022, 14, 20231104], ["테스트4", 20231023, 30, 20231121]],
+            style=PresetStyle.borderless
+        )
+        await ctx.send(f"```\n{output}\n```")
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):
@@ -67,9 +74,15 @@ class Test(commands.Cog):
         await ctx.send("닉변권 1회 추가")
 
     @commands.command(name='테스트4', pass_context=True)
-    async def _test4(self, ctx):
-        pass
+    async def _test4(self, ctx, startDate, period):
+        startDate_time = myfun.convertTextToDatetime(startDate)
+        print(startDate_time)
 
+        period = int(period)
+        print(period, type(period))
+        endData = startDate_time + timedelta(days=period-1)
+
+        print(endData)
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):

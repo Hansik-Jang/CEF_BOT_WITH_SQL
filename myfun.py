@@ -1,6 +1,6 @@
 import string
 import forAccessDB
-
+from datetime import datetime, timedelta
 
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname2(name):
@@ -122,7 +122,58 @@ def teamNameConvert(name):
     else:
         return 'error'
 
+
 def getRoleCount(ctx, roleName):
     from discord.utils import get
     discordRole = get(ctx.guild.roles, name=roleName)
     return str(len(discordRole.members))
+
+
+def getDateToday():
+    from datetime import datetime, timedelta
+    time = datetime.now()
+    year = str(time.year)
+    month = str(time.month)
+    day = str(time.day)
+    return year, month, day
+
+def convertDate(date):
+    temp = date.split("/")
+    year = temp[0]
+    month = temp[1]
+    day = temp[2]
+
+    return year + ". " + month + ". " + day
+
+
+def calculateRemainDate(text):
+    try:
+        endDate_datetime = convertTextToDatetime(text)
+        today = datetime.now()
+        result = endDate_datetime - today
+        result2 = result.days + 2
+    except:
+        result2 = ""
+    return result2
+
+def convertTextToDatetime(text):
+    try:
+        temp = text.split("/")
+        year = int(temp[0])
+        month = int(temp[1])
+        day = int(temp[2])
+        result = datetime(year, month, day)
+    except:
+        result = ""
+    return result
+
+def convertDateTimeToText(dateTime):
+    try:
+        year = str(dateTime.year)
+        month = str(dateTime.month)
+        day = str(dateTime.day)
+        result = year + "/" + month + "/" + day
+    except:
+        result = ''
+    return result
+

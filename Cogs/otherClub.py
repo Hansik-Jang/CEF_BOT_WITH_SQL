@@ -25,9 +25,9 @@ class OtherClub(commands.Cog):
                     RFA_ROLE = get(ctx.guild.roles, name="RFA")
                     KPA_ROLE = get(ctx.guild.roles, name="KPA")
                     CEF_ROLE = get(ctx.guild.roles, name="CEF")
-                    NEW_ROLE = get(ctx.guild.roles, name="신규")
-                    ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
-                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA"]
+                    NEW_ROLE = get(ctx.guild.roles, name="신규🐤")
+                    DELETE_ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
+                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA", "신규🐤"]
                     user = ctx.author
 
                     delete_message = ''
@@ -45,7 +45,7 @@ class OtherClub(commands.Cog):
                             elif role == "KPA" :
                                 delete_message = delete_message + "KPA"
 
-                            for ROLE in ROLE_LIST :  # 모든 관련 역할 제거
+                            for ROLE in DELETE_ROLE_LIST :  # 모든 관련 역할 제거
                                 await user.remove_roles(ROLE)
 
                     await user.add_roles(EVE_ROLE)  # 역할 추가
@@ -79,9 +79,9 @@ class OtherClub(commands.Cog):
                     RFA_ROLE = get(ctx.guild.roles, name="RFA")
                     KPA_ROLE = get(ctx.guild.roles, name="KPA")
                     CEF_ROLE = get(ctx.guild.roles, name="CEF")
-                    NEW_ROLE = get(ctx.guild.roles, name="신규")
-                    ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
-                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA"]
+                    NEW_ROLE = get(ctx.guild.roles, name="신규🐤")
+                    DELETE_ROLE_LIST = []
+                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA", "신규🐤"]
                     user = ctx.author
 
                     delete_message = ''
@@ -90,16 +90,23 @@ class OtherClub(commands.Cog):
                         if role in role_names :  # 본인 역할에 서버 역할이 하나라도 있을 경우
                             if role == "CEF" :  # 삭제된 역할 목록 저장
                                 delete_message = delete_message + "CEF"
+                                DELETE_ROLE_LIST.append(CEF_ROLE)
                             elif role == "EVE" :
                                 delete_message = delete_message + "EVE"
+                                DELETE_ROLE_LIST.append(EVE_ROLE)
                             elif role == "SNI:" :
                                 delete_message = delete_message + "SNI"
+                                DELETE_ROLE_LIST.append(SNI_ROLE)
                             elif role == "RFA" :
                                 delete_message = delete_message + "RFA"
+                                DELETE_ROLE_LIST.append(RFA_ROLE)
                             elif role == "KPA" :
                                 delete_message = delete_message + "KPA"
+                                DELETE_ROLE_LIST.append(KPA_ROLE)
+                            elif role == "신고🐤":
+                                DELETE_ROLE_LIST.append(NEW_ROLE)
 
-                            for ROLE in ROLE_LIST :  # 모든 관련 역할 제거
+                            for ROLE in DELETE_ROLE_LIST :  # 모든 관련 역할 제거
                                 await user.remove_roles(ROLE)
 
                     await user.add_roles(SNI_ROLE)  # 역할 추가
@@ -134,28 +141,38 @@ class OtherClub(commands.Cog):
                     RFA_ROLE = get(ctx.guild.roles, name="RFA")
                     KPA_ROLE = get(ctx.guild.roles, name="KPA")
                     CEF_ROLE = get(ctx.guild.roles, name="CEF")
-                    NEW_ROLE = get(ctx.guild.roles, name="신규")
-                    ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
-                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA"]
+                    NEW_ROLE = get(ctx.guild.roles, name="신규🐤")
+                    DELETE_ROLE_LIST = []
+                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA", "신규🐤"]
                     user = ctx.author
 
                     delete_message = ''
 
                     for role in role_check_text_list :  # 본인 역할에 서버 역할들이 들어있는지 검사 시작
+                        print(role, "A")
                         if role in role_names :  # 본인 역할에 서버 역할이 하나라도 있을 경우
+                            print(role)
                             if role == "CEF" :  # 삭제된 역할 목록 저장
                                 delete_message = delete_message + "CEF"
+                                DELETE_ROLE_LIST.append(CEF_ROLE)
                             elif role == "EVE" :
                                 delete_message = delete_message + "EVE"
+                                DELETE_ROLE_LIST.append(EVE_ROLE)
                             elif role == "SNI:" :
                                 delete_message = delete_message + "SNI"
+                                DELETE_ROLE_LIST.append(SNI_ROLE)
                             elif role == "RFA" :
                                 delete_message = delete_message + "RFA"
+                                DELETE_ROLE_LIST.append(RFA_ROLE)
                             elif role == "KPA" :
                                 delete_message = delete_message + "KPA"
+                                DELETE_ROLE_LIST.append(KPA_ROLE)
+                            elif role == "신규🐤":
+                                DELETE_ROLE_LIST.append(NEW_ROLE)
 
-                            for ROLE in ROLE_LIST :  # 모든 관련 역할 제거
-                                await user.remove_roles(ROLE)
+                            #for ROLE in DELETE_ROLE_LIST :  # 모든 관련 역할 제거
+                            await user.edit(roles=[])
+                            print("B")
 
                     await user.add_roles(KPA_ROLE)  # 역할 추가
                     if delete_message == '' :
@@ -188,9 +205,9 @@ class OtherClub(commands.Cog):
                     RFA_ROLE = get(ctx.guild.roles, name="RFA")
                     KPA_ROLE = get(ctx.guild.roles, name="KPA")
                     CEF_ROLE = get(ctx.guild.roles, name="CEF")
-                    NEW_ROLE = get(ctx.guild.roles, name="신규")
-                    ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
-                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA"]
+                    NEW_ROLE = get(ctx.guild.roles, name="신규🐤")
+                    DELETE_ROLE_LIST = [CEF_ROLE, EVE_ROLE, SNI_ROLE, RFA_ROLE, KPA_ROLE, CEF_ROLE, NEW_ROLE]
+                    role_check_text_list = ["CEF", "EVE", "SNI", "KPA", "RFA", "신규🐤"]
                     user = ctx.author
 
                     delete_message = ''
@@ -208,7 +225,7 @@ class OtherClub(commands.Cog):
                             elif role == "KPA" :
                                 delete_message = delete_message + "KPA"
 
-                            for ROLE in ROLE_LIST :                                                 # 모든 관련 역할 제거
+                            for ROLE in DELETE_ROLE_LIST :                                                 # 모든 관련 역할 제거
                                 await user.remove_roles(ROLE)
 
                     await user.add_roles(RFA_ROLE)                                                  # 역할 추가

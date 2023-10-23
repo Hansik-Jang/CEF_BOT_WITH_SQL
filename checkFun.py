@@ -4,6 +4,15 @@ import string
 import discord
 import asyncio
 
+
+def checkStaff(ctx):
+    role_names = [role.name for role in ctx.author.roles]
+    if "스태프" in role_names:
+        result = True
+    else:
+        result = False
+    return result
+
 def checkDisplayNameChange(ctx):
     if ctx.author.display_name != ctx.author.name:
         return True

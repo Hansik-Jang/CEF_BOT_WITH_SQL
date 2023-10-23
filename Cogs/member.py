@@ -452,7 +452,6 @@ class Member(commands.Cog) :
                 await thread.delete()
                 user = ctx.author
 
-
     @commands.command(name='닉네임변경', pass_context=True, aliases=['닉변'])
     async def _changeNick(self, ctx, *, insert_nickname=None):
         result = forAccessDB.getUserInformation(ctx)
@@ -463,38 +462,39 @@ class Member(commands.Cog) :
             if insert_nickname is not None :
                 # 닉네임 중복 검사
                 if checkFun.checkNicknameOverlapText(insert_nickname):
+                    if checkFun.checkEnglish(ctx):
+                        # 닉변권 개수 검사
+                        if result[6] > 0:   # 1개 이상일 경우에만 가능
+                            # 입력 데이터 정리
+                            myID = ctx.author.id
+                            nickname = insert_nickname
+                            reduceCount = result[6] - 1
+                            # DB 업데이트
+                            try :
+                                conn = sqlite3.connect("CEF.db")
+                                cur = conn.cursor()
+                                cur.execute("UPDATE USER_INFORMATION SET Nickname=?, NickChangeCoupon=? WHERE id=?", (nickname, reduceCount, myID))
+                                conn.commit()
+                            finally :
+                                conn.close()
 
-                    # 닉변권 개수 검사
-                    if result[6] > 0:   # 1개 이상일 경우에만 가능
-                        # 입력 데이터 정리
-                        myID = ctx.author.id
-                        nickname = insert_nickname
-                        reduceCount = result[6] - 1
-                        # DB 업데이트
-                        try :
-                            conn = sqlite3.connect("CEF.db")
-                            cur = conn.cursor()
-                            cur.execute("UPDATE USER_INFORMATION SET Nickname=?, NickChangeCoupon=? WHERE id=?", (nickname, reduceCount, myID))
-                            conn.commit()
-                        finally :
-                            conn.close()
-
-                        # 디스코드 닉네임 수정
-                        result = forAccessDB.getUserInformation(ctx)
-                        nickname = result[1]
-                        mainPos = result[2]
-                        subPos = result[3]
-                        imoji = getImoji(ctx)
-                        edit_nickname = myfun.recombinationNickname(nickname, mainPos, subPos, imoji)
-                        user = ctx.author
-                        await user.edit(nick=edit_nickname)
-                        await ctx.reply(content=f"닉네임 변경이 완료되었습니다.\n"
-                                                f"{ex_nickname} -> {edit_nickname}\n"
-                                                f"남은 닉변권 개수 : {reduceCount}")
-
-
-                    else:               # 닉변권이 0개일 경우
-                        await ctx.reply(content=f"닉변권 개수가 {result[6]} 입니다.")
+                            # 디스코드 닉네임 수정
+                            result = forAccessDB.getUserInformation(ctx)
+                            nickname = result[1]
+                            mainPos = result[2]
+                            subPos = result[3]
+                            imoji = getImoji(ctx)
+                            edit_nickname = myfun.recombinationNickname(nickname, mainPos, subPos, imoji)
+                            user = ctx.author
+                            await user.edit(nick=edit_nickname)
+                            await ctx.reply(content=f"닉네임 변경이 완료되었습니다.\n"
+                                                    f"{ex_nickname} -> {edit_nickname}\n"
+                                                    f"남은 닉변권 개수 : {reduceCount}")
+                        else:               # 닉변권이 0개일 경우
+                            await ctx.reply(content=f"닉변권 개수가 {result[6]} 입니다.")
+                    else:
+                        await ctx.reply(f"스태프를 제외한 인원은 영문으로 닉네임이 제한되어 있습니다.\n"
+                                        f"수정 후 다시 입력해주세요")
                 else:
                     await ctx.reply(content=f"{ctx.author.mention}, 현재 '{insert_nickname}'와(과) 동일한 닉네임 혹은 유사한 닉네임이 사용 중입니다.\n"
                                             f"닉네임 수정 후 다시 명령어를 입력해주세요.\n"

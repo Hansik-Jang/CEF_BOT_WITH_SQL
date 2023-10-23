@@ -6,7 +6,7 @@ from discord.utils import get
 from forAccessDB import *
 
 
-class Team(commands.Cog):
+class ManageTeam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -84,4 +84,4 @@ class Team(commands.Cog):
             await ctx.reply("해당 인원은 등록되지 않는 인원입니다.")
 
 async def setup(bot):
-    await bot.add_cog(Team(bot))
+    await bot.add_cog(ManageTeam(bot))
