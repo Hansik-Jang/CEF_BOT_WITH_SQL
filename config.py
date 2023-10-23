@@ -39,7 +39,7 @@ def devlopCheck(ctx):
 '''
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
-            if checkUseJoinCommandWithID(member.id):
+            if checkUseJoinCommandWithID(ctx.author.id):
                 pass
             else :
                 await ctx.reply("해당 인원은 등록되지 않는 인원입니다.")

@@ -1,6 +1,8 @@
 import string
 import forAccessDB
 from datetime import datetime, timedelta
+import discord
+from discord.utils import get
 
 # display_name으로부터 닉네임 정보 얻기
 def getNickFromDisplayname2(name):
@@ -176,4 +178,5 @@ def convertDateTimeToText(dateTime):
     except:
         result = ''
     return result
+
 

@@ -74,15 +74,8 @@ class Test(commands.Cog):
         await ctx.send("닉변권 1회 추가")
 
     @commands.command(name='테스트4', pass_context=True)
-    async def _test4(self, ctx, startDate, period):
-        startDate_time = myfun.convertTextToDatetime(startDate)
-        print(startDate_time)
-
-        period = int(period)
-        print(period, type(period))
-        endData = startDate_time + timedelta(days=period-1)
-
-        print(endData)
+    async def _test4(self, ctx, member:discord.Member):
+        pass
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):

@@ -295,9 +295,8 @@ class Contract(commands.Cog):
                         try :
                             conn = sqlite3.connect("CEF.db")
                             cur = conn.cursor()
-                            cur.execute("UPDATE CONTRACT SET StartDate=? WHERE ID=?", (startDate, idnum))
-                            cur.execute("UPDATE CONTRACT SET Period=? WHERE ID=?", (period, idnum))
-                            cur.execute("UPDATE CONTRACT SET EndDate=? WHERE ID=?", (endData, idnum))
+                            cur.execute("UPDATE CONTRACT SET StartDate=?, Period=?, EndDate=? WHERE ID=?",
+                                        (startDate, period, endData, idnum))
                             await ctx.reply(f"{myfun.getNickFromDisplayname2(member.display_name)}, DB에 업데이트 되었습니다.\n"
                                             f"계약 시작일 : {startDate}, 계약 종료일 : {endData} (총 계약기간 : {str(period)}일")
                         finally :

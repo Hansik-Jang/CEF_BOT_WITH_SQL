@@ -218,3 +218,16 @@ def checkNicknameOverlapText(text):
             JOIN_SWITCH = False
 
     return JOIN_SWITCH
+
+
+def reclaimTeamRole():
+    import sqlite3
+    conn = sqlite3.connect("CEF.db")
+    cur = conn.cursor()
+    cur.execute("SELECT Abbreviation FROM TEAM_INFORMATION")
+    result = cur.fetchall()
+    li = []
+    for row in result:
+        li.append(row[0])
+    print(li)
+    return li
