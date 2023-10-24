@@ -208,6 +208,22 @@ def getNickChangeCouponFromUserInfoWithID(id) :
 
 
 # ------------- TEAM_INFORMATION -------------
+def checkTeamExistFromTeamInfor(abbTeamName):
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName,))
+        result = cur.fetchone()
+        for row in result:
+            if row[0] == "FA":
+                return False
+            elif row[0] == abbTeamName:
+                return True
+                break
+            else:
+                return False
+    except:
+        print("error")
 
 
 def getTeamFullNameFromTeamInfor(abbTeamName) :
@@ -267,32 +283,79 @@ def getInforFromTotsFW(ctx) :
 # ------------- HISTORY -------------
 
 def getHystoryFromSeasonUserHistory(ctx) :
-    conn = sqlite3.connect("CEF.db")
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
-    result = cur.fetchall()
-    nickname = getNicknameFromUserInfoWithID(ctx.author.id)
-    text = ''
-    for row in result :
-        season = row[1]
-        print(season, type(season))
-        team = row[2]
-        print(team, type(team))
-        job = row[3]
-        print(job, type(job))
-        position = row[4]
-        print(position, type(position))
-        rank = row[5]
-        print(rank, type(rank))
-        totalcount = getTotalCountFromSeasonTeamCount(season)
-        print(totalcount, type(totalcount))
-        text = text + season + " 시즌 | " + team + " (" + job + ") 포지션 : " + position + " | 총 " + str(
-            totalcount) + "팀 중 " + str(rank) + "위\n"
-        print(text)
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
+        result = cur.fetchall()
+        nickname = getNicknameFromUserInfoWithID(ctx.author.id)
+        text = ''
+        for row in result :
+            season = row[1]
+            team = row[2]
+            job = row[3]
+            position = row[4]
+            rank = row[5]
+            totalcount = getTotalCountFromSeasonTeamCount(season)
+            text = text + season + " 시즌 | " + team + " (" + job + ") 포지션 : " + position + " | 총 " + str(
+                totalcount) + "팀 중 " + str(rank) + "위\n"
+    except:
+        text = ''
 
     return text
 
+# ------------- TOTS & VALONDOR -------------
 
+def getTotsFromCareerWithID(idnum):
+    try:
+        text = "***TOTS***\n"
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SElECT * FROM CAREER_TOTS WHERE ID=?", (idnum,))
+        result = cur.fetchall()
+        result.sort(key=lambda x: x[1])
+        if len(result) > 0 :
+            for row in result:
+                season = row[1]
+
+                if row[2]:
+                    text = text + season + " | TOTS __***FW***__\n"
+                elif row[3]:
+                    text = text + season + " | _TOTS FW_ Nomi\n"
+                elif row[4]:
+                    text = text + season + " | __***TOTS MF***__\n"
+                elif row[5]:
+                    text = text + season + " | _TOTS MF_ Nomi\n"
+                elif row[6]:
+                    text = text + season + " | __***TOTS DF***__\n"
+                elif row[7]:
+                    text = text + season + " | _TOTS DF_ Nomi\n"
+                elif row[8]:
+                    text = text + season + " | __***TOTS GK***__\n"
+                elif row[9]:
+                    text = text + season + " | _TOTS GK_ Nomi\n"
+
+    except:
+        text = ""
+    if text == "***TOTS***\n":
+        text = ""
+    return text
+
+def getValFromCareerValondorWithID(idnum):
+    try:
+        text = ''
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SElECT * FROM CAREER_VALONDOR WHERE ID=?", (idnum,))
+        result2 = cur.fetchall()
+        if len(result2) > 0:
+            for row2 in result2 :
+                text = text + "\n***VALONDOR***\n" + row2[1] + " | __***Valondor***__"
+        else:
+            print(" \n")
+    except:
+        text = ''
+    return text
 # ------------- SEASON_TEAM_COUNT_INFORMATION -------------
 
 def getHostFromSeasonTeamCount(season) :

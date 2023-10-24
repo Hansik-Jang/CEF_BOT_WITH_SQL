@@ -4,84 +4,93 @@ import sqlite3
 import myfun
 from discord.utils import get
 from forAccessDB import *
+import asyncio
 
 
 class ManageTeam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='전체팀목록', pass_context=True, aliases=['팀목록', '전체팀명단'])
-    async def _wholeTeamList(self, ctx):
-        text = ''
-        conn = sqlite3.connect("CEF.db")
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM TEAM_INFORMATION")
-        result = cur.fetchall()
-        result.sort(key=lambda x : x[3])
-        i = 0
+    @commands.command(name='팀등록', pass_context=True)
+    async def _registerTeam(self, ctx):
+        role_names = [role.name for role in ctx.author.roles]
+        if "스태프" in role_names :
+            pass
+        else:
+            await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-        embed = discord.Embed(title="CEF 전체 팀 간략 정보", description="")
-        print("A")
-        for row in result:
-            print(row)
-            abbName = row[0]
-            fullName = row[1]
-            if row[3] == -1 :
-                lastRank = ""
-            elif row[3] == 99:
-                lastRank = "New"
-            elif row[3] == 100:
-                lastRank = "-"
-            else :
-                #lastRank = "지난 시즌 : " + str(row[3]) + " 위"
-                lastRank = str(row[3]) + " 위"
+    @commands.command(name='팀해체', pass_context=True)
+    async def _deleteTeam(self, ctx):
+        role_names = [role.name for role in ctx.author.roles]
+        if "스태프" in role_names :
+            pass
+        else:
+            await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-            if abbName == "FA":
-                abb2 = "FA (무소속)"
-                embed.add_field(name=f"{fullName}", value=f" - 현재 인원 : {str(myfun.getRoleCount(ctx, abb2))} 명",
-                                inline=False)
-            else :
-                embed.add_field(name=f"{fullName}", value=f" - 팀 약자 : {abbName}\n"
-                                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
-                                                          f"- 지난 순위 : {lastRank}",
-                            inline=True)
-        await ctx.send(embed=embed)
+    @commands.command(name='팀정보수정', pass_context=True)
+    async def _editTeamInfor(self, ctx, inputMessage):
+        role_names = [role.name for role in ctx.author.roles]
+        if "스태프" in role_names :
+            abbName = ""
+            fullName = ""
+            colorCode = ""
+            imoji = ""
+            edit_abbName = ""
+            edit_fullName = ""
+            edit_colorCode = ""
+            edit_imoji = ""
 
-    @commands.command(name="팀명단", pass_context=True)
-    async def _teamList(self, ctx, name):
-        if checkUseJoinCommandWithID(ctx.author.id):
-            print(name)
-            if name != "":
-                posList = ["ST", "LW", "RW", "CAM", "CM", "CDM", "LB", "CB", "RB", "GK"]
-                teamList = []
-                getRole = get(ctx.guild.roles, name=name)
-                print(getRole)
-                name = name.upper()
-                embed = discord.Embed(title=f"팀 {name} 정보", description=f"총원 : {myfun.getRoleCount(ctx, name)} 명")
-                for member in getRole.members:
-                    print(member.display_name, member.id)
-                    nickname = getNicknameFromUserInfoWithID(member.id)
-                    print(nickname)
-                    mainPosition = getMainPositionFromUserInfoWithID(member.id)
-                    print(mainPosition)
-                    teamList.append((mainPosition, nickname))
-                print(teamList)
-                for pos in posList:
-                    text = ''
-                    for mem in teamList:
-                        print(pos, mem[0], mem[1])
-                        if pos == mem[0]:
-                            text = text + mem[1] + "\n"
-                    embed.add_field(name=f"{pos}", value=f"{text}")
-
-                await ctx.send(embed=embed)
-
+            temp = ''
+            abbList = []
+            abbList2 = []
+            conn = sqlite3.connect("CEF.db")
+            cur = conn.cursor()
+            cur.execute("SELECT Abbreviation From TEAM_INFORMATION")
+            result = cur.fetchall()
+            result.sort()
+            i = 1
+            # 임베드 작업
+            embed = discord.Embed(title="현재 팀 목록")
+            for row in result:
+                if row[0] == "FA":
+                    pass
+                else:
+                    temp = temp + str(i) + ". " + row[0] + "\n"
+                    text = str(i) + ". " + row[0]
+                    abbList.append((i, row[0]))
+                    abbList2.append(text)
+                    i = i + 1
+                    embed.add_field(name=f"{row[0]}", value=" ", inline=True)
+            ann_msg = await ctx.send(f"```팀 정보 수정합니다.\n"
+                                     f"팀 약자 : {abbName}\n"
+                                     f"팀 이름 : {fullName}\n"
+                                     f"색상 코드 : {colorCode}\n"
+                                     f"이모지 : {imoji} -> {}```")
+            ann_msg1 = await ctx.send(f"1. 수정할 팀의 번호를 입력해주세요.\n"
+                           f"{temp}")
+            await ctx.send(embed=embed)
+            # 팀 약자 입력
+            try :
+                msg = await self.bot.wait_for("message",
+                                              check=lambda
+                                                  m : m.author == ctx.author and m.channel == ctx.channel,
+                                              timeout=30.0)
+                print(msg)
+                print(msg.content)
+            except asyncio.TimeoutError :
+                await ctx.send("시간이 초과되었습니다.\n"
+                                  f"다시 명령어를 입력해주세요\n"
+                                  f"해당 메시지는 30초 후 자동 삭제됩니다.")
             else:
-                ctx.reply("팀약자와 함께 명령어를 사용해주세요.\n"
-                          "사용방법 : $팀명단 '팀약자'\n"
-                          "예시) $팀명단 FCB")
-        else :
-            await ctx.reply("해당 인원은 등록되지 않는 인원입니다.")
+                abbName = msg.content.upper()
+            # ----------------- 수정할 항목 선택 -----------------
+            await ann_msg1.delete()
+            await ann_msg.edit(f"")
+            embed2 = discord.Embed2(title="변경할 항목 선택")
+            
+
+        else:
+            await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
 async def setup(bot):
     await bot.add_cog(ManageTeam(bot))

@@ -75,28 +75,19 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트4', pass_context=True)
     async def _test4(self, ctx):
-        conn = sqlite3.connect("CEF.db")
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM SEASON_USER_HISTORY WHERE ID=?", (ctx.author.id,))
-        result = cur.fetchall()
-        nickname = getNicknameFromUserInfoWithID(ctx.author.id)
-        text = ''
-        for row in result:
-            season = row[1]
-            print(season, type(season))
-            team = row[2]
-            print(team, type(team))
-            job = row[3]
-            print(job, type(job))
-            position = row[4]
-            print(position, type(position))
-            rank = row[5]
-            print(rank, type(rank))
-            totalcount = getTotalCountFromSeasonTeamCount(season)
-            print(totalcount, type(totalcount))
-            text = text + season + " 시즌 | " + team + " (" + job + ") 포지션 : " + position + " | 총 " + str(totalcount) + "팀 중 " + str(rank) + "위\n"
-            print(text)
-        await ctx.send(f"```{text}```")
+        try :
+            msg = await self.bot.wait_for("message",
+                                          check=lambda
+                                              m : m.author == ctx.author and m.channel == ctx.author,
+                                          timeout=30.0)
+        except asyncio.TimeoutError :
+            await ctx.send("시간이 초과되었습니다.\n"
+                              f"다시 명령어를 입력해주세요\n"
+                              f"해당 스레드는 30초 후 자동 삭제됩니다.")
+        else:
+            if msg.content.lower() == '1' :
+                mainPosition = "LW"
+
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):
         user = ctx.author
@@ -111,6 +102,8 @@ class Test(commands.Cog):
             conn.commit()
         finally :
             conn.close()
+
+
 
 
 
