@@ -19,37 +19,12 @@ from discord.ext.commands import Greedy, Context # or a subclass of yours
 class Test(commands.Cog):
     def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
-    '''
-    @commands.Cog.listener()
-    async def on_ready(self):
-        await self.bot.tree.sync()
-
-    @app_commands.command(name="슬래시", description="슬래시 테스트 중")
-    async def tree(
-            self,
-            interaction: discord.Interaction,
-            nickname: str,
-            mainPos: str,
-            subPos: str) -> None:
-        await interaction.respons.send_message(f"ID : {interaction.user.id}\n"
-                                               f"닉네임 : {nickname}\n"
-                                               f"주포지션 : {mainPos}, 부포지션 : {subPos}")
-
-    @app_commands.command(name="테스트1", description="테스트 1번")
-    async def slasytest1(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_message("테스트1")'''
 
     @commands.command(name='테스트', pass_context=True)
     async def _test1(self, ctx):
-        from table2ascii import table2ascii as t2a, PresetStyle
-
-        output = t2a(
-            header=["닉네임", "계약 시작일", "계약기간", "계약 종료일"],
-            body=[["테스트1", 20231021, 30, 20231119], ["테스트2", 20231021, 20, 20231109],
-                  ["테스트3", 20231022, 14, 20231104], ["테스트4", 20231023, 30, 20231121]],
-            style=PresetStyle.borderless
-        )
-        await ctx.send(f"```\n{output}\n```")
+        role = get(ctx.guild.roles, name="테스트용")
+        await role.edit(name="Tester")
+        await ctx.send("변경 완료")
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):

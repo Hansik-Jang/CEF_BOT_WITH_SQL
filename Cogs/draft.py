@@ -68,35 +68,7 @@ class Draft(commands.Cog) :
         self.DraftSwitchTwo = False
         self.DraftSwitchThree = False
         self.DraftSwitchFour = False
-
-
-    def editSwitchTwo(self):
-        if self.DraftSwitchTwo:
-            self.DraftSwitchTwo = False
-        else:
-            self.DraftSwitchTwo = True
-
-    def editSwitchThree(self):
-        if self.DraftSwitchThree:
-            self.DraftSwitchThree = False
-        else:
-            self.DraftSwitchThree = True
-
-    def editSwitchFour(self):
-        if self.DraftSwitchFour:
-            self.DraftSwitchFour = False
-        else:
-            self.DraftSwitchFour = True
-
-    def deleteNameFromPositonList(self, name):
-        pos_li = [st, lw, rw, cam, cm, cdm, lb, cb, rb, gk]
-
-        for pos in pos_li:
-            if name in pos:
-                pos.remove(name)
-
-
-
+'''
     @commands.command(name='개선', aliases=["개선주장"], pass_context=True)
     async def _개선(self, ctx, num) :
         global TeamA
@@ -652,7 +624,7 @@ class Draft(commands.Cog) :
                                            f"현재 {TeamD.getCapData().mention} 차례입니다.")
 
     @commands.command(name='버튼', pass_context=True)
-    async def 버튼(self, ctx) :
+    async def bo(self, ctx) :
         switch = True
         button = Button(label='ST', style=ButtonType().Danger)
         await ctx.send("grabbing a click...", components=[self.buttonST])
@@ -672,7 +644,7 @@ class Draft(commands.Cog) :
                 if res.component.label == 'ST' or res.component.custom_id == 'st':
                     print('a')
 
-        '''await ctx.send("버튼 테스트", components=[
+        await ctx.send("버튼 테스트", components=[
             [Button(label='ST', style="3", custom_id="st"), Button(label='LW', style=4, custom_id='lw')]
         ])
         async def button_callback(interaction):
@@ -682,13 +654,13 @@ class Draft(commands.Cog) :
         print(int)
         print(int.component.label)
         if int.component.label =='st':
-            await int.respond("ST 누름")'''
-        '''
+            await int.respond("ST 누름")
+        
         view = View()
         for pos in self.button_li:
             view.add_item(item=pos)
-        await ctx.send("테스트", view=view)'''
-        '''
+        await ctx.send("테스트", view=view)
+        
         B_ST = Button(style=ButtonStyle.red, label='ST', custom_id='st')
         B_LW = Button(style=ButtonStyle.red, label='LW', custom_id='lw')
         B_RW = Button(style=ButtonStyle.red, label='RW', custom_id='rw')
@@ -700,7 +672,7 @@ class Draft(commands.Cog) :
 
         interaction = await self.bot.wait_for("button_click")
         if interaction.id == 'st':
-            await ctx.send("ST 누름")'''
+            await ctx.send("ST 누름")
 
     #    @commands.Cog.listener()
     #    async def on_button_click(self, interaction) :
@@ -739,7 +711,6 @@ class Draft(commands.Cog) :
         finally:
             conn.close()
 
-    '''
     @commands.command(name='전술정보수정', pass_context=True)
     async def _임시주장2(self, ctx, *, text):
         conn = sqlite3.connect("CEF.db")
@@ -766,7 +737,7 @@ class Draft(commands.Cog) :
             print('b')
 
         finally:
-            conn.close()'''
+            conn.close()
 
     @commands.command(name='전술정보전체목록', pass_context=True)
     async def _임시주장3(self, ctx):
@@ -1004,7 +975,7 @@ class Draft(commands.Cog) :
                             embed.set_footer(text="Copyright ⓒ 2020-2021 타임제이(TimeJ) in C.E.F All Right Reserved.")
 
                             await ctx.send(embed=embed)
-                            '''
+                            
                             await ctx.send(content=f"포지션 선택 현황"
                                                    f"ST - {makeListFromList(st)}\n"
                                                    f"LW - {makeListFromList(lw)}\n"
@@ -1015,7 +986,7 @@ class Draft(commands.Cog) :
                                                    f"LB - {makeListFromList(lb)}\n"
                                                    f"CB - {makeListFromList(cb)}\n"
                                                    f"RB - {makeListFromList(rb)}\n"
-                                                   f"GK - {makeListFromList(gk)}\n")'''
+                                                   f"GK - {makeListFromList(gk)}\n")
                             # ---------------------------------------------------------
                             # await ctx.send(content=f"{TeamA.getData('cap')} 님은 팀원을 선택해주세요.\n"
                             #                       f"%선발 @멘션 으로 선택해주세요.")
@@ -1109,7 +1080,7 @@ class Draft(commands.Cog) :
                 testgk.append(user)
                 testentry.append(user.display_name)
 
-
+'''
 '''
         # 드래프트용 (개발용)
         if switch == 0 :  # 스위치가 꺼져있으면

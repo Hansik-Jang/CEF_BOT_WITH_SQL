@@ -7,7 +7,7 @@ import config
 import myfun
 
 
-class Body(commands.Cog):
+class Career(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -28,6 +28,9 @@ class Body(commands.Cog):
                 embed.add_field(name="계약기간", value="감독 직책으로 미표기", inline=False)
             elif "FA (무소속)" in role_names:
                 embed.add_field(name="계약기간", value="FA 신분으로 미표기", inline=False)
+            elif (getStartDateFromContract(ctx) is not None and getEndDateFromContract(ctx) is not None
+                  and getPeriodFromContract(ctx) is None):
+                embed.add_field(name="계약기간", value="계약 정보 없음", inline=False)
             else:
                 text = (getStartDateFromContract(ctx) + " ~ " + getEndDateFromContract(ctx)
                         + " (총 " + str(getPeriodFromContract(ctx)) + " 일)")
@@ -76,4 +79,4 @@ class Body(commands.Cog):
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
 async def setup(bot):
-    await bot.add_cog(Body(bot))
+    await bot.add_cog(Career(bot))

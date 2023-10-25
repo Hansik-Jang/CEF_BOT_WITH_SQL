@@ -29,6 +29,9 @@ notJoinText = "등록된 인원만 사용 가능한 명령어입니다.\n" \
 DEVELOPER_LIST = [146549960312225792,   # 타임제이
                   790243958071492648]   # 테스트계정
 
+# Cog 리스트
+COG_LIST = ["AboutDB", "Career", "Contract", "ControlSwitch", "Event", "Game", "Help", "League", "ManageTeam",
+            "Mark", "Member", "OtherClub", "Team", "Test", "Transfer"] # Draft 재외
 def devlopCheck(ctx):
     if ctx.author.id in DEVELOPER_LIST:
         return True

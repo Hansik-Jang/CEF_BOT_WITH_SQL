@@ -9,7 +9,7 @@ class OtherClub(commands.Cog):
         self.bot = bot
         self.li = []
 
-    @commands.command(aliases=["에버튼", "EVT", "evt"], pass_context=True)
+    @commands.command(name="에버튼", aliases=["EVT", "evt"], pass_context=True)
     async def _everton(self, ctx):
         if str(ctx.message.channel) == "타커뮤-등록신청":
             add_message = "에버튼"
@@ -64,7 +64,7 @@ class OtherClub(commands.Cog):
             await ctx.message.delete()
             await ctx.send(content=f"{join_other_community_channel.mention} 채널에 작성해주세요.", delete_after=5)
 
-    @commands.command(aliases=["저격", "SNI", "sni"], pass_context=True)
+    @commands.command(name="저격", aliases=["SNI", "sni"], pass_context=True)
     async def _sniper(self, ctx):
         if str(ctx.message.channel) == "타커뮤-등록신청":
             add_message = "저격 UTD"
@@ -126,7 +126,7 @@ class OtherClub(commands.Cog):
             await ctx.message.delete()
             await ctx.send(content=f"{join_other_community_channel.mention} 채널에 작성해주세요.", delete_after=5)
 
-    @commands.command(aliases=["KPA", "kpa"], pass_context=True)
+    @commands.command(name="KPA", aliases=["kpa"], pass_context=True)
     async def _kpa(self, ctx) :
         if str(ctx.message.channel) == "타커뮤-등록신청":
             add_message = "KPA"
@@ -190,7 +190,7 @@ class OtherClub(commands.Cog):
             await ctx.message.delete()
             await ctx.send(content=f"{join_other_community_channel.mention} 채널에 작성해주세요.", delete_after=5)
 
-    @commands.command(aliases=["RFA", "rfa"], pass_context=True)
+    @commands.command(name="RFA", aliases=["rfa"], pass_context=True)
     async def _rfa(self, ctx):
         if str(ctx.message.channel) == "타커뮤-등록신청" :
             add_message = "RFA"

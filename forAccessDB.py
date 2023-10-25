@@ -262,6 +262,32 @@ def getLastRankFromTeamInfor(abbTeamName) :
     return lastRank
 
 
+def getImojiFromTeamInfor(abbTeamName) :
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName,))
+        result = cur.fetchone()
+        imoji = result[4]
+    except:
+        imoji =''
+
+    return imoji
+
+def getLogoFromTeamInfor(abbTeamName) :
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName,))
+        result = cur.fetchone()
+        logo = result[5]
+    except:
+        logo =''
+
+    return logo
+
+
+
 # ------------- TOTS -------------
 
 def getInforFromTotsFW(ctx) :
