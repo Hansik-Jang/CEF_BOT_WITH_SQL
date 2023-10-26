@@ -17,9 +17,10 @@ class Career(commands.Cog):
 
             role_names = [role.name for role in ctx.author.roles]
             history = getHystoryFromSeasonUserHistory(ctx)
+            imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
             embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
                                   description=ctx.author.id)
-            embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx), inline=True)
+            embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx)+imoji, inline=True)
             embed.add_field(name="신분", value=getRankFromUserInfo(ctx), inline=True)
             embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
             embed.add_field(name="주포지션", value=getMainPositionFromUserInfo(ctx), inline=True)

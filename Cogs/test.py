@@ -21,10 +21,9 @@ class Test(commands.Cog):
         self.bot = bot
 
     @commands.command(name='테스트', pass_context=True)
-    async def _test1(self, ctx):
-        role = get(ctx.guild.roles, name="테스트용")
-        await role.edit(name="Tester")
-        await ctx.send("변경 완료")
+    async def _test1(self, ctx, name):
+        imoji = getImojiFromTeamInfor(name)
+        await ctx.send(f"{imoji}")
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):

@@ -38,7 +38,7 @@ class ManageTeam(commands.Cog):
             edit_colorCode = ""
             edit_imoji = ""
             edit_logo = ""
-
+            swt = False
             loop_switch = True
             temp = ''
             abbList = []
@@ -159,6 +159,8 @@ class ManageTeam(commands.Cog):
                                                f"해당 메시지는 30초 후 자동 삭제됩니다.")
                             else :
                                 await temp_msg.delete()
+                                if "#" in msg1.content:
+                                    msg.content.replace("#","")
                                 edit_colorCode = msg1.content
                                 await ctx.channel.purge(limit=1)
                         # 팀 이모지 코드 수정
@@ -273,30 +275,72 @@ class ManageTeam(commands.Cog):
                         conn.close()
                     # 디스코드 작용
                     await getRole.edit(name=edit_abbName)
+                    swt = True
+                    await ctx.send("약자 수정 완료")
                 # 팀 풀네임 수정
                 if fullName != edit_fullName:
                     try :
                         conn = sqlite3.connect("CEF.db")
                         cur = conn.cursor()
-                        cur.execute("UPDATE TEAM_INFORMATION SET TeamName=? WHERE Abbreviation=?",
-                                    (edit_fullName, abbName))
+                        if swt:
+                            cur.execute("UPDATE TEAM_INFORMATION SET TeamName=? WHERE Abbreviation=?",
+                                        (edit_fullName, edit_abbName))
+                        else:
+                            cur.execute("UPDATE TEAM_INFORMATION SET TeamName=? WHERE Abbreviation=?",
+                                        (edit_fullName, abbName))
                     finally :
                         conn.commit()
                         conn.close()
+                        await ctx.send("풀네임 수정 완료")
                 # 팀 색상 코드 수정
                 if colorCode != edit_colorCode:
                     try :
                         conn = sqlite3.connect("CEF.db")
                         cur = conn.cursor()
-                        cur.execute("UPDATE TEAM_INFORMATION SET TeamName=? WHERE Abbreviation=?",
-                                    (edit_fullName, abbName))
+                        if swt:
+                            cur.execute("UPDATE TEAM_INFORMATION SET ColorCode=? WHERE Abbreviation=?",
+                                        (edit_colorCode, edit_abbName))
+                        else:
+                            cur.execute("UPDATE TEAM_INFORMATION SET ColorCode=? WHERE Abbreviation=?",
+                                        (edit_colorCode, abbName))
                     finally :
                         conn.commit()
                         conn.close()
-
-                # 디스코드 내 업데이트
-                # 역할 이름 변경
-
+                    # 디스코드 작용
+                    x = "0x" + str(edit_colorCode)
+                    await getRole.edit(color=discord.Colour.from_str(x))
+                    await ctx.send("색상코드 수정 완료")
+                # 팀 이모지 수정
+                if imoji != edit_imoji:
+                    try :
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        if swt :
+                            cur.execute("UPDATE TEAM_INFORMATION SET Imoji=? WHERE Abbreviation=?",
+                                        (edit_imoji, edit_abbName))
+                        else :
+                            cur.execute("UPDATE TEAM_INFORMATION SET Imoji=? WHERE Abbreviation=?",
+                                        (edit_imoji, abbName))
+                    finally :
+                        conn.commit()
+                        conn.close()
+                    await ctx.send("이모지 수정 완료")
+                # 팀 로고 수정
+                if logo != edit_logo :
+                    try :
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        if swt :
+                            cur.execute("UPDATE TEAM_INFORMATION SET Logo=? WHERE Abbreviation=?",
+                                        (logo, edit_abbName))
+                        else :
+                            cur.execute("UPDATE TEAM_INFORMATION SET Logo=? WHERE Abbreviation=?",
+                                        (edit_logo, abbName))
+                    finally :
+                        conn.commit()
+                        conn.close()
+                    await ctx.send("로고 수정 완료")
+                
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
