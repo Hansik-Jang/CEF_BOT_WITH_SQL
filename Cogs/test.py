@@ -22,8 +22,11 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True)
     async def _test1(self, ctx, name):
-        imoji = getImojiFromTeamInfor(name)
-        await ctx.send(f"{imoji}")
+        i = 1
+        while i < 6:
+            print(i)
+            i += 1
+
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):
