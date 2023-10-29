@@ -20,12 +20,15 @@ class Test(commands.Cog):
     def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name='테스트', pass_context=True)
-    async def _test1(self, ctx, name):
-        i = 1
-        while i < 6:
-            print(i)
-            i += 1
+    @commands.command(name='테스트', pass_context=True,
+                      help="설명서", brief="사용법")
+    async def _test1(self, ctx, people: commands.Greedy[discord.User]):
+        for man in people:
+            await ctx.send(f"{man.mention}")
+            idnum = man.id
+            member = get(ctx.guild.members, id=idnum)
+            role = get(ctx.guild.roles, name='FCB')
+            await member.add_roles(role)
 
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
@@ -52,18 +55,33 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트4', pass_context=True)
     async def _test4(self, ctx):
+        pic_ext = ['.jpg', '.png', '.jpeg']
+        def check(message) :
+            if message.author == ctx.author and message.channel == ctx.channel :
+                attachments = message.attachments
+                if len(attachments) == 0 :
+                    return False
+                attachment = attachments[0]
+                return attachment.filename.endswith(('.jpg', '.png'))
+        await ctx.send("이미지 업로드")
         try :
-            msg = await self.bot.wait_for("message",
-                                          check=lambda
-                                              m : m.author == ctx.author and m.channel == ctx.author,
-                                          timeout=30.0)
+            image_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
         except asyncio.TimeoutError :
             await ctx.send("시간이 초과되었습니다.\n"
-                              f"다시 명령어를 입력해주세요\n"
-                              f"해당 스레드는 30초 후 자동 삭제됩니다.")
-        else:
-            if msg.content.lower() == '1' :
-                mainPosition = "LW"
+                           f"다시 명령어를 입력해주세요\n"
+                           f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+        else :
+            print(image_msg.attachments[0].filename)
+            image = image_msg.attachments[0]
+            print(image.url)
+        embed2 = discord.Embed(title="테스트")
+        embed2.add_field(name="테스트", value="테스트")
+        embed2.set_thumbnail(image.url)
+        await ctx.send(embed=embed2)
+        embed1 = discord.Embed(title="테스트")
+        embed1.add_field(name="테스트", value="테스트")
+        embed1.set_image(image.url)
+        await ctx.send(embed=embed1)
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):

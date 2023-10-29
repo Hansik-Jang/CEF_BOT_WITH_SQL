@@ -127,8 +127,11 @@ def teamNameConvert(name):
 
 def getRoleCount(ctx, roleName):
     from discord.utils import get
-    discordRole = get(ctx.guild.roles, name=roleName)
-    return str(len(discordRole.members))
+    try:
+        discordRole = get(ctx.guild.roles, name=roleName)
+        return str(len(discordRole.members))
+    except:
+        return "오류"
 
 
 def getDateToday():

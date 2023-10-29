@@ -13,7 +13,10 @@ class Transfer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='팀추첨', pass_context=True)
+    @commands.command(name='팀추첨', pass_context=True,
+                      help="권한 : 전체"
+                           "\n특정 팀의 명단을 포지션별로 구분하여 출력합니다.",
+                      brief="$팀명단 '팀약자'")
     async def _select(self, ctx):
         fcb = get(ctx.guild.roles, name="FC Barcelona")
         for member in fcb.members:
@@ -21,7 +24,10 @@ class Transfer(commands.Cog):
             print(data_list)
 
     # 미완
-    @commands.command(name="이적", pass_context=True)
+    @commands.command(name="이적", pass_context=True,
+                      help="권한 : 스태프 전용"
+                           "\n특정 팀의 명단을 포지션별로 구분하여 출력합니다.",
+                      brief="$팀명단 '팀약자'")
     async def _transfer(self, ctx, member:discord.Member, abbTeamName=None, startDate=None, period=None):
         delete_time = 15
         role_names = [role.name for role in ctx.author.roles]

@@ -12,127 +12,164 @@ class ManageTeam(commands.Cog):
         self.bot = bot
 
     @commands.command(name='팀등록', pass_context=True)
-    async def _registerTeam(self, ctx):
+    async def _registerTeam(self, ctx, people: commands.Greedy[discord.User]):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
-            abbName = ""
-            fullName = ""
-            colorCode = ""
-            lastRank = 99
-            imoji = ""
-            logoLink = ""
-            loop_switch = 1
-            text = ("1. 팀약자 : \n"
-                    "2. 풀네임 : \n"
-                    "3. 색상코드 : \n"
-                    "4. 이모지 : \n"
-                    "5. 로고 링크 : \n\n"
-                    "<TIP>\n"
-                    "1. 이모지는 명령어 사용 전 미리 등록한 후 로고 입력 후 로고 앞에 '\'를 붙여 다음과 같은 형태를 입력해야 합니다.\n"
-                    "<로고이름:로고 ID 번호>\n"
-                    "2. 로고 링크는 채팅 채널에 이미지 업로드 후 우클릭하여 링크 복사하기를 하여 '이미지 링크'를 입력해주세요.\n")
-            embed = discord.Embed(title="팀등록 절차를 시작합니다.", description=text, color=discord.Color.red())
-            embed_msg = await ctx.send(embed=embed)
-            while loop_switch < 6:
-                print(loop_switch)
-                if abbName == "":
-                    text1 = f"1. 팀약자 : {abbName} (입력 X)\n"
-                else:
-                    text1 = f"1. 팀약자 : {abbName} (입력 O)\n"
-                if fullName == "":
-                    text2 = f"2. 풀네임 : {fullName} (입력 X)\n"
-                else:
-                    text2 = f"2. 풀네임 : {fullName} (입력 O)\n"
-                if colorCode == "":
-                    text3 = f"3. 색상코드 : {colorCode} (입력 X)\n"
-                else:
-                    text3 = f"3. 색상코드 : {colorCode} (입력 X)\n"
-                if imoji == "":
-                    text4 = f"4. 이모지 : {imoji} (입력 X)\n"
-                else:
-                    text4 = f"4. 이모지 : {imoji} (입력 O)\n"
-                if logoLink == "":
-                    text5 = f"5. 로고 링크 : {logoLink} (입력 X)\n"
-                else:
-                    text5 = f"5. 로고 링크 : {logoLink} (입력 O)\n"
-                text6 = "6. 강제 종료하기\n\n"
-                text_tip = (f"<TIP>\n"
-                           f"1. 이모지는 명령어 사용 전 미리 등록한 후 로고 입력 후 로고 앞에 '\'를 붙여 다음과 같은 형태를 입력해야 합니다.\n"
-                           f"   <로고이름:로고 ID 번호>\n"
-                           f"2. 로고 링크는 채팅 채널에 이미지 업로드 후 우클릭하여 링크 복사하기를 하여 '이미지 링크'를 입력해주세요.\n")
-                text = text1 + text2 + text3 + text4 + text5 + text6 + text_tip
-                exitText = text1 + text2 + text3 + text4 + text5
-                embed2 = discord.Embed(title="팀등록 절차를 시작합니다.", description=text, color=discord.Color.yellow())
-                await embed_msg.edit(embed=embed2)
-                ann_msg = await ctx.send("안내 문구에 따라 정보를 입력해주세요.")
+            temp = ''
+            insertSwitch = False
+            for man in people:
+                print(man.display_name)
+                temp = temp + man.display_name + "\n"
 
-                if loop_switch == 1:
-                    temp_msg = await ann_msg.edit(content="안내 문구에 따라 정보를 입력해주세요."
-                                                          "\n1번. 팀약자를 입력해주세요.")
-                elif loop_switch == 2:
-                    temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
-                                                          "\n2번. 팀이름 전체를 대소문자 구분하여 입력해주세요.")
-                elif loop_switch == 3:
-                    temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
-                                                          "\n3번. 팀 색상코드 #을 제외한 6자리를 입력해주세요. ")
-                elif loop_switch == 4:
-                    temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
-                                                          "\n4번. TIP 1번을 참고하여 이모지를 입력해주세요.")
-                elif loop_switch == 5:
-                    temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
-                                                          "\n5번. TIP 2번을 참고하여 이미지 링크를 입력해주세요.")
+            temp_msg = await ctx.send(f"```팀등록에 앞서 명단 체크를 진행합니다.\n\n"
+                                      f"팀에 등록될 명단 : \n"
+                                      f"{temp}\n"
+                                      f"맞으면 1, 틀리면 2를 입력해주세요.```")
+            try :
+                temp_msg2 = await self.bot.wait_for("message",
+                                               check=lambda
+                                                   m : m.author == ctx.author and m.channel == ctx.channel,
+                                               timeout=30.0)
+            except asyncio.TimeoutError :
+                await ctx.send("시간이 초과되었습니다.\n"
+                               f"다시 명령어를 입력해주세요\n"
+                               f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+            else :
+                if temp_msg2.content == "1":
+                    insertSwitch = True
+                    await temp_msg.edit(content=f"다음 단계로 진행합니다.", delete_after=30)
+                elif temp_msg2.content == "2":
+                    await temp_msg.edit(content=f"명령어를 종료합니다. 수정 후 다시 입력해주세요.", delete_after=30)
+
+            if insertSwitch:
+                abbName = ""
+                fullName = ""
+                colorCode = ""
+                lastRank = 99
+                logoLink = ""
+                loop_switch = 1
+                text = ("1. 팀약자 : \n"
+                        "2. 풀네임 : \n"
+                        "3. 색상코드 : \n"
+                        "5. 로고 링크 : \n\n"
+                        "<TIP>\n"
+                        "1. 이모지는 명령어 사용 전 미리 등록한 후 로고 입력 후 로고 앞에 '\'를 붙여 다음과 같은 형태를 입력해야 합니다.\n"
+                        "<로고이름:로고 ID 번호>\n"
+                        "2. 로고 링크는 채팅 채널에 이미지 업로드 후 우클릭하여 링크 복사하기를 하여 '이미지 링크'를 입력해주세요.\n")
+                embed = discord.Embed(title="팀등록 절차를 시작합니다.", description=text, color=discord.Color.red())
+                embed_msg = await ctx.send(embed=embed)
+                while loop_switch < 5:
+                    print(loop_switch)
+                    if abbName == "":
+                        text1 = f"1. 팀약자 : {abbName} (입력 X)\n"
+                    else:
+                        text1 = f"1. 팀약자 : {abbName} (입력 O)\n"
+                    if fullName == "":
+                        text2 = f"2. 풀네임 : {fullName} (입력 X)\n"
+                    else:
+                        text2 = f"2. 풀네임 : {fullName} (입력 O)\n"
+                    if colorCode == "":
+                        text3 = f"3. 색상코드 : {colorCode} (입력 X)\n"
+                    else:
+                        text3 = f"3. 색상코드 : {colorCode} (입력 O)\n"
+                    if logoLink == "":
+                        text5 = f"5. 로고 링크 : {logoLink} (입력 X)\n"
+                    else:
+                        text5 = f"5. 로고 링크 : {logoLink} (입력 O)\n"
+                    text6 = "6. 강제 종료하기\n\n"
+                    text_tip = (f"<TIP>\n"
+                               f"1. 이모지는 명령어 사용 전 미리 등록한 후 로고 입력 후 로고 앞에 '\'를 붙여 다음과 같은 형태를 입력해야 합니다.\n"
+                               f"   <로고이름:로고 ID 번호>\n"
+                               f"2. 로고 링크는 채팅 채널에 이미지 업로드 후 우클릭하여 링크 복사하기를 하여 '이미지 링크'를 입력해주세요.\n")
+                    text = text1 + text2 + text3 + text5 + text6 + text_tip
+                    exitText = text1 + text2 + text3 + text5
+                    embed2 = discord.Embed(title="팀등록 절차를 시작합니다.", description=text, color=discord.Color.yellow())
+                    await embed_msg.edit(embed=embed2)
+                    ann_msg = await ctx.send("안내 문구에 따라 정보를 입력해주세요.")
+
+                    if loop_switch == 1:
+                        temp_msg = await ann_msg.edit(content="안내 문구에 따라 정보를 입력해주세요."
+                                                              "\n1번. 팀약자를 입력해주세요.")
+                    elif loop_switch == 2:
+                        temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
+                                                              "\n2번. 팀이름 전체를 대소문자 구분하여 입력해주세요.")
+                    elif loop_switch == 3:
+                        temp_msg = await ann_msg.edit(content=f"안내 문구에 따라 정보를 입력해주세요."
+                                                              "\n3번. 팀 색상코드 #을 제외한 6자리를 입력해주세요. ")
+                    elif loop_switch == 4:
+                        break
+                    try :
+                        msg2 = await self.bot.wait_for("message",
+                                                       check=lambda
+                                                           m : m.author == ctx.author and m.channel == ctx.channel,
+                                                       timeout=30.0)
+                    except asyncio.TimeoutError :
+                        await ctx.send("시간이 초과되었습니다.\n"
+                                       f"다시 명령어를 입력해주세요\n"
+                                       f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+                        break
+                    else :
+                        print(type(msg2.content), msg2.content)
+                        if loop_switch == 1:
+                            await temp_msg.delete()
+                            await ctx.channel.purge(limit=1)
+                            abbName = msg2.content.upper()
+                        elif loop_switch == 2:
+                            await temp_msg.delete()
+                            await ctx.channel.purge(limit=1)
+                            fullName = msg2.content
+                        elif loop_switch == 3:
+                            await temp_msg.delete()
+                            await ctx.channel.purge(limit=1)
+                            colorCode = msg2.content
+                        else:
+                            await ctx.send("잘못 입력하였습니다.", delete_after=10)
+                    loop_switch += 1
+                print('a')
+
+                await temp_msg.delete()
+                temp_msg2 = await ctx.send(content=f"안내 문구에 따라 정보를 입력해주세요."
+                                                   f"\n4번. 팀 로고 이미지 파일(jpg, png 파일)을 업로드해주세요.")
+
+                def check(message) :
+                    if message.author == ctx.author and message.channel == ctx.channel :
+                        attachments = message.attachments
+                        if len(attachments) == 0 :
+                            return False
+                        attachment = attachments[0]
+                        return attachment.filename.endswith(('.jpg', '.png'))
                 try :
-                    msg2 = await self.bot.wait_for("message",
-                                                   check=lambda
-                                                       m : m.author == ctx.author and m.channel == ctx.channel,
-                                                   timeout=30.0)
+                    image_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
                 except asyncio.TimeoutError :
                     await ctx.send("시간이 초과되었습니다.\n"
                                    f"다시 명령어를 입력해주세요\n"
                                    f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
-                    break
                 else :
-                    print(type(msg2.content), msg2.content)
-                    if loop_switch == 1:
-                        await temp_msg.delete()
-                        await ctx.channel.purge(limit=1)
-                        abbName = msg2.content.upper()
-                    elif loop_switch == 2:
-                        await temp_msg.delete()
-                        await ctx.channel.purge(limit=1)
-                        fullName = msg2.content
-                    elif loop_switch == 3:
-                        await temp_msg.delete()
-                        await ctx.channel.purge(limit=1)
-                        colorCode = msg2.content
-                    elif loop_switch == 4:
-                        await temp_msg.delete()
-                        await ctx.channel.purge(limit=1)
-                        imoji = msg2.content
-                    elif loop_switch == 5:
-                        await temp_msg.delete()
-                        await ctx.channel.purge(limit=1)
-                        logoLink = str(msg2.content)
-                loop_switch += 1
-            embed3 = discord.Embed(title="입력 결과", description=exitText, color=discord.Color.yellow())
-            await embed_msg.delete()
-            await ctx.send(embed=embed3)
+                    print(image_msg.attachments[0].filename)
+                    image = image_msg.attachments[0]
+                    print(image.url)
 
-            # 디스코드 상호작용
-            x = "0x" + str(colorCode)
-            guild = ctx.guild
-            await guild.create_role(name=abbName, colour=discord.Colour.from_str(x))
-            #await getRole.edit(color=discord.Colour.from_str(x))
-            # DB TEAM_INFORMATION 인서트
-            try:
-                conn = sqlite3.connect("CEF.db")
-                cur = conn.cursor()
-                cur.execute("INSERT INTO TEAM_INFORMATION VALUES(?, ?, ?, ?, ?, ?);",
-                            (abbName, fullName, colorCode, lastRank, imoji, logoLink))
-            finally:
-                conn.commit()
-                conn.close()
-            await ctx.send("역할 이모지는 별도로 설정해야 합니다.")
+                embed3 = discord.Embed(title="입력 결과", color=discord.Color.green())
+                embed.add_field(name="팀 약자", value=abbName)
+                await embed_msg.delete()
+                await ctx.send(embed=embed3)
+
+                # 디스코드 상호작용
+                x = "0x" + str(colorCode)    # 역할 색상
+                guild = ctx.guild
+                await guild.create_role(name=abbName, colour=discord.Colour.from_str(x))     # 역할 생성
+                msg3 = await ctx.send("")
+
+                # DB TEAM_INFORMATION 인서트
+                try:
+                    conn = sqlite3.connect("CEF.db")
+                    cur = conn.cursor()
+                    cur.execute("INSERT INTO TEAM_INFORMATION VALUES(?, ?, ?, ?, ?, ?);",
+                                (abbName, fullName, colorCode, lastRank, logoLink))
+                finally:
+                    conn.commit()
+                    conn.close()
+                await ctx.reply("역할 이모지는 서버 설정에서 별도로 설정해주세요.")
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
