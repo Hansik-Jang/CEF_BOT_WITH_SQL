@@ -26,5 +26,6 @@ class Event(commands.Cog):
         await self.bot.tree.sync(discord.Object(id=706480732477849650))
         print('싱크 완료')
 
+
 async def setup(bot):
     await bot.add_cog(Event(bot))

@@ -22,14 +22,34 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
-    async def _test1(self, ctx, people: commands.Greedy[discord.User]):
-        for man in people:
-            await ctx.send(f"{man.mention}")
-            idnum = man.id
-            member = get(ctx.guild.members, id=idnum)
-            role = get(ctx.guild.roles, name='FCB')
+    async def _test1(self, ctx, abbName, *people: discord.Member):
+        # 디스코드 상호작용
+        guild = ctx.guild
+        await guild.create_role(name=abbName, colour=discord.Colour.red())  # 역할 생성
+        for member in people :
+            role = get(ctx.guild.roles, name=abbName)
             await member.add_roles(role)
+            await ctx.send(f"{member.display_name} - {abbName} 역할 추가 완료")
 
+        # DB TEAM_INFORMATION 인서트
+        try :
+            fullName = abbName
+            colorCode = "0xff0000"
+            lastRank = 99
+            url = "https://cdn.discordapp.com/attachments/853175297926889472/1168485933058895912/FCB.png?ex=6551f053&is=653f7b53&hm=44ede6da9286e3f03321077f5b86710a80530a94d345f2d4536cffedec0dd39d&"
+            conn = sqlite3.connect("CEF.db")
+            print("a")
+            cur = conn.cursor()
+            print("b")
+            cur.execute("INSERT INTO TEAM_INFORMATION VALUES(?, ?, ?, ?, ?, ?);",
+                        (abbName, fullName, colorCode, lastRank, "", url))
+            await ctx.send("DB 추가 완료")
+        except :
+            print("실패")
+        finally :
+            conn.commit()
+            conn.close()
+        await ctx.reply("역할 이모지는 서버 설정에서 별도로 설정해주세요.")
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):
@@ -74,14 +94,20 @@ class Test(commands.Cog):
             print(image_msg.attachments[0].filename)
             image = image_msg.attachments[0]
             print(image.url)
-        embed2 = discord.Embed(title="테스트")
+            print(type(image.url))
+        embed2 = discord.Embed(title="테스트", description="   ")
         embed2.add_field(name="테스트", value="테스트")
-        embed2.set_thumbnail(image.url)
+        embed2.set_thumbnail(url=image.url)
         await ctx.send(embed=embed2)
-        embed1 = discord.Embed(title="테스트")
-        embed1.add_field(name="테스트", value="테스트")
-        embed1.set_image(image.url)
-        await ctx.send(embed=embed1)
+        role = get(ctx.guild.roles, name="USA")
+        print(role.name)
+        await role.edit(display_icon=f"{image}")
+        await ctx.send("완료")
+
+        # Cog error handler
+
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"An error occurred in the Test cog: {error}")
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):
