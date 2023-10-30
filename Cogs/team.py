@@ -15,7 +15,6 @@ class Team(commands.Cog):
                       help="권한 : 전체"
                            "\nCEF에 소속된 팀들의 총원과 지난 시즌 성적 등 정보를 출력합니다.",
                       brief="$전체팀목록")
-
     async def _wholeTeamList(self, ctx) :
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
@@ -45,10 +44,19 @@ class Team(commands.Cog):
                 embed.add_field(name=f"{fullName}", value=f" - 현재 인원 : {str(myfun.getRoleCount(ctx, abb2))} 명",
                                 inline=False)
             else :
-                embed.add_field(name=f"{fullName}", value=f" - 팀 약자 : {abbName}\n"
-                                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
-                                                          f"- 지난 순위 : {lastRank}",
-                                inline=True)
+                imoji = getImojiFromTeamInfor(abbName)
+                if imoji == "":
+                    embed.add_field(name=f"{fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
+                else:
+                    embed.add_field(name=f"{imoji} {fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
         await ctx.send(embed=embed)
 
     @commands.command(name="팀명단", pass_context=True,

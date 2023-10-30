@@ -18,9 +18,10 @@ class Career(commands.Cog):
             role_names = [role.name for role in ctx.author.roles]
             history = getHystoryFromSeasonUserHistory(ctx)
             imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
+            logo = getLogoFromTeamInfor(getTeamNameFromUserInfo(ctx))
             embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
                                   description=ctx.author.id)
-            embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx)+imoji, inline=True)
+            embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx), inline=True)
             embed.add_field(name="신분", value=getRankFromUserInfo(ctx), inline=True)
             embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
             embed.add_field(name="주포지션", value=getMainPositionFromUserInfo(ctx), inline=True)
@@ -47,6 +48,8 @@ class Career(commands.Cog):
                 embed.add_field(name="히스토리", value="기록 없음", inline=False)
             else:
                 embed.add_field(name="히스토리", value=history, inline=False)
+            if logo != "":
+                embed.set_thumbnail(url=logo)
 
 
             embed2_msg = await ctx.send(embed=embed)
@@ -71,8 +74,8 @@ class Career(commands.Cog):
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-    @commands.command(name='리그순위', pass_context=True)
-    async def _awardValondor(self, ctx):
+    @commands.command(name='리그순위입력', pass_context=True)
+    async def _awardValondor(self, ctx, rank, role:discord.Role):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
             pass
