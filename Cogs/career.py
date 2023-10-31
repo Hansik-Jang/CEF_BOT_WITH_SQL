@@ -70,56 +70,22 @@ class Career(commands.Cog):
         # ID, Season, FW_Tots, FW_Nomi, MF_Tots, MF_Nomi, DF_Tots, DF_Nomi, GK_Tots, GK_Nomi
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
-            if season is not None :
-                if member is not None :
-                    msg = await ctx.send(f"```{season} 시즌의 ```\n\n"
-                                         f"정상 입력되었으면 1, 잘못 입력되었으면 2를 입력하세요.")
-                    try :
-                        msg2 = await self.bot.wait_for("message",
-                                                       check=lambda
-                                                           m : m.author == ctx.author and m.channel == ctx.channel,
-                                                       timeout=30.0)
-                    except asyncio.TimeoutError :
-                        await ctx.send("시간이 초과되었습니다.")
-                    else :
-                        if msg.content == "1" :
-                            # DB 업데이트
-                            try :
-                                conn = connectDB()
-                                cur = conn.cursor()
-                                cur.execute("INSERT INTO CAREE_VALONDOR VALUES(?, ?)", (member.id, season))
-                                await ctx.send(f"{member.display_name} DB 업데이트 완료")
-                            finally :
-                                closeDB(conn)
-                        elif msg.content == "2" :
-                            await ctx.send("다시 명령어를 입력해주세요.")
-                else :
-                    await ctx.reply("```cs\n"
-                                    "#명령어 실패!!!\n"
-                                    "멤버 멘션이 누락되었습니다.\n"
-                                    "사용법 : $발롱도르 '시즌' '@멘션'\n"
-                                    "예시 - $발롱도르 24-1 @타임제이```")
-            else :
-                await ctx.reply("```cs\n"
-                                "#명령어 실패!!!\n"
-                                "시즌 정보가 누락되었습니다.\n"
-                                "$시즌수정 명령어를 사용하여 시즌 정보를 업데이트 후 다시 시도해주세요.\n"
-                                "사용법 : $발롱도르 '시즌' '@멘션'\n"
-                                "예시 - $발롱도르 24-1 @타임제이```")
+            pass
         else :
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
     @commands.command(name='발롱도르', pass_context=True,
                       help="권한 : 스태프\n"
                            "해당 하는 인원의 발롱도르 정보를 추가합니다.",
-                      brief="$발롱도르 '시즌' '@멘션'")
+                      brief="$발롱도르 '@멘션'")
     async def _awardValondor(self, ctx, member:discord.Member=None):
         # ID, Season
         role_names = [role.name for role in ctx.author.roles]
+        print(self.season)
         if "스태프" in role_names :
             if self.season is not None:
                 if member is not None:
-                    msg = await ctx.send(f"```{self.season} 시즌의 ```\n\n"
+                    msg = await ctx.send(f"```{self.season} 시즌의 수상자 : {member.display_name}```\n"
                                          f"정상 입력되었으면 1, 잘못 입력되었으면 2를 입력하세요.")
                     try :
                         msg2 = await self.bot.wait_for("message",
@@ -129,16 +95,17 @@ class Career(commands.Cog):
                     except asyncio.TimeoutError :
                         await ctx.send("시간이 초과되었습니다.")
                     else:
-                        if msg.content == "1":
+                        if msg2.content == "1":
                             # DB 업데이트
                             try :
                                 conn = connectDB()
                                 cur = conn.cursor()
-                                cur.execute("INSERT INTO CAREE_VALONDOR VALUES(?, ?)", (member.id, season))
+                                cur.execute("INSERT INTO CAREER_VALONDOR VALUES(?, ?)", (member.id, self.season))
                                 await ctx.send(f"{member.display_name} DB 업데이트 완료")
                             finally :
                                 closeDB(conn)
-                        elif msg.content == "2":
+
+                        elif msg2.content == "2":
                             await ctx.send("다시 명령어를 입력해주세요.")
                 else :
                     await ctx.reply("```cs\n"
@@ -160,7 +127,7 @@ class Career(commands.Cog):
                       help="권한 : 스태프\n"
                            "해당 역할의 인원들의 정보(시즌, 순위)를 DB에 추가합니다.",
                       brief="$리그순위입력 '시즌' '순위' '@팀_멘션'")
-    async def _awardValondor(self, ctx, rank=None, selectRole:discord.Role=None):
+    async def _insertLeageInfo(self, ctx, rank=None, selectRole:discord.Role=None):
         button = False
         resultList = []
         role_names = [role.name for role in ctx.author.roles]
@@ -293,6 +260,7 @@ class Career(commands.Cog):
                         if msg3.content == "1":
                             self.season = msg1.content
                             await ctx.send(f"{self.season}으로 업데이트되었습니다.", delete_after=10)
+                            break
                         elif msg3.content == "2":
                             await ctx.send("예시와 같은 형태로 시즌 정보를 다시 입력해주세요.\n"
                                            f"예시) 24-1, 24-2, 24-3")
