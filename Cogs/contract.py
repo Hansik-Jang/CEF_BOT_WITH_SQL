@@ -263,6 +263,11 @@ class Contract(commands.Cog):
                     period = getPeriodFromContractwithID(row[0])
                     endDate = myfun.convertDate(getEndDateFromContractwithID(row[0]))
                     remainDate = myfun.calculateRemainDate(getEndDateFromContractwithID(row[0]))
+                    print(remainDate)
+                    if remainDate < 0:
+                        remainDate = "만료"
+                    elif remainDate == 0:
+                        remainDate = "만료 임박"
                     outfutList.append([nickname, startDate, period, endDate, remainDate])
                 except:
                     pass
