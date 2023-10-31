@@ -486,3 +486,12 @@ def getEndDateFromContractwithID(idNum) :
     except :
         result = ""
     return result
+
+
+def conncectDB():
+    conn = sqlite3.connect("CEF.db")
+    return conn
+
+def closeDB(conn):
+    conn.commit()
+    conn.close()

@@ -7,6 +7,7 @@ baseRoleName = "테스트용"
 totalCommunityRoleNameList = ["테스트용", "RFA", "KPA", "EVT", "SNI"] # 나중에 테스트용은 CEF로 변경 필수
 CEF_SERVER_ID = 706480732477849650
 TEST_SERVER_ID = 1114943322201526272
+positionList = ["ST", "LW", "RW", "CAM", "CM", "CDM", "LB", "CB", "RB", "GK"]
 
 # 상태
 DEVELOPER_SWITCH = True     # True이면 개발자만 사용 가능, DB에선 1
