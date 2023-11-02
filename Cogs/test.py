@@ -22,12 +22,31 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
-    async def _test1(self, ctx):
-        conn = sqlite3.connect("CEF.db")
-        cur = conn.cursor()
-        cur.execute("SELECT Abbreviaiton FROM TEAM_INFORMATION")
-        result = cur.fetchall()
-        print(result)
+    async def _test1(self, ctx, *members:discord.Member):
+        totsList = []
+        for i in range(8):
+            for member in members:
+                temp = []
+                temp.append(member)
+            totsList.append(temp)
+        try:
+            for i in range(len(totsList)) :
+                print(i, totsList[i])
+                for mem in totsList[i] :
+                    print(mem.id)
+                    data = [mem.id, "24-1", "", "", "", "", "", "", "", ""]
+                    print(data)
+                    data[i + 2] = True
+                    conn = sqlite3.connect("CEF.db")
+                    cur = conn.cursor()
+                    cur.execute("INSERT INTO CAREER_TOTS(ID, Season, FW_Tots, MF_Tots, DF_Tots, GK_Tots, "
+                                "FW_Nomi, MF_Nomi, DF_Nomi, GK_Nomi) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?", data)
+                    await ctx.send(f"{member.display_name} DB 업데이트 완료")
+
+        finally :
+            conn.commit()
+            conn.close()
+
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
         if config.devlopCheck(ctx):

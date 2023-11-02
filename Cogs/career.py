@@ -13,7 +13,7 @@ from table2ascii import table2ascii as t2a, PresetStyle
 class Career(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.season = None
+        self.season = "24-1"
 
     @commands.command(name='내정보', pass_context=True)
     async def _myinformation(self, ctx):
@@ -70,7 +70,160 @@ class Career(commands.Cog):
         # ID, Season, FW_Tots, FW_Nomi, MF_Tots, MF_Nomi, DF_Tots, DF_Nomi, GK_Tots, GK_Nomi
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
-            pass
+            tots = '토츠'
+            position = "FW"
+            totsFW = []
+            totsMF = []
+            totsDF = []
+            totsGK = []
+            nomiFW = []
+            nomiMF = []
+            nomiDF = []
+            nomiGK = []
+            totsList = [totsFW, totsMF, totsDF, totsGK, nomiFW, nomiMF, nomiDF, nomiGK]
+            t_totsFW = ""
+            t_totsMF = ""
+            t_totsDF = ""
+            t_totsGK = ""
+            t_nomiFW = ""
+            t_nomiMF = ""
+            t_nomiDF = ""
+            t_nomiGK = ""
+            totsInsertResult = await ctx.send(content=f"```<토츠 입력 현황>\n"
+                                                      f"FW - {t_totsFW}\n"
+                                                      f"MF - {t_totsMF}\n"
+                                                      f"DF - {t_totsDF}\n"
+                                                      f"GK - {t_totsGK}\n\n"
+                                                      f"<노미 입력 현황>\n"
+                                                      f"FW - {t_nomiFW}\n"
+                                                      f"MF - {t_nomiMF}\n"
+                                                      f"DF - {t_nomiDF}\n"
+                                                      f"GK - {t_nomiGK}```")
+            ann_msg = await ctx.send(content=f"{tots} {position} 수상자 명단을 멘션으로 입력하세요.")
+            i = 0
+            while i < 8:
+                temp = divmod(i, 4)
+                if temp[0] == 0:
+                    tots = "토츠"
+                    if temp[1] == 0 :
+                        position = "FW"
+                    elif temp[1] == 1 :
+                        position = "MF"
+                    elif temp[1] == 2 :
+                        position = "DF"
+                    elif temp[1] == 3 :
+                        position = "GK"
+                elif temp[0] == 1:
+                    tots = "노미"
+                    if temp[1] == 0 :
+                        position = "FW"
+                    elif temp[1] == 1 :
+                        position = "MF"
+                    elif temp[1] == 2 :
+                        position = "DF"
+                    elif temp[1] == 3 :
+                        position = "GK"
+
+                await totsInsertResult.edit(content=f"```<토츠 입력 현황>\n"
+                                                      f"FW - {t_totsFW}\n"
+                                                      f"MF - {t_totsMF}\n"
+                                                      f"DF - {t_totsDF}\n"
+                                                      f"GK - {t_totsGK}\n\n"
+                                                      f"<노미 입력 현황>\n"
+                                                      f"FW - {t_nomiFW}\n"
+                                                      f"MF - {t_nomiMF}\n"
+                                                      f"DF - {t_nomiDF}\n"
+                                                      f"GK - {t_nomiGK}```")
+                await ann_msg.edit(content=f"{tots} {position} 수상자 명단을 멘션으로 입력하세요.")
+                try :
+                    msg = await self.bot.wait_for("message",
+                                                  check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
+                                                  timeout=60.0)
+                except asyncio.TimeoutError :
+                    await ctx.send("시간이 초과되었습니다.\n"
+                                   f"다시 명령어를 입력해주세요\n"
+                                   f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+                    break
+                else :
+                    await ctx.channel.purge(limit=1)
+                    member = msg.content.replace("<", "")
+                    member = member.replace(">", "")
+                    memberNum = member.replace("@", "")
+                    tempList = memberNum.split(" ")
+                    temp = []
+                    for id in tempList :
+                        member_obj = await self.bot.fetch_user(id)
+                        totsList[i].append(member_obj)
+                        if i == 0:
+                            t_totsFW = t_totsFW + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 1:
+                            t_totsMF = t_totsMF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 2:
+                            t_totsDF = t_totsDF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 3:
+                            t_totsGK = t_totsGK + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 4:
+                            t_nomiFW = t_nomiFW + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 5:
+                            t_nomiMF = t_nomiMF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 6:
+                            t_nomiDF = t_nomiDF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                        elif i == 7:
+                            t_nomiGK = t_nomiGK + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
+                    i += 1
+            await totsInsertResult.delete()
+            totsInsertResult2 = await ctx.send(content=f"``` <토츠 입력 최종 결과>\n"
+                                                      f"FW - {t_totsFW}\n"
+                                                      f"MF - {t_totsMF}\n"
+                                                      f"DF - {t_totsDF}\n"
+                                                      f"GK - {t_totsGK}\n\n"
+                                                      f"<노미 입력 최종 결과>\n"
+                                                      f"FW - {t_nomiFW}\n"
+                                                      f"MF - {t_nomiMF}\n"
+                                                      f"DF - {t_nomiDF}\n"
+                                                      f"GK - {t_nomiGK}\n\n"
+                                                      f"다음 단계로 진행하기를 희망하면 1을 입력하세요.```")
+            try :
+                msg = await self.bot.wait_for("message",
+                                              check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
+                                              timeout=60.0)
+            except asyncio.TimeoutError :
+                await ctx.send("시간이 초과되었습니다.\n"
+                               f"다시 명령어를 입력해주세요\n"
+                               f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+            else:
+                if msg.content == "1":
+                    print(totsList)
+
+                    for i in range(len(totsList)):
+                        print(i, totsList[i])
+                        for mem in totsList[i]:
+                            data = [mem.id, self.season, "", "", "", "", "", "", "", ""]
+                            data[i+2] = True
+                            try :
+                                conn = connectDB()
+                                cur = conn.cursor()
+                                cur.execute("INSERT INTO CAREER_TOTS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                            data)
+                                #cur.execute("INSERT INTO CAREER_TOTS(ID, Season, FW_Tots, MF_Tots, DF_Tots, GK_Tots, "
+                                #            "FW_Nomi, MF_Nomi, DF_Nomi, GK_Nomi) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
+                                #            (data, ))
+                            finally:
+                                conn.commit()
+                                conn.close()
+                            await ctx.send(f"{mem.display_name} - DB 업데이트 완료", delete_after=10)
+            await ctx.send("토츠 DB 업데이트 완료")
+            await ctx.send(content=f"``` <{self.season} 토츠> \n"
+                                   f"FW - {t_totsFW}\n"
+                                   f"MF - {t_totsMF}\n"
+                                   f"DF - {t_totsDF}\n"
+                                   f"GK - {t_totsGK}\n\n"
+                                   f"<{self.season} 노미>\n"
+                                   f"FW - {t_nomiFW}\n"
+                                   f"MF - {t_nomiMF}\n"
+                                   f"DF - {t_nomiDF}\n"
+                                   f"GK - {t_nomiGK}\n\n"
+                                   f"다음 단계로 진행하기를 희망하면 1을 입력하세요.```")
         else :
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
