@@ -26,21 +26,14 @@ class Test(commands.Cog):
     @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
     async def _test1(self, ctx):
-        sortResult = ['', '', '', '', '', '', '', '', '', '', '']
-        name = "FCB"
-        embed = discord.Embed(title=name)
-        # DB 정보 얻기
-        conn = sqlite3.connect("CEF.db")
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", (name, ))
-        teamList = cur.fetchall()
-        # DB 정보 정렬하여 Embed로 정리
-        for i, data in enumerate(teamList):
-            for position in config.positionList:
-                if data[2] == position:
-                    sortResult[i] = sortResult[i] + data[1] + "\n"
-        for i, position in enumerate(config.positionList):
-            embed.add_field(name=position, value=sortResult[i])
+        url = ctx.author.display_avatar
+        colour = getStringColorCodeFromTeamInfor("FCB")
+        embed = discord.Embed(title="테스트", colour=colour)
+        for pos in config.positionList:
+            embed.add_field(name=pos, value=" ", inline=True)
+        embed.set_image(url=url)
+        embed.set_thumbnail(url=url)
+        embed.set_footer(text="푸터", icon_url=url)
 
         await ctx.send(embed=embed)
 

@@ -31,6 +31,7 @@ class Career(commands.Cog):
             embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
             embed.add_field(name="주포지션", value=getMainPositionFromUserInfo(ctx), inline=True)
             embed.add_field(name="부포지션", value=getSubPositionFromUserInfo(ctx), inline=True)
+            embed.set_author(name="test", url=ctx.author.display_avatar)
             if "감독" in role_names:
                 embed.add_field(name="계약기간", value="감독 직책으로 미표기", inline=False)
             elif "FA (무소속)" in role_names:

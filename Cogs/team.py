@@ -16,7 +16,7 @@ class Dropdown(discord.ui.Select) :
         for name in teamTemp:
             options.append(discord.SelectOption(label=name,
                                                 description=f"{getTeamFullNameFromTeamInfor(name)}",
-                                                emoji=getImojiFromTeamInfor(name)))
+                                                emoji=f"{getImojiFromTeamInfor(name)}"))
 
         # The placeholder is what will be shown when no option is chosen
         # The min and max values indicate we can only pick one of the three options
@@ -31,7 +31,18 @@ class Dropdown(discord.ui.Select) :
         # selected options. We only want the first one.
         # 상호 작용 메시지 세팅
         sortResult = ['', '', '', '', '', '', '', '', '', '']
-        embed = discord.Embed(title=self.values[0])
+        colour = getStringColorCodeFromTeamInfor(self.values[0])
+        role = str(len(get(interaction.guild.roles, name=self.values[0]).members))
+        if colour == "":
+            embed = discord.Embed(title=f"{getImojiFromTeamInfor(self.values[0])} {getTeamFullNameFromTeamInfor(self.values[0])}")
+        else:
+            embed = discord.Embed(title=getTeamFullNameFromTeamInfor(self.values[0]), colour=colour)
+        embed.add_field(name="팀 정보",
+                        value=f"현재 인원 : {str(len(get(interaction.guild.roles, name=self.values[0]).members))} 명\n"
+                              f"지난 순위 : {getLastRankFromTeamInfor(self.values[0])}",
+                        inline=False)
+        if getLogoFromTeamInfor(self.values[0]) != '':
+            embed.set_thumbnail(url=getLogoFromTeamInfor(self.values[0]))
         # DB 정보 얻기
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
@@ -79,7 +90,6 @@ class DropdownView(discord.ui.View) :
 class Team(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.switch = 'FA'
 
     @commands.command(name='전체팀목록2', pass_context=True, aliases=['팀목록2', '전체팀명단2'],
                       help="권한 : 전체"
@@ -88,11 +98,15 @@ class Team(commands.Cog):
     async def _wholeTeamList2(self, ctx) :
         sortResult = ['', '', '', '', '', '', '', '', '', '']
         embed = discord.Embed(title="FA 목록")
+        logo = getLogoFromTeamInfor("FA")
+        color = getColorCodeFromTeamInfor("FA")
         # DB 정보 얻기
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", ("FA", ))
         teamList = cur.fetchall()
+        embed.set_thumbnail(url=getLogoFromTeamInfor("FA"))
+        embed.set_footer(text=f"사용자 : {myfun.getNickFromDisplayname(ctx)}", icon_url=ctx.author.display_avatar)
         # DB 정보 정렬하여 Embed로 정리
         for data in teamList:
             if data[2] == "LW":
@@ -202,6 +216,10 @@ class Team(commands.Cog):
             ctx.reply("팀약자와 함께 명령어를 사용해주세요.\n"
                       "사용방법 : $팀명단 '팀약자'\n"
                       "예시) $팀명단 FCB")
+
+
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"An error occurred in the Team cog: {error}")
 
 async def setup(bot):
     await bot.add_cog(Team(bot))

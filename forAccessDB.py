@@ -249,6 +249,25 @@ def getColorCodeFromTeamInfor(abbTeamName) :
         colorCode =''
     return colorCode
 
+def getStringColorCodeFromTeamInfor(abbTeamName) :
+    try:
+        import discord
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName,))
+        result = cur.fetchone()
+        colorCode = result[2]
+        print(colorCode)
+        colorCode = "#" + colorCode
+        print(colorCode)
+        colourCode = discord.Colour.from_str(colorCode)
+        print(colourCode)
+    except:
+        colourCode = ''
+        print(colourCode)
+
+    return colourCode
+
 
 def getLastRankFromTeamInfor(abbTeamName) :
     try:
