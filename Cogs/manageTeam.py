@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import sqlite3
+
+import config
 import myfun
 from discord.utils import get
 from forAccessDB import *
@@ -11,12 +13,17 @@ class ManageTeam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='팀등록', pass_context=True)
+    @commands.command(name='팀등록', pass_context=True,
+                      help="권한 : 스태프 전용\n"
+                           "팀 등록을 진행합니다.\n"
+                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 업데이트 등",
+                      brief="$팀등록 @멘션(다수 가능)")
     async def _registerTeam(self, ctx, *people: discord.Member):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
             temp = ''
             insertSwitch = False
+            exitSwitch = True
             for man in people:
                 temp = temp + man.display_name + "\n"
 
@@ -71,10 +78,10 @@ class ManageTeam(commands.Cog):
                     else:
                         text3 = f"3. 색상코드 : {colorCode} (입력 O)\n"
                     if logoLink == "":
-                        text5 = f"5. 로고 링크 : {logoLink} (입력 X)\n"
+                        text5 = f"4. 로고 링크 : {logoLink} (입력 X)\n"
                     else:
-                        text5 = f"5. 로고 링크 : {logoLink} (입력 O)\n"
-                    text6 = "6. 강제 종료하기\n\n"
+                        text5 = f"4. 로고 링크 : {logoLink} (입력 O)\n"
+                    text6 = "5. 강제 종료하기\n\n"
                     text_tip = (f"<TIP>\n"
                                f"1. 이모지는 명령어 사용 전 미리 등록한 후 로고 입력 후 로고 앞에 '\'를 붙여 다음과 같은 형태를 입력해야 합니다.\n"
                                f"   <로고이름:로고 ID 번호>\n"
@@ -119,72 +126,77 @@ class ManageTeam(commands.Cog):
                             await temp_msg.delete()
                             await ctx.channel.purge(limit=1)
                             colorCode = msg2.content
+                        if msg2.content == "5":
+                            break
+                            await ctx.send("강제 종료되었습니다.")
+                            exitSwitch = False
                         else:
                             await ctx.send("잘못 입력하였습니다.", delete_after=10)
                     loop_switch += 1
 
             await ctx.send(f"안내 문구에 따라 정보를 입력해주세요."
                            "\n4번. 팀 로고 이미지 파일(jpg, png 파일)을 업로드해주세요.")
+            if exitSwitch:
+                def check(message) :
+                    if message.author == ctx.author and message.channel == ctx.channel :
+                        attachments = message.attachments
+                        if len(attachments) == 0 :
+                            return False
+                        attachment = attachments[0]
+                        return attachment.filename.endswith(('.jpg', '.png'))
+                try :
+                    image_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
+                except asyncio.TimeoutError :
+                    await ctx.send("시간이 초과되었습니다.\n"
+                                   f"다시 명령어를 입력해주세요\n"
+                                   f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+                else :
+                    image = image_msg.attachments[0]
+                edit_colorCode = "0x" + str(colorCode)  # 역할 색상
+                embed3 = discord.Embed(title="입력 결과", color=discord.Color.green())
+                embed3.add_field(name="팀 약자", value=abbName)
+                embed3.add_field(name="풀네임", value=fullName)
+                embed3.add_field(name="색상코드", value=colorCode)
+                embed3.set_thumbnail(url=image.url)
+                await embed_msg.delete()
+                await ctx.send(embed=embed3)
 
-            def check(message) :
-                if message.author == ctx.author and message.channel == ctx.channel :
-                    attachments = message.attachments
-                    if len(attachments) == 0 :
-                        return False
-                    attachment = attachments[0]
-                    return attachment.filename.endswith(('.jpg', '.png'))
-            try :
-                image_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
-            except asyncio.TimeoutError :
-                await ctx.send("시간이 초과되었습니다.\n"
-                               f"다시 명령어를 입력해주세요\n"
-                               f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
-            else :
-                image = image_msg.attachments[0]
-            edit_colorCode = "0x" + str(colorCode)  # 역할 색상
-            embed3 = discord.Embed(title="입력 결과", color=discord.Color.green())
-            embed3.add_field(name="팀 약자", value=abbName)
-            embed3.add_field(name="풀네임", value=fullName)
-            embed3.add_field(name="색상코드", value=colorCode)
-            embed3.set_thumbnail(url=image.url)
-            await embed_msg.delete()
-            await ctx.send(embed=embed3)
+                # 디스코드 상호작용
+                guild = ctx.guild
+                await guild.create_role(name=abbName, colour=discord.Colour.from_str(edit_colorCode))     # 역할 생성
+                await asyncio.sleep(1)
+                for man in people:
+                    role = get(ctx.guild.roles, name=abbName)
+                    await man.add_roles(role)
+                    await ctx.send(f"{man.display_name} - {abbName} 역할 추가 완료")
 
-            # 디스코드 상호작용
-            guild = ctx.guild
-            await guild.create_role(name=abbName, colour=discord.Colour.from_str(edit_colorCode))     # 역할 생성
-            await asyncio.sleep(1)
-            for man in people:
-                role = get(ctx.guild.roles, name=abbName)
-                await man.add_roles(role)
-                await ctx.send(f"{man.display_name} - {abbName} 역할 추가 완료")
+                # 디스코드 이적센터 채널 게시
+                channel = get(ctx.guild.channels, id=config.TRANSFER_CENTER)
+                await channel.send("<")
 
-            # DB TEAM_INFORMATION 인서트
-            try:
-                print(abbName)
-                print(fullName)
-                print(colorCode)
-                print(lastRank)
-                print(image.url)
-                conn = sqlite3.connect("CEF.db")
-                print("a")
-                cur = conn.cursor()
-                print("b")
-                cur.execute("INSERT INTO TEAM_INFORMATION VALUES(?, ?, ?, ?, ?, ?);",
-                            (abbName, fullName, colorCode, lastRank, "", image.url))
-                await ctx.send("DB 추가 완료")
-            except:
-                await ctx.send("DB 업데이트 오류 발생. 다시 시도해주세요")
-            finally:
-                conn.commit()
-                conn.close()
-            await ctx.reply("역할 이모지는 서버 설정에서 별도로 설정해주세요.")
+                # DB TEAM_INFORMATION 인서트
+                try:
+                    conn = sqlite3.connect("CEF.db")
+                    cur = conn.cursor()
+                    cur.execute("INSERT INTO TEAM_INFORMATION VALUES(?, ?, ?, ?, ?, ?);",
+                                (abbName, fullName, colorCode, lastRank, "", image.url))
+                    await ctx.send("DB 추가 완료")
+                except:
+                    await ctx.send("DB 업데이트 오류 발생. 다시 시도해주세요")
+                finally:
+                    conn.commit()
+                    conn.close()
+                await ctx.reply("역할 이모지는 서버 설정에서 별도로 설정해주세요.")
 
 
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-    @commands.command(name='팀해체', pass_context=True)
+    @commands.command(name='팀해체(미완)', pass_context=True,
+                      help="권한 : 스태프 전용\n"
+                           "팀 해체를 진행합니다.\n"
+                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 업데이트 등",
+                      brief="$팀등록 @멘션(다수 가능)")
     async def _deleteTeam(self, ctx):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :

@@ -30,22 +30,37 @@ class Dropdown(discord.ui.Select) :
         # Select object, and the values attribute gets a list of the user's
         # selected options. We only want the first one.
         # 상호 작용 메시지 세팅
-        sortResult = ['', '', '', '', '', '', '', '', '', '', '']
-        print(self.values)
-        print(self.values[0])
+        sortResult = ['', '', '', '', '', '', '', '', '', '']
         embed = discord.Embed(title=self.values[0])
         # DB 정보 얻기
         conn = sqlite3.connect("CEF.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", (self.values[0], ))
         teamList = cur.fetchall()
-        print(teamList)
         # DB 정보 정렬하여 Embed로 정리
-        for i, data in enumerate(teamList):
-            for position in config.positionList:
-                if data[2] == position:
-                    sortResult[i] = sortResult[i] + data[1] + "\n"
-        for i, position in enumerate(config.positionList):
+        for data in teamList :
+            if data[2] == "LW" :
+                sortResult[0] = sortResult[0] + data[1] + "\n"
+            elif data[2] == "ST" :
+                sortResult[1] = sortResult[1] + data[1] + "\n"
+            elif data[2] == "RW" :
+                sortResult[2] = sortResult[2] + data[1] + "\n"
+            elif data[2] == "CAM" :
+                sortResult[3] = sortResult[3] + data[1] + "\n"
+            elif data[2] == "CM" :
+                sortResult[4] = sortResult[4] + data[1] + "\n"
+            elif data[2] == "CDM" :
+                sortResult[5] = sortResult[5] + data[1] + "\n"
+            elif data[2] == "LB" :
+                sortResult[6] = sortResult[6] + data[1] + "\n"
+            elif data[2] == "CB" :
+                sortResult[7] = sortResult[7] + data[1] + "\n"
+            elif data[2] == "RB" :
+                sortResult[8] = sortResult[8] + data[1] + "\n"
+            elif data[2] == "GK" :
+                sortResult[9] = sortResult[9] + data[1] + "\n"
+
+        for i, position in enumerate(config.positionList) :
             embed.add_field(name=position, value=sortResult[i])
 
         # 상호 작용
@@ -71,11 +86,43 @@ class Team(commands.Cog):
                            "\nCEF에 소속된 팀들의 총원과 지난 시즌 성적 등 정보를 출력합니다.",
                       brief="$전체팀목록")
     async def _wholeTeamList2(self, ctx) :
+        sortResult = ['', '', '', '', '', '', '', '', '', '']
+        embed = discord.Embed(title="FA 목록")
+        # DB 정보 얻기
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", ("FA", ))
+        teamList = cur.fetchall()
+        # DB 정보 정렬하여 Embed로 정리
+        for data in teamList:
+            if data[2] == "LW":
+                sortResult[0] = sortResult[0] + data[1] + "\n"
+            elif data[2] == "ST":
+                sortResult[1] = sortResult[1] + data[1] + "\n"
+            elif data[2] == "RW":
+                sortResult[2] = sortResult[2] + data[1] + "\n"
+            elif data[2] == "CAM":
+                sortResult[3] = sortResult[3] + data[1] + "\n"
+            elif data[2] == "CM":
+                sortResult[4] = sortResult[4] + data[1] + "\n"
+            elif data[2] == "CDM":
+                sortResult[5] = sortResult[5] + data[1] + "\n"
+            elif data[2] == "LB":
+                sortResult[6] = sortResult[6] + data[1] + "\n"
+            elif data[2] == "CB":
+                sortResult[7] = sortResult[7] + data[1] + "\n"
+            elif data[2] == "RB":
+                sortResult[8] = sortResult[8] + data[1] + "\n"
+            elif data[2] == "GK":
+                sortResult[9] = sortResult[9] + data[1] + "\n"
+
+        for i, position in enumerate(config.positionList):
+            embed.add_field(name=position, value=sortResult[i])
         """Sends a message with our dropdown containing colours"""
         # Create the view containing our dropdown
         view = DropdownView()
         # Sending a message containing our view
-        await ctx.send('조회할 팀을 선택하세요.', view=view)
+        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)
 
 
 

@@ -13,21 +13,13 @@ class Transfer(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='팀추첨', pass_context=True,
-                      help="권한 : 전체"
-                           "\n특정 팀의 명단을 포지션별로 구분하여 출력합니다.",
-                      brief="$팀명단 '팀약자'")
-    async def _select(self, ctx):
-        fcb = get(ctx.guild.roles, name="FC Barcelona")
-        for member in fcb.members:
-            data_list = [member.id, myfun.getNickFromDisplayname2(member.display_name), 0]
-            print(data_list)
-
     # 미완
     @commands.command(name="이적", pass_context=True,
-                      help="권한 : 스태프 전용"
-                           "\n특정 팀의 명단을 포지션별로 구분하여 출력합니다.",
-                      brief="$팀명단 '팀약자'")
+                      help="권한 : 스태프 전용\n"
+                           "특정 인원의 이적 과정을 진행합니다.\n"
+                           "FA 역할 제거, 팀 역할 추가, 이적센터 게시, 기존 계약 등록 여부 검사 등\n"
+                           "사용 예시 : $이적 @타임제이 FCB 11/7 20 or $이적 @타임제이 FCB 23/11/7 20",
+                      brief="$이적 @멘션 '팀약자' '계약시작일' '계약기간'")
     async def _transfer(self, ctx, member:discord.Member, abbTeamName=None, startDate=None, period=None):
         delete_time = 15
         role_names = [role.name for role in ctx.author.roles]
@@ -45,18 +37,12 @@ class Transfer(commands.Cog):
                             if checkUseJoinCommandWithID(member.id):
                                 abbTeamName = abbTeamName.upper()
                                 memberRoleList = [role.name for role in member.roles]
-                                print(memberRoleList)
                                 if abbTeamName not in memberRoleList :
-                                    print(abbTeamName)
                                     # 디스코드 내 작업 - FA 역할 회수
                                     if "FA (무소속)" in memberRoleList :
-                                        print("1")
                                         role = get(ctx.guild.roles, name="FA (무소속)")
-                                        print("2")
                                         await member.remove_roles(role)  # O
-                                        print("3")
                                         await ctx.reply(f"FA 역할 제거", delete_after=delete_time)
-                                        print("4")
                                     # 디스코드 내 작업 - 팀 역할 추가
                                     abbTeamName = abbTeamName.upper()
                                     add_role = get(ctx.guild.roles, name=abbTeamName)
@@ -77,7 +63,6 @@ class Transfer(commands.Cog):
                                         conn.close()
                                     # 계약 테이블 업데이트
                                     year_now = str(datetime.today().year) + "/"
-                                    print(year_now)
                                     idnum = member.id
                                     if year_now not in startDate :
                                         startDate = year_now + startDate
@@ -122,7 +107,11 @@ class Transfer(commands.Cog):
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=delete_time)
 
-    @commands.command(name='FA전환', pass_context=True)
+    @commands.command(name='FA전환(미완)', pass_context=True,
+                      help="권한 : 스태프 전용\n"
+                           "특정 인원을 FA로 전환합니다.\n"
+                           "특정 인원의 계약 정보를 삭제하고, 팀역할을 삭제하며",
+                      brief="$FA전환 @멘션")
     async def _FA(self, ctx, member:discord.Member):
         delete_time = 15
         role_names = [role.name for role in ctx.author.roles]
