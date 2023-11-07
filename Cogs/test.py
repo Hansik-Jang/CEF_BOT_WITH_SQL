@@ -14,6 +14,9 @@ from datetime import datetime, timedelta
 from typing import Literal, Optional
 from discord.ext import commands
 from discord.ext.commands import Greedy, Context # or a subclass of yours
+from discord.ui import Select
+
+dropdown_msg = None
 
 
 class Test(commands.Cog):
@@ -22,30 +25,35 @@ class Test(commands.Cog):
 
     @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
-    async def _test1(self, ctx, *members:discord.Member):
-        totsList = []
-        for i in range(8):
-            for member in members:
-                temp = []
-                temp.append(member)
-            totsList.append(temp)
-        try:
-            for i in range(len(totsList)) :
-                print(i, totsList[i])
-                for mem in totsList[i] :
-                    print(mem.id)
-                    data = [mem.id, "24-1", "", "", "", "", "", "", "", ""]
-                    print(data)
-                    data[i + 2] = True
-                    conn = sqlite3.connect("CEF.db")
-                    cur = conn.cursor()
-                    cur.execute("INSERT INTO CAREER_TOTS(ID, Season, FW_Tots, MF_Tots, DF_Tots, GK_Tots, "
-                                "FW_Nomi, MF_Nomi, DF_Nomi, GK_Nomi) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?", data)
-                    await ctx.send(f"{member.display_name} DB 업데이트 완료")
+    async def _test1(self, ctx):
+        sortResult = ['', '', '', '', '', '', '', '', '', '', '']
+        name = "FCB"
+        embed = discord.Embed(title=name)
+        # DB 정보 얻기
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", (name, ))
+        teamList = cur.fetchall()
+        # DB 정보 정렬하여 Embed로 정리
+        for i, data in enumerate(teamList):
+            for position in config.positionList:
+                if data[2] == position:
+                    sortResult[i] = sortResult[i] + data[1] + "\n"
+        for i, position in enumerate(config.positionList):
+            embed.add_field(name=position, value=sortResult[i])
 
-        finally :
-            conn.commit()
-            conn.close()
+        await ctx.send(embed=embed)
+
+
+    @commands.command(name='테스트2', pass_context=True,
+                      help="설명서", brief="사용법")
+    async def _test5(self, ctx) :
+        print(getTeamList())
+        teamList = []
+        for li in getTeamList():
+            print(li)
+            teamList.append(li[0])
+            print(teamList)
 
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):

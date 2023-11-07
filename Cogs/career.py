@@ -23,6 +23,7 @@ class Career(commands.Cog):
             history = getHystoryFromSeasonUserHistory(ctx)
             imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
             logo = getLogoFromTeamInfor(getTeamNameFromUserInfo(ctx))
+            print(logo)
             embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
                                   description=ctx.author.id)
             embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx), inline=True)
@@ -56,7 +57,7 @@ class Career(commands.Cog):
                 embed.set_thumbnail(url=logo)
 
 
-            embed2_msg = await ctx.send(embed=embed)
+            embed2_msg = await ctx.reply(embed=embed)
 
         else:
             await ctx.reply(config.notJoinText)
@@ -222,8 +223,7 @@ class Career(commands.Cog):
                                    f"FW - {t_nomiFW}\n"
                                    f"MF - {t_nomiMF}\n"
                                    f"DF - {t_nomiDF}\n"
-                                   f"GK - {t_nomiGK}\n\n"
-                                   f"다음 단계로 진행하기를 희망하면 1을 입력하세요.```")
+                                   f"GK - {t_nomiGK}\n\n```")
         else :
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 

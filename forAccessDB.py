@@ -286,6 +286,16 @@ def getLogoFromTeamInfor(abbTeamName) :
 
     return logo
 
+def getTeamList():
+    conn = connectDB()
+    cur = conn.cursor()
+    cur.execute("SELECT Abbreviation FROM TEAM_INFORMATION")
+    temp = cur.fetchall()
+    result = []
+    for name in temp:
+        result.append(name[0])
+    result.sort()
+    return result
 
 
 # ------------- TOTS -------------

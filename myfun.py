@@ -131,7 +131,7 @@ def getRoleCount(ctx, roleName):
         discordRole = get(ctx.guild.roles, name=roleName)
         return str(len(discordRole.members))
     except:
-        return "오류"
+        return " - "
 
 
 def getDateToday():

@@ -7,9 +7,77 @@ import random
 from datetime import datetime, timedelta
 import config
 
+
+class Dropdown(discord.ui.Select) :
+    def __init__(self) :
+        # 옵션에 팀 정보 받아서 넣기
+        options = []
+        teamTemp = getTeamList()
+        for name in teamTemp:
+            options.append(discord.SelectOption(label=name,
+                                                description=f"{getTeamFullNameFromTeamInfor(name)}",
+                                                emoji=getImojiFromTeamInfor(name)))
+
+        # The placeholder is what will be shown when no option is chosen
+        # The min and max values indicate we can only pick one of the three options
+        # The options parameter defines the dropdown options. We defined this above
+        super().__init__(placeholder='팀 선택', min_values=1, max_values=1, options=options)
+
+    # 드롭다운 선택 시 상호작용
+    async def callback(self, interaction: discord.Interaction) :
+        # Use the interaction object to send a response message containing
+        # the user's favourite colour or choice. The self object refers to the
+        # Select object, and the values attribute gets a list of the user's
+        # selected options. We only want the first one.
+        # 상호 작용 메시지 세팅
+        sortResult = ['', '', '', '', '', '', '', '', '', '', '']
+        print(self.values)
+        print(self.values[0])
+        embed = discord.Embed(title=self.values[0])
+        # DB 정보 얻기
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", (self.values[0], ))
+        teamList = cur.fetchall()
+        print(teamList)
+        # DB 정보 정렬하여 Embed로 정리
+        for i, data in enumerate(teamList):
+            for position in config.positionList:
+                if data[2] == position:
+                    sortResult[i] = sortResult[i] + data[1] + "\n"
+        for i, position in enumerate(config.positionList):
+            embed.add_field(name=position, value=sortResult[i])
+
+        # 상호 작용
+        await interaction.response.defer()
+        msg = await interaction.original_response()
+        await msg.edit(content=f"{self.values[0]}을 선택하였습니다.", embed=embed)
+
+class DropdownView(discord.ui.View) :
+    def __init__(self) :
+        super().__init__()
+
+        # Adds the dropdown to our view object.
+        self.add_item(Dropdown())
+
+
 class Team(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.switch = 'FA'
+
+    @commands.command(name='전체팀목록2', pass_context=True, aliases=['팀목록2', '전체팀명단2'],
+                      help="권한 : 전체"
+                           "\nCEF에 소속된 팀들의 총원과 지난 시즌 성적 등 정보를 출력합니다.",
+                      brief="$전체팀목록")
+    async def _wholeTeamList2(self, ctx) :
+        """Sends a message with our dropdown containing colours"""
+        # Create the view containing our dropdown
+        view = DropdownView()
+        # Sending a message containing our view
+        await ctx.send('조회할 팀을 선택하세요.', view=view)
+
+
 
     @commands.command(name='전체팀목록', pass_context=True, aliases=['팀목록', '전체팀명단'],
                       help="권한 : 전체"
