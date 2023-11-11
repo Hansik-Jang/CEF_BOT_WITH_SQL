@@ -824,13 +824,6 @@ class Member(commands.Cog) :
                                                 f"5. 포지션 정보 입력 - {mainPosition}/{subPosition} (○)\n"
                                                 f"6. 신규/재가입 검사 - {rejoin_text} (○)```")
                 # DB 추가
-                print(myID)
-                print(nickname)
-                print(mainPosition)
-                print(subPosition)
-                print(originalTeamName)
-                print(rank)
-                print(nicknameChangeCoupon)
                 try :
 
                     conn = sqlite3.connect("CEF.db")

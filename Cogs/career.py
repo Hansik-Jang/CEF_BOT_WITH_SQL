@@ -21,10 +21,11 @@ class Career(commands.Cog):
 
             role_names = [role.name for role in ctx.author.roles]
             history = getHystoryFromSeasonUserHistory(ctx)
-            imoji = getImojiFromTeamInfor(getImojiFromTeamInfor(ctx))
-            logo = getLogoFromTeamInfor(getLogoFromTeamInfor(ctx))
+            imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
+            logo = getLogoFromTeamInfor(getTeamNameFromUserInfo(ctx))
             embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
-                                  description=ctx.author.id)
+                                  description=ctx.author.id,
+                                  colour=getStringColorCodeFromTeamInfor(getTeamNameFromUserInfo(ctx)))
             embed.add_field(name="소속", value=f"{getTeamNameFromUserInfo(ctx)} {imoji}", inline=True)
             embed.add_field(name="신분", value=getRankFromUserInfo(ctx), inline=True)
             embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
@@ -51,9 +52,7 @@ class Career(commands.Cog):
                 embed.add_field(name="커리어", value="기록 없음", inline=False)
             else:
                 embed.add_field(name="커리어", value=text, inline=False)
-
-            if logo != "":
-                embed.set_thumbnail(url=logo)
+            embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
 
             embed2_msg = await ctx.reply(embed=embed)

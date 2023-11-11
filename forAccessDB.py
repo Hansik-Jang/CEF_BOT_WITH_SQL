@@ -313,6 +313,16 @@ def getTeamList():
     return result
 
 
+def getTeammateList(abbName):
+    conn = connectDB()
+    cur = conn.cursor()
+    cur.execute("SELECT Nickname FROM USER_INFORMATION WHERE TeamName=?", (abbName, ))
+    temp = cur.fetchall()
+    result = []
+    for name in temp:
+        result.append(name[0])
+    result.sort()
+    return result
 # ------------- TOTS -------------
 
 def getInforFromTotsFW(ctx) :

@@ -181,4 +181,11 @@ def convertDateTimeToText(dateTime):
         result = ''
     return result
 
-
+def getMyTeam(ctx):
+    ownRolesNameList = [role.name for role in ctx.author.roles]
+    currentTeamList = forAccessDB.getTeamList()
+    for ownRoleName in ownRolesNameList :
+        for teamName in currentTeamList :
+            if ownRoleName == teamName :
+                myTeam = teamName
+    return myTeam

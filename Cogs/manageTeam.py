@@ -1,22 +1,211 @@
 import discord
 from discord.ext import commands
 import sqlite3
-
 import config
 import myfun
 from discord.utils import get
 from forAccessDB import *
 import asyncio
+from discord import ui, ButtonStyle
 
+abbNameFromChangeRankInTeam = ""
+playerList = []
+class MenuButtonFunction(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=30)
+        self.MenuButtonInput = "0"
+    @discord.ui.button(label='감독 변경', style=discord.ButtonStyle.secondary, row=1)
+    async def menubutton1(self, interaction: discord.Interaction, button: discord.ui.Button) :
+        global abbNameFromChangeRankInTeam
+        self.MenuButtonInput = 1
+        print("메뉴버튼 상태2", self.MenuButtonInput)
+        print("팀약자 : ", abbNameFromChangeRankInTeam)
+        await interaction.channel.send("감독 변경")
+        await interaction.response.defer()
+        await interaction.edit_original_response(content="```감독 변경을 선택하였습니다.\n"
+                                                         "변경할 감독의 번호를 선택해주세요.",
+                                                 view=None)
+
+    @discord.ui.button(label='코치 변경', style=discord.ButtonStyle.secondary, row=1)
+    async def menubutton2(self, interaction: discord.Interaction, button: discord.ui.Button) :
+        global abbNameFromChangeRankInTeam
+        self.MenuButtonInput = 2
+        print("메뉴버튼 상태2", self.MenuButtonInput)
+        print("팀약자 : ", abbNameFromChangeRankInTeam)
+        await interaction.channel.send("코치 변경")
+        await interaction.response.defer()
+        await interaction.edit_original_response(content="```코치 변경을 선택하였습니다.\n"
+                                                         "메뉴 번호를 선택 혹은 입력하세요.\n"
+                                                         "1 - 코치 임명\n"
+                                                         "2 - 코치 해임```",
+                                                 view=ChangeCoach1ButtonFunction())
+
+
+class ChangeCoach1ButtonFunction(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=30)
+    @discord.ui.button(label='코치 임명', style=discord.ButtonStyle.secondary, row=1)
+    async def changeCocachButton1(self, interaction: discord.Interaction, button: discord.ui.Button) :
+        global abbNameFromChangeRankInTeam
+        global playerList
+        playerList.clear()
+        await interaction.channel.send("버튼 - 코치 임명")
+        await interaction.response.defer()
+        await interaction.edit_original_response(content="```코치 선임 -> \n"
+                                                         "코치 선임을 선택하였습니다.\n"
+                                                         "코치로 선임할 선수의 번호 혹은 버튼을 선택하세요.```",
+                                                 view=None)
+        result = getTeammateList(abbNameFromChangeRankInTeam)
+        text = ''
+        view = discord.ui.View()
+        for i, name in enumerate(result, start=1) :
+            text = text + str(i) + ". " + name + "\n"
+            temp = str(i) + ". " + name
+            playerList.append(temp)
+            button = ui.Button(style=ButtonStyle.green, label=temp, disabled=False)
+            view.add_item(button)
+        embed = discord.Embed(title=f"{abbNameFromChangeRankInTeam} 팀원 목록",
+                              description=text,
+                              colour=getStringColorCodeFromTeamInfor(abbNameFromChangeRankInTeam))
+        await interaction.channel.send(embed=embed, view=view)
+
+        async def button_callback(interaction:discord.Interaction) :
+            await interaction.response.edit_message(content="버튼 눌러짐!")
+
+        button.callback = button_callback
+        await interaction.response.send_message(view=view)
+
+    @discord.ui.button(label='코치 해임', style=discord.ButtonStyle.secondary, row=1)
+    async def changeCocachButton2(self, interaction: discord.Interaction, button: discord.ui.Button) :
+        global abbNameFromChangeRankInTeam
+        await interaction.channel.send("버튼 - 코치 해임")
+        await interaction.response.defer()
+        await interaction.edit_original_response(content="```코치 변경 -> \n"
+                                                         "코치 해임을 선택하였습니다.\n"
+                                                         "해임할 코치의 번호 혹은 버튼을 선택하세요.```",
+                                                 view=None)
 
 class ManageTeam(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.test = "test"
+        self.changeRankView = MenuButtonFunction()
+
+    @commands.command(name='직책변경', pass_context=True)
+    async def _changeRankInTeam(self, ctx) :
+        global abbNameFromChangeRankInTeam
+        print("메뉴버튼 상태1", self.changeRankView.MenuButtonInput)
+        # 감독만 사용 가능
+        ownRolesNameList = [role.name for role in ctx.author.roles]
+        if "감독" in ownRolesNameList :
+            # 팀명 조회하여 소속팀 역할(AbbName, Role)과 소속팀 코치 역할(AbbName + "Coach", Role) 세팅
+            currentTeamList = getTeamList()
+            for ownRoleName in ownRolesNameList:
+                for teamName in currentTeamList:
+                    if ownRoleName == teamName:
+                        abbNameFromChangeRankInTeam = teamName
+            ownRole = get(ctx.guild.roles, name=abbNameFromChangeRankInTeam)
+            coachRole = get(ctx.guild.roles, name=abbNameFromChangeRankInTeam + " Coach")
+            print("팀약자 : ", abbNameFromChangeRankInTeam)
+            # 메뉴 설정 (1 - 감독 변경, 2 - 코치 변경
+            ann_msg = await ctx.send("```메뉴 번호를 선택 혹은 입력하세요.\n"
+                                     "1 - 감독 변경\n"
+                                     "2 - 코치 변경```", view=self.changeRankView)
+            print(self.changeRankView.MenuButtonInput)
+            try:
+                ManageTeam.menu1 = await self.bot.wait_for("message",
+                                                           check=lambda
+                                                               m : m.author == ctx.author and m.channel == ctx.channel and
+                                                                   self.changeRankView.MenuButtonInput == "0",
+                                                           timeout=30.0)
+            except asyncio.TimeoutError:
+                await ctx.send("시간이 초과되었습니다.\n"
+                               f"다시 명령어를 입력해주세요\n"
+                               f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+            else:
+                if ManageTeam.menu1.content == "1":
+                    await ann_msg.edit(content="```코치 선임 -> \n"
+                                               "코치 선임을 선택하였습니다.\n"
+                                               "코치로 선임할 선수의 번호 혹은 버튼을 선택하세요.```",
+                                     view=None)
+                    #print("메뉴버튼 상태2", self.changeRankView.MenuButtonInput)
+                    self.changeRankView.MenuButtonInput = 1
+                    result = getTeammateList(abbNameFromChangeRankInTeam)
+                    text = ''
+                    tempList = []
+                    for i, name in enumerate(result, start=1) :
+                        text = text + str(i) + ". " + name + "\n"
+                        tempList.append(i, name)
+                    print(tempList)
+                    embed = discord.Embed(title=f"{abbNameFromChangeRankInTeam} 팀원 목록",
+                                          description=text,
+                                          colour=getStringColorCodeFromTeamInfor(abbNameFromChangeRankInTeam))
+                    await ctx.send(embed=embed)
+
+                    try :
+                        msg = await self.bot.wait_for("message",
+                                                       check=lambda
+                                                           m : m.author == ctx.author and m.channel == ctx.channel and
+                                                               self.changeRankView.MenuButtonInput == "0",
+                                                       timeout=30.0)
+                    except asyncio.TimeoutError :
+                        await ctx.send("시간이 초과되었습니다.\n"
+                                       f"다시 명령어를 입력해주세요\n"
+                                       f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
+                    else :
+                        pass
+                    '''# MenuButtonFunction.MenuButtonInput = 1
+                    print("메뉴버튼 상태2", self.changeRankView.MenuButtonInput)
+                    print("메뉴버튼 상태2", MenuButtonFunction.MenuButtonInput)
+                    print("팀약자 : ", abbNameFromChangeRankInTeam)'''
+                elif ManageTeam.menu1.content == "2":
+                    await ann_msg.edit(content="```코치 변경 -> \n"
+                                                         "코치 해임을 선택하였습니다.\n"
+                                                         "해임할 코치의 번호 혹은 버튼을 선택하세요.```",
+                                       view=None)
+                    #print("메뉴버튼 상태2", self.changeRankView.MenuButtonInput)
+                    self.changeRankView.MenuButtonInput = 2
+
+                    ''' MenuButtonFunction.MenuButtonInput = 2
+                    print("메뉴버튼 상태2", self.changeRankView.MenuButtonInput)
+                    print("메뉴버튼 상태2", MenuButtonFunction.MenuButtonInput)
+                    print("팀약자 : ", abbNameFromChangeRankInTeam)'''
+        else :
+            await ctx.reply("해당 명령어는 감독만 사용 가능합니다.")
+
+        if self.changeRankView.MenuButtonInput == 1:
+            result = getTeammateList(abbNameFromChangeRankInTeam)
+            text = ''
+            for i, name in enumerate(result, start=1) :
+                text = text + str(i) + ". " + name + "\n"
+            print(text)
+            embed = discord.Embed(title=f"{abbNameFromChangeRankInTeam} 팀원 목록",
+                                  description=text,
+                                  colour=getStringColorCodeFromTeamInfor(abbNameFromChangeRankInTeam))
+            await ctx.send(embed=embed)
+
+        # 1. 감독 변경
+        # 1-1. 변경할 감독 멘션 (반복문 사용하여, 같은 소속 아닐 경우 재입력)
+        # 1-2. 기존 감독 역할(감독, Coach 제거), 신규 감독 역할(감독, Coach 추가)
+        # 1-3. 이적센터 명시(<팀풀네임>\n@기존감독 -> @신규감독 감독 변경
+        elif self.changeRankView.MenuButtonInput == 2:
+            print("B")
+        # 2. 코치 변경
+        # 2-1. 메뉴 설정 (1 - 코치 추가, 2 - 코치 제거)
+        # 2-1-1 코치 임명
+        # 2-1-1-1 코치 수 조회(감독 포함 3명 이상일 경우 불가)
+        # 2-1-1-2 소속 팀원 번호 닉네임 순으로 나열하여 번호 선택 (소속 팀원 리스트화)
+        # 2-1-1-3 선택된 번호의 인원 확인 및 Coach 역할 추가
+        # 2-1-1-4 이적센터 명시 (<팀풀네임>\n@추가코치 코치 임명
+
+        # 2-2-2 코치 해임
+        # 2-2-2-1 소속팀 코치 번호로 나열
+        # 2-2-2-2 선택된 번호의 인원 확인 및 Coach 역할 제거
+        # 2-1-1-4 이적센터 명시 (<팀풀네임>\n@추가코치 코치 해임
 
     @commands.command(name='팀등록', pass_context=True,
                       help="권한 : 스태프 전용\n"
-                           "팀 등록을 진행합니다.\n"
-                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 업데이트 등",
+                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 업데이트 등 팀 등록을 진행합니다.\n",
                       brief="$팀등록 @멘션(다수 가능)")
     async def _registerTeam(self, ctx, *people: discord.Member):
         role_names = [role.name for role in ctx.author.roles]
@@ -172,7 +361,12 @@ class ManageTeam(commands.Cog):
 
                 # 디스코드 이적센터 채널 게시
                 channel = get(ctx.guild.channels, id=config.TRANSFER_CENTER)
-                await channel.send("<")
+                await channel.send(f"<팀 창단>\n"
+                                   f"팀명 : {fullName}\n"
+                                   f"팀약자 : {abbName}\n"
+                                   f"팀 색상 : {colorCode}\n"
+                                   f"팀 이미지 : {logoLink}\n"
+                                   f"팀 카테고리 및 역할 이미지는 별도로 스태프가 설정해야합니다.")
 
                 # DB TEAM_INFORMATION 인서트
                 try:
@@ -194,22 +388,26 @@ class ManageTeam(commands.Cog):
 
     @commands.command(name='팀해체(미완)', pass_context=True,
                       help="권한 : 스태프 전용\n"
-                           "팀 해체를 진행합니다.\n"
-                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 업데이트 등",
-                      brief="$팀등록 @멘션(다수 가능)")
+                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 삭제 등 팀 해체를 진행합니다.\n",
+                      brief="$해채 '팀약자'")
     async def _deleteTeam(self, ctx):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
             # 소속 팀원 역할 제거
 
-            # 소속 역할 삭제
+            # DB - USER_INFORMATION 소속 선수들 소속명 'FA'로 수정
 
-            # 소속
+            # DB - TEAM_INFORMATION 정보 삭제
+
+            # 소속 역할 삭제
             pass
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-    @commands.command(name='팀정보수정', pass_context=True)
+    @commands.command(name='팀정보수정', pass_context=True,
+                      help="권한 : 스태프 전용\n"
+                           "팀 명단 체크, 팀 정보(팀약자, 풀네임, 색상코드, 로고 링크) 입력, DB 삭제 등 팀 해체를 진행합니다.\n",
+                      brief="$해채 '팀약자'")
     async def _editTeamInfor(self, ctx):
         role_names = [role.name for role in ctx.author.roles]
         switch = ""
@@ -525,6 +723,10 @@ class ManageTeam(commands.Cog):
 
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
+
+
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"An error occurred in the Test cog: {error}")
 
 async def setup(bot):
     await bot.add_cog(ManageTeam(bot))

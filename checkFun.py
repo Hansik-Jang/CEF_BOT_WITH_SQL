@@ -13,6 +13,13 @@ def checkStaff(ctx):
         result = False
     return result
 
+def checkRole(ctx, roleName):
+    role_names = [role.name for role in ctx.author.role]
+    if roleName in role_names:
+        result = True
+    else:
+        result = False
+    return result
 def checkDisplayNameChange(ctx):
     if ctx.author.display_name != ctx.author.name:
         return True

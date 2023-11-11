@@ -19,28 +19,50 @@ from discord.ui import Select
 dropdown_msg = None
 
 
+
 class Test(commands.Cog):
     def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name='서버부스트동기화', pass_context=True,
+    @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
     async def _test1(self, ctx):
-        test = discord.Embed()
-        user = ctx.author
-        test.set_author(name="title", icon_url=user.display_avatar.url)
-        await ctx.send(embed=test)
+        li = [(1, "A"), (2, "B"), (3, "C")]
+        for i, name in li:
+            print(i, name)
 
-
-    @commands.command(name='테스트2', pass_context=True,
+    @commands.command(name='직책동기화', pass_context=True,
                       help="설명서", brief="사용법")
     async def _test5(self, ctx) :
-        print(getTeamList())
-        teamList = []
-        for li in getTeamList():
-            print(li)
-            teamList.append(li[0])
-            print(teamList)
+        roleAbbNameList = getTeamList()
+        for abbName in roleAbbNameList:
+            if abbName != "FA":
+                await ctx.send(f"{abbName}")
+                role = get(ctx.guild.roles, name=abbName)
+
+                for member in role.members:
+                    coach = abbName + " Coach"
+                    if coach in [role.name for role in member.roles]:
+                        await ctx.send(f"{member.display_name} - 코치 동기화 완료")
+                        try:
+                            conn = sqlite3.connect("CEF.db")
+                            cur = conn.cursor()
+                            cur.execute("UPDATE USER_INFORMATION SET Rank=? WHERE id=?",
+                                    ("코치", member.id))
+                        finally:
+                            conn.commit()
+                            conn.close()
+                    if "감독" in [role.name for role in member.roles]:
+                        await ctx.send(f"{member.display_name} - 감독 동기화 완료")
+                        try:
+                            conn = sqlite3.connect("CEF.db")
+                            cur = conn.cursor()
+                            cur.execute("UPDATE USER_INFORMATION SET Rank=? WHERE id=?",
+                                    ("감독", member.id))
+                        finally:
+                            conn.commit()
+                            conn.close()
+
 
     @commands.command(name='바꿔', pass_context=True)
     async def _test2(self, ctx, *, name):
@@ -98,8 +120,7 @@ class Test(commands.Cog):
 
         # Cog error handler
 
-    async def cog_command_error(self, ctx, error) :
-        await ctx.send(f"An error occurred in the Test cog: {error}")
+
 
     @commands.command(name='테스트제거', pass_context=True)
     async def _test8(self, ctx):
@@ -116,7 +137,8 @@ class Test(commands.Cog):
         finally :
             conn.close()
 
-
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"An error occurred in the Test cog: {error}")
 
 
 
