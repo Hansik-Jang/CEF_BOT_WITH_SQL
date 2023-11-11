@@ -114,19 +114,16 @@ def checkNicknameOverlap(ctx):
         nicknameDataInDB = nicknameDataInDB.replace(" ", "")
         # A in B 검사
         if ownNickname in nicknameDataInDB:
-            print(ownNickname, nicknameDataInDB, "A in B")
             OVL_SWITCH = False
             text = text + "A in B / "
             break
         # B in A 검사
         elif nicknameDataInDB in ownNickname:
-            print(ownNickname, nicknameDataInDB, "B in A")
             OVL_SWITCH = False
             text = text + "B in A / "
             break
         # 중복이 아닐 경우
         else:
-            print(ownNickname, nicknameDataInDB, "중복 없음")
             OVL_SWITCH = True
 
     # NICKNAME_EXCEPTION DB 내 검사
@@ -139,10 +136,8 @@ def checkNicknameOverlap(ctx):
             nicknameDataInDB2 = nicknameDataInDB2.replace(" ", "")
             if ownNickname == nicknameDataInDB2:       # 예외 목록에 있음
                 EXC_SWITCH = True
-                print("A")
                 break
             else:
-                print("B")
                 EXC_SWITCH = False
 
     if OVL_SWITCH:
@@ -178,19 +173,16 @@ def checkNicknameOverlapText(text):
         nicknameDataInDB = nicknameDataInDB.replace(" ", "")
         # A in B 검사
         if ownNickname in nicknameDataInDB:
-            print(ownNickname, nicknameDataInDB, "A in B")
             OVL_SWITCH = False
             text = text + "A in B / "
             break
         # B in A 검사
         elif nicknameDataInDB in ownNickname:
-            print(ownNickname, nicknameDataInDB, "B in A")
             OVL_SWITCH = False
             text = text + "B in A / "
             break
         # 중복이 아닐 경우
         else:
-            print(ownNickname, nicknameDataInDB, "중복 없음")
             OVL_SWITCH = True
 
     # NICKNAME_EXCEPTION DB 내 검사
@@ -203,10 +195,8 @@ def checkNicknameOverlapText(text):
             nicknameDataInDB2 = nicknameDataInDB2.replace(" ", "")
             if ownNickname == nicknameDataInDB2:       # 예외 목록에 있음
                 EXC_SWITCH = True
-                print("A")
                 break
             else:
-                print("B")
                 EXC_SWITCH = False
 
     if OVL_SWITCH:

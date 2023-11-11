@@ -257,14 +257,10 @@ def getStringColorCodeFromTeamInfor(abbTeamName) :
         cur.execute("SELECT * FROM TEAM_INFORMATION WHERE Abbreviation=?", (abbTeamName,))
         result = cur.fetchone()
         colorCode = result[2]
-        print(colorCode)
         colorCode = "#" + colorCode
-        print(colorCode)
         colourCode = discord.Colour.from_str(colorCode)
-        print(colourCode)
     except:
         colourCode = ''
-        print(colourCode)
 
     return colourCode
 
@@ -407,7 +403,8 @@ def getValFromCareerValondorWithID(idnum):
             for row2 in result2 :
                 text = text + "\n***VALONDOR***\n" + row2[1] + " | __***Valondor***__"
         else:
-            print(" \n")
+            #print(" \n")
+            pass
     except:
         text = ''
     return text
@@ -437,6 +434,26 @@ def getTotalCountFromSeasonTeamCount(season) :
     return totalCount
 
 
+def getRankInforFromSeasonTeamCount(abbName):
+    text = ''
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM SEASON_TEAM_COUNT_INFORMATION")
+        dataList = cur.fetchall()
+
+        for data in dataList:
+            if data[3] == abbName:
+                text = text + data[0] + " 시즌 : 1위\n"
+            if data[4] == abbName:
+                text = text + data[0] + " 시즌 : 2위\n"
+            if data[5] == abbName:
+                text = text + data[0] + " 시즌 : 3위\n"
+    except:
+        text = ''
+    return text
+
+
 # ------------- CONTRACT -------------
 def checkInsertOverapFromContract(ctx):
     conn = sqlite3.connect("CEF.db")
@@ -461,36 +478,52 @@ def checkInsertOverapFromContractWithID(idnum):
     return result2
 
 def getStartDateFromContract(ctx) :
-    conn = sqlite3.connect("CEF.db")
-    cur = conn.cursor()
-    cur.execute("SELECT StartDate FROM CONTRACT WHERE ID=?", (ctx.author.id,))
-    startDate = cur.fetchone()
-    print(startDate)
-    return startDate[0]
-
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT StartDate FROM CONTRACT WHERE ID=?", (ctx.author.id,))
+        period = cur.fetchone()
+        result = period[0]
+    except:
+        result = ''
+    return result
 
 def getStartDateFromContractwithID(idNum) :
-    conn = sqlite3.connect("CEF.db")
-    cur = conn.cursor()
-    cur.execute("SELECT StartDate FROM CONTRACT WHERE ID=?", (idNum,))
-    startDate = cur.fetchone()
-    return startDate[0]
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT StartDate FROM CONTRACT WHERE ID=?", (idNum,))
+        period = cur.fetchone()
+        result = period[0]
+    except:
+        result = ''
+    return result
+
 
 
 def getPeriodFromContract(ctx) :
-    conn = sqlite3.connect("CEF.db")
-    cur = conn.cursor()
-    cur.execute("SELECT Period FROM CONTRACT WHERE ID=?", (ctx.author.id,))
-    period = cur.fetchone()
-    return period[0]
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT Period FROM CONTRACT WHERE ID=?", (ctx.author.id,))
+        period = cur.fetchone()
+        result = period[0]
+    except:
+        result = ''
+    return result
 
 
 def getPeriodFromContractwithID(idNum) :
-    conn = sqlite3.connect("CEF.db")
-    cur = conn.cursor()
-    cur.execute("SELECT Period FROM CONTRACT WHERE ID=?", (idNum,))
-    period = cur.fetchone()
-    return period[0]
+    try:
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT Period FROM CONTRACT WHERE ID=?", (idNum,))
+        period = cur.fetchone()
+        result = period[0]
+    except:
+        result = ''
+    return result
+
 
 
 def getEndDateFromContract(ctx) :

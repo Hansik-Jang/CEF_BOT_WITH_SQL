@@ -96,7 +96,46 @@ class Team(commands.Cog):
                            "\nCEF에 소속된 팀들의 총원과 지난 시즌 성적 등 정보를 출력합니다.",
                       brief="$전체팀목록")
     async def _wholeTeamList2(self, ctx) :
-        sortResult = ['', '', '', '', '', '', '', '', '', '']
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION")
+        result = cur.fetchall()
+        result.sort(key=lambda x : x[3])
+        embed = discord.Embed(title="CEF 전체 팀 간략 정보")
+        for row in result :
+            abbName = row[0]
+            fullName = row[1]
+            if row[3] == -1 :
+                lastRank = ""
+            elif row[3] == 99 :
+                lastRank = "New"
+            elif row[3] == 100 :
+                lastRank = "-"
+            else :
+                # lastRank = "지난 시즌 : " + str(row[3]) + " 위"
+                lastRank = str(row[3]) + " 위"
+            if abbName == "FA" :
+                abb2 = "FA (무소속)"
+                embed.add_field(name=f"{fullName}", value=f" - 현재 인원 : {str(myfun.getRoleCount(ctx, abb2))} 명",
+                                inline=False)
+            else :
+                imoji = getImojiFromTeamInfor(abbName)
+                if imoji == "" :
+                    embed.add_field(name=f"{fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
+                else :
+                    embed.add_field(name=f"{imoji} {fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
+        view = DropdownView()
+        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)
+
+        '''sortResult = ['', '', '', '', '', '', '', '', '', '']
         embed = discord.Embed(title="FA 목록")
         logo = getLogoFromTeamInfor("FA")
         color = getColorCodeFromTeamInfor("FA")
@@ -136,7 +175,7 @@ class Team(commands.Cog):
         # Create the view containing our dropdown
         view = DropdownView()
         # Sending a message containing our view
-        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)
+        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)'''
 
 
 
@@ -152,12 +191,8 @@ class Team(commands.Cog):
         result.sort(key=lambda x:x[3])
         embed = discord.Embed(title="CEF 전체 팀 간략 정보")
         for row in result :
-            print(row)
             abbName = row[0]
-            print(abbName)
             fullName = row[1]
-            print(fullName)
-            print(row[3])
             if row[3] == -1 :
                 lastRank = ""
             elif row[3] == 99 :
@@ -167,7 +202,6 @@ class Team(commands.Cog):
             else :
                 # lastRank = "지난 시즌 : " + str(row[3]) + " 위"
                 lastRank = str(row[3]) + " 위"
-            print(lastRank)
             if abbName == "FA" :
                 abb2 = "FA (무소속)"
                 embed.add_field(name=f"{fullName}", value=f" - 현재 인원 : {str(myfun.getRoleCount(ctx, abb2))} 명",
@@ -186,7 +220,9 @@ class Team(commands.Cog):
                                           f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
                                           f"- 지난 순위 : {lastRank}",
                                     inline=True)
-        await ctx.send(embed=embed)
+        view = DropdownView()
+        # Sending a message containing our view
+        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)
 
     @commands.command(name="팀명단", pass_context=True,
                       help="권한 : 전체"

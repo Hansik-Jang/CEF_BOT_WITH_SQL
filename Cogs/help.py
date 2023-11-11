@@ -20,7 +20,7 @@ class Help(commands.Cog):
                 commands = cog.get_commands()
                 text = ""
                 for command in commands:
-                    print(command.help)
+                    #print(command.help)
                     text = text + str(i) + ". " + command.name + "\n"
                     i += 1
                 help_embed.add_field(name=cogName, value=text, inline=True)

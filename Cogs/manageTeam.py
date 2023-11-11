@@ -200,6 +200,11 @@ class ManageTeam(commands.Cog):
     async def _deleteTeam(self, ctx):
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
+            # 소속 팀원 역할 제거
+
+            # 소속 역할 삭제
+
+            # 소속
             pass
         else:
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)

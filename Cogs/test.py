@@ -23,19 +23,13 @@ class Test(commands.Cog):
     def __init__(self, bot:commands.Bot) -> None:
         self.bot = bot
 
-    @commands.command(name='테스트', pass_context=True,
+    @commands.command(name='서버부스트동기화', pass_context=True,
                       help="설명서", brief="사용법")
     async def _test1(self, ctx):
-        url = ctx.author.display_avatar
-        colour = getStringColorCodeFromTeamInfor("FCB")
-        embed = discord.Embed(title="테스트", colour=colour)
-        for pos in config.positionList:
-            embed.add_field(name=pos, value=" ", inline=True)
-        embed.set_image(url=url)
-        embed.set_thumbnail(url=url)
-        embed.set_footer(text="푸터", icon_url=url)
-
-        await ctx.send(embed=embed)
+        test = discord.Embed()
+        user = ctx.author
+        test.set_author(name="title", icon_url=user.display_avatar.url)
+        await ctx.send(embed=test)
 
 
     @commands.command(name='테스트2', pass_context=True,

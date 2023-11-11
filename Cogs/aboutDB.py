@@ -11,8 +11,6 @@ class AboutDB(commands.Cog):
     @commands.command(name='예외추가', pass_context=True)
     async def _insertNicknameException(self, ctx, *, text) :
         li = [text]
-        print(text, type(text))
-        print(li)
         try :
             conn = sqlite3.connect("CEF.db")
             cur = conn.cursor()
@@ -30,7 +28,6 @@ class AboutDB(commands.Cog):
         cur.execute("SELECT * FROM NICKNAME_EXCEPTION")
 
         rows = cur.fetchall()
-        print(rows)
         await ctx.send(content=f"{rows}")
 
 

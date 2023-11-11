@@ -67,7 +67,6 @@ def getImojiFromDisplayname(ctx):
 def getImoji(ctx):
     imoji = ""
     role_names = [role.name for role in ctx.author.roles]
-    print(role_names)
     if "TOTS🥇" in role_names:
         imoji = imoji + "🥇"
     if "TOTS Nomi🥈" in role_names:

@@ -21,23 +21,20 @@ class Career(commands.Cog):
 
             role_names = [role.name for role in ctx.author.roles]
             history = getHystoryFromSeasonUserHistory(ctx)
-            imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
-            logo = getLogoFromTeamInfor(getTeamNameFromUserInfo(ctx))
-            print(logo)
+            imoji = getImojiFromTeamInfor(getImojiFromTeamInfor(ctx))
+            logo = getLogoFromTeamInfor(getLogoFromTeamInfor(ctx))
             embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
                                   description=ctx.author.id)
-            embed.add_field(name="소속", value=getTeamNameFromUserInfo(ctx), inline=True)
+            embed.add_field(name="소속", value=f"{getTeamNameFromUserInfo(ctx)} {imoji}", inline=True)
             embed.add_field(name="신분", value=getRankFromUserInfo(ctx), inline=True)
             embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
             embed.add_field(name="주포지션", value=getMainPositionFromUserInfo(ctx), inline=True)
             embed.add_field(name="부포지션", value=getSubPositionFromUserInfo(ctx), inline=True)
-            embed.set_author(name="test", url=ctx.author.display_avatar)
             if "감독" in role_names:
                 embed.add_field(name="계약기간", value="감독 직책으로 미표기", inline=False)
             elif "FA (무소속)" in role_names:
                 embed.add_field(name="계약기간", value="FA 신분으로 미표기", inline=False)
-            elif (getStartDateFromContract(ctx) is not None and getEndDateFromContract(ctx) is not None
-                  and getPeriodFromContract(ctx) is None):
+            elif getStartDateFromContract(ctx) == '' or getEndDateFromContract(ctx) == '' or getPeriodFromContract(ctx) == '':
                 embed.add_field(name="계약기간", value="계약 정보 없음", inline=False)
             else:
                 text = (getStartDateFromContract(ctx) + " ~ " + getEndDateFromContract(ctx)
@@ -46,14 +43,15 @@ class Career(commands.Cog):
             career = getTotsFromCareerWithID(ctx.author.id)
             val = getValFromCareerValondorWithID(ctx.author.id)
             text = career + val
-            if text == "":
-                embed.add_field(name="커리어", value="기록 없음", inline=False)
-            else:
-                embed.add_field(name="커리어", value=text, inline=False)
             if history == "":
                 embed.add_field(name="히스토리", value="기록 없음", inline=False)
             else:
                 embed.add_field(name="히스토리", value=history, inline=False)
+            if text == "":
+                embed.add_field(name="커리어", value="기록 없음", inline=False)
+            else:
+                embed.add_field(name="커리어", value=text, inline=False)
+
             if logo != "":
                 embed.set_thumbnail(url=logo)
 
@@ -430,5 +428,9 @@ class Career(commands.Cog):
                       brief="$시즌수정 '시즌'")
     async def _showSeason(self, ctx) :
         await ctx.send(f"현재 봇에 저장된 시즌 정보는 {self.season}입니다.")
+
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"An error occurred in the career cog: {error}")
+
 async def setup(bot):
     await bot.add_cog(Career(bot))
