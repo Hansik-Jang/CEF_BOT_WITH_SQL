@@ -3,7 +3,8 @@ from discord.ext import commands
 from discord.utils import get
 import asyncio
 
-class Game(commands.Cog):
+
+class 게임(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -48,4 +49,4 @@ class Game(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Game(bot))
+    await bot.add_cog(게임(bot))

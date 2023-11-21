@@ -2,13 +2,12 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import sqlite3
-
+import config
 import checkFun
 import myfun
 from forAccessDB import *
 from datetime import datetime, timedelta
 from table2ascii import table2ascii as t2a, PresetStyle
-
 sortSwitch = 3
 gl_teamname = ''
 SHOW_LIST_SWITCH = True # True이면 전체, False이면 특정 팀
@@ -182,11 +181,163 @@ class ButtonFunction(discord.ui.View):
                                                         f"정렬 기준 : 남은 기간\n"
                                                         f"\n{output}\n```",  view=ButtonFunction())
 
+class Dropdown(discord.ui.Select) :
+    def __init__(self) :
+        # 옵션에 팀 정보 받아서 넣기
+        options = []
+        teamTemp = getTeamList()
+        for name in teamTemp:
+            options.append(discord.SelectOption(label=name,
+                                                description=f"{getTeamFullNameFromTeamInfor(name)}",
+                                                emoji=f"{getImojiFromTeamInfor(name)}"))
 
-# --------------------------------------
-class Contract(commands.Cog):
+        # The placeholder is what will be shown when no option is chosen
+        # The min and max values indicate we can only pick one of the three options
+        # The options parameter defines the dropdown options. We defined this above
+        super().__init__(placeholder='팀 선택', min_values=1, max_values=1, options=options)
+
+    # 드롭다운 선택 시 상호작용
+    async def callback(self, interaction: discord.Interaction) :
+        # Use the interaction object to send a response message containing
+        # the user's favourite colour or choice. The self object refers to the
+        # Select object, and the values attribute gets a list of the user's
+        # selected options. We only want the first one.
+        # 상호 작용 메시지 세팅
+        sortResult = ['', '', '', '', '', '', '', '', '', '']
+        colour = getStringColorCodeFromTeamInfor(self.values[0])
+        role = str(len(get(interaction.guild.roles, name=self.values[0]).members))
+        if colour == "":
+            embed = discord.Embed(title=f"{getImojiFromTeamInfor(self.values[0])} {getTeamFullNameFromTeamInfor(self.values[0])}")
+        else:
+            embed = discord.Embed(title=getTeamFullNameFromTeamInfor(self.values[0]), colour=colour)
+        embed.add_field(name="팀 정보",
+                        value=f"현재 인원 : {str(len(get(interaction.guild.roles, name=self.values[0]).members))} 명\n"
+                              f"지난 순위 : {getLastRankFromTeamInfor(self.values[0])}",
+                        inline=False)
+        if getLogoFromTeamInfor(self.values[0]) != '':
+            embed.set_thumbnail(url=getLogoFromTeamInfor(self.values[0]))
+        # DB 정보 얻기
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM USER_INFORMATION WHERE TeamName=?", (self.values[0], ))
+        teamList = cur.fetchall()
+        # DB 정보 정렬하여 Embed로 정리
+        for data in teamList :
+            if data[2] == "LW" :
+                sortResult[0] = sortResult[0] + data[1] + "\n"
+            elif data[2] == "ST" :
+                sortResult[1] = sortResult[1] + data[1] + "\n"
+            elif data[2] == "RW" :
+                sortResult[2] = sortResult[2] + data[1] + "\n"
+            elif data[2] == "CAM" :
+                sortResult[3] = sortResult[3] + data[1] + "\n"
+            elif data[2] == "CM" :
+                sortResult[4] = sortResult[4] + data[1] + "\n"
+            elif data[2] == "CDM" :
+                sortResult[5] = sortResult[5] + data[1] + "\n"
+            elif data[2] == "LB" :
+                sortResult[6] = sortResult[6] + data[1] + "\n"
+            elif data[2] == "CB" :
+                sortResult[7] = sortResult[7] + data[1] + "\n"
+            elif data[2] == "RB" :
+                sortResult[8] = sortResult[8] + data[1] + "\n"
+            elif data[2] == "GK" :
+                sortResult[9] = sortResult[9] + data[1] + "\n"
+
+        for i, position in enumerate(config.positionList) :
+            embed.add_field(name=position, value=sortResult[i])
+
+        # 상호 작용
+        await interaction.response.defer()
+        msg = await interaction.original_response()
+        await msg.edit(content=f"{self.values[0]}을 선택하였습니다.", embed=embed)
+
+class DropdownView(discord.ui.View) :
+    def __init__(self) :
+        super().__init__()
+
+        # Adds the dropdown to our view object.
+        self.add_item(Dropdown())
+
+
+class 팀정보(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(name='전체팀목록', pass_context=True, aliases=['팀목록', '전체팀명단'],
+                      help="권한 : 전체"
+                           "\nCEF에 소속된 팀들의 총원과 지난 시즌 성적 등 정보를 출력합니다.",
+                      brief="$전체팀목록")
+    async def _wholeTeamList(self, ctx) :
+        conn = sqlite3.connect("CEF.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM TEAM_INFORMATION")
+        result = cur.fetchall()
+        result.sort(key=lambda x:x[3])
+        embed = discord.Embed(title="CEF 전체 팀 간략 정보")
+        for row in result :
+            abbName = row[0]
+            fullName = row[1]
+            if row[3] == -1 :
+                lastRank = ""
+            elif row[3] == 99 :
+                lastRank = "New"
+            elif row[3] == 100 :
+                lastRank = "-"
+            else :
+                # lastRank = "지난 시즌 : " + str(row[3]) + " 위"
+                lastRank = str(row[3]) + " 위"
+            if abbName == "FA" :
+                abb2 = "FA (무소속)"
+                embed.add_field(name=f"{fullName}", value=f" - 현재 인원 : {str(myfun.getRoleCount(ctx, abb2))} 명",
+                                inline=False)
+            else :
+                imoji = getImojiFromTeamInfor(abbName)
+                if imoji == "":
+                    embed.add_field(name=f"{fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
+                else:
+                    embed.add_field(name=f"{imoji} {fullName}",
+                                    value=f" - 팀 약자 : {abbName}\n"
+                                          f"- 현재 인원 : {str(myfun.getRoleCount(ctx, abbName))} 명\n"
+                                          f"- 지난 순위 : {lastRank}",
+                                    inline=True)
+        view = DropdownView()
+        # Sending a message containing our view
+        await ctx.send('조회할 팀을 선택하세요.', embed=embed, view=view)
+
+    @commands.command(name="팀명단", pass_context=True,
+                      help="권한 : 전체"
+                           "\n특정 팀의 명단을 포지션별로 구분하여 출력합니다.",
+                      brief="$팀명단 '팀약자'")
+    async def _teamList(self, ctx, name) :
+        if name != "" :
+            posList = ["ST", "LW", "RW", "CAM", "CM", "CDM", "LB", "CB", "RB", "GK"]
+            teamList = []
+            getRole = get(ctx.guild.roles, name=name)
+            name = name.upper()
+            embed = discord.Embed(title=f"팀 {name} 정보", description=f"총원 : {myfun.getRoleCount(ctx, name)} 명")
+            for member in getRole.members :
+                nickname = getNicknameFromUserInfoWithID(member.id)
+                mainPosition = getMainPositionFromUserInfoWithID(member.id)
+                teamList.append((mainPosition, nickname))
+            for pos in posList :
+                text = ''
+                for mem in teamList :
+                    if pos == mem[0] :
+                        text = text + mem[1] + "\n"
+                embed.add_field(name=f"{pos}", value=f"{text}")
+
+            await ctx.send(embed=embed)
+
+        else :
+            ctx.reply("팀약자와 함께 명령어를 사용해주세요.\n"
+                      "사용방법 : $팀명단 '팀약자'\n"
+                      "예시) $팀명단 FCB")
+
 
     @commands.command(name='계약정보', pass_context=True,
                       help="권한 : 전체\n"
@@ -283,55 +434,6 @@ class Contract(commands.Cog):
                            f"\n{output}\n```",
                            view=ButtonFunction())
 
-    # 추후 재계약으로 변경 필요
-    @commands.command(name='계약수정', pass_context=True,
-                      help="권한 : 스태프\n"
-                           "멘션한 유저의 DB 내 계약 정보를 수정 및 업데이트합니다.\n\n"
-                           "사용시 주의사항 : \n"
-                           "1. 계약정보가 기존에 입력이 되있는 유저만 수정이 가능합니다.\n"
-                           "2. 계약기간은 숫자만 입력해도 되지만 계약시작일은 '/'를 사용해 연도, 월, 일을 구분해줘야 합니다.\n"
-                           "연도 미입력 시 자동으로 입력 날짜를 기준으로 연도를 계산하여 작동합니다.\n"
-                           "사용 예시 : $계약수정 @타임제이 23/10/29 30 or $계약수정 @타임제이 10/29 30",
-                      brief="$계약수정 '@멘션' '계약시작일' '계약기간'")
-    async def _contractEdit(self, ctx, member:discord.Member, startDate=None, period=None):
-        if checkFun.checkStaff(ctx) :
-            if startDate is not None and period is not None :
-                if '/' in startDate :
-                    year_now = str(datetime.today().year) + "/"
-                    print(year_now)
-                    idnum = member.id
-                    if year_now not in startDate :
-                        startDate = year_now + startDate
-                    startDate_time = myfun.convertTextToDatetime(startDate)
-                    period2 = int(period) - 1
-                    endData_time = startDate_time + timedelta(days=period2)
-                    endData = myfun.convertDateTimeToText(endData_time)
-                    if checkInsertOverapFromContractWithID(member.id):
-                        await ctx.reply(f"{myfun.getNickFromDisplayname2(member.display_name)}, 계약서 미등록 유저입니다.")
-                    else:
-                        try :
-                            conn = sqlite3.connect("CEF.db")
-                            cur = conn.cursor()
-                            cur.execute("UPDATE CONTRACT SET StartDate=?, Period=?, EndDate=? WHERE ID=?",
-                                        (startDate, period, endData, idnum))
-                            await ctx.reply(f"{myfun.getNickFromDisplayname2(member.display_name)}, DB에 업데이트 되었습니다.\n"
-                                            f"계약 시작일 : {startDate}, 계약 종료일 : {endData} (총 계약기간 : {str(period)}일")
-                        finally :
-                            conn.commit()
-                            conn.close()
-
-                else :
-                    await ctx.reply("아래 명령어 사용법을 참고하여 입력해주세요.\n"
-                                    "$계약입력 @멘션 계약시작일 계약기간\n"
-                                    "작성 예시) $계약입력 @타임제이 2023/10/21 30")
-            else :
-                await ctx.reply("아래 명령어 사용법을 참고하여 입력해주세요.\n"
-                                "$계약입력 @멘션 계약시작일 계약기간\n"
-                                "작성 예시) $계약입력 @타임제이 2023/10/21 30")
-        else :
-            await ctx.reply("해당 명령어는 스태프만 사용 가능합니다.")
-
-    # 계약 정보 전체 = 예비FA목록
     @commands.command(name='예비FA목록', pass_context=True,
                       aliases=['예비FA'],
                       help="권한 : 전체\n"
@@ -381,52 +483,8 @@ class Contract(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='계약입력', pass_context=True,
-                      aliases=[],
-                      help="권한 : 스태프\n"
-                           "멘션한 인원의 계약 정보를 DB에 추가합니다.\n\n"
-                           "사용시 주의사항 : \n"
-                           "1. 계약정보가 기존에 입력이 되있는 유저만 수정이 가능합니다.\n"
-                           "2. 계약기간은 숫자만 입력해도 되지만 계약시작일은 '/'를 사용해 연도, 월, 일을 구분해줘야 합니다.\n"
-                           "연도 미입력 시 자동으로 입력 날짜를 기준으로 연도를 계산하여 작동합니다.\n"
-                           "사용 예시 : $계약입력 @타임제이 23/10/29 30 or $계약수정 @타임제이 10/29 30",
-                      brief="$예비FA목록 or $예비FA")
-    async def _insertContact(self, ctx, member:discord.Member, startDate=None, period=None):
-        if checkFun.checkStaff(ctx):
-            if startDate is not None and period is not None:
-                if '/' in startDate:
-                    year_now = str(datetime.today().year) + "/"
-                    print(year_now)
-                    idnum = member.id
-                    if year_now not in startDate :
-                        startDate = year_now + startDate
-                    startDate_time = myfun.convertTextToDatetime(startDate)
-                    period2 = int(period) - 1
-                    endData_time = startDate_time + timedelta(days=period2)
-                    endData = myfun.convertDateTimeToText(endData_time)
-                    if checkInsertOverapFromContractWithID(member.id):
-                        try:
-                            conn = sqlite3.connect("CEF.db")
-                            cur = conn.cursor()
-                            cur.execute("INSERT INTO CONTRACT VALUES(?, ?, ?, ?);", (idnum, startDate, period, endData))
-                            await ctx.reply(f"{myfun.getNickFromDisplayname2(member.display_name)}, DB에 업데이트 되었습니다.")
-                        finally:
-                            conn.commit()
-                            conn.close()
-                    else:
-                        await ctx.reply(f"{myfun.getNickFromDisplayname2(member.display_name)}, 이미 등록되어 있습니다.")
-                else:
-                    await ctx.reply("아래 명령어 사용법을 참고하여 입력해주세요.\n"
-                                    "$계약입력 @멘션 계약시작일 계약기간\n"
-                                    "작성 예시) $계약입력 @타임제이 2023/10/21 30")
-            else:
-                await ctx.reply("아래 명령어 사용법을 참고하여 입력해주세요.\n"
-                                "$계약입력 @멘션 계약시작일 계약기간\n"
-                                "작성 예시) $계약입력 @타임제이 2023/10/21 30")
-        else :
-            await ctx.reply("해당 명령어는 스태프만 사용 가능합니다.")
+    async def cog_command_error(self, ctx, error) :
+        await ctx.send(f"팀정보 전용 : {error}")
 
-
-
-async def setup(bot):
-    await bot.add_cog(Contract(bot))
+async def setup(bot) :
+    await bot.add_cog(팀정보(bot))

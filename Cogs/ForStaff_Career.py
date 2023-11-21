@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-import gspread
-import sqlite3
+import checkFun
 from forAccessDB import *
 import config
 import asyncio
@@ -10,62 +9,21 @@ import myfun
 from table2ascii import table2ascii as t2a, PresetStyle
 
 
-class Career(commands.Cog):
+class 스태프전용_커리어(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.season = "24-1"
-
-    @commands.command(name='내정보', pass_context=True)
-    async def _myinformation(self, ctx):
-        if checkUseJoinCommand(ctx):
-
-            role_names = [role.name for role in ctx.author.roles]
-            history = getHystoryFromSeasonUserHistory(ctx)
-            imoji = getImojiFromTeamInfor(getTeamNameFromUserInfo(ctx))
-            logo = getLogoFromTeamInfor(getTeamNameFromUserInfo(ctx))
-            embed = discord.Embed(title=getNicknameFromUserInfo(ctx),
-                                  description=ctx.author.id,
-                                  colour=getStringColorCodeFromTeamInfor(getTeamNameFromUserInfo(ctx)))
-            embed.add_field(name="소속", value=f"{getTeamNameFromUserInfo(ctx)} {imoji}", inline=True)
-            embed.add_field(name="신분", value=getRankFromUserInfo(ctx), inline=True)
-            embed.add_field(name="닉네임 변경권", value=getNickChangeCouponFromUserInfo(ctx), inline=True)
-            embed.add_field(name="주포지션", value=getMainPositionFromUserInfo(ctx), inline=True)
-            embed.add_field(name="부포지션", value=getSubPositionFromUserInfo(ctx), inline=True)
-            if "감독" in role_names:
-                embed.add_field(name="계약기간", value="감독 직책으로 미표기", inline=False)
-            elif "FA (무소속)" in role_names:
-                embed.add_field(name="계약기간", value="FA 신분으로 미표기", inline=False)
-            elif getStartDateFromContract(ctx) == '' or getEndDateFromContract(ctx) == '' or getPeriodFromContract(ctx) == '':
-                embed.add_field(name="계약기간", value="계약 정보 없음", inline=False)
-            else:
-                text = (getStartDateFromContract(ctx) + " ~ " + getEndDateFromContract(ctx)
-                        + " (총 " + str(getPeriodFromContract(ctx)) + " 일)")
-                embed.add_field(name="계약기간", value=text, inline=False)
-            career = getTotsFromCareerWithID(ctx.author.id)
-            val = getValFromCareerValondorWithID(ctx.author.id)
-            text = career + val
-            if history == "":
-                embed.add_field(name="히스토리", value="기록 없음", inline=False)
-            else:
-                embed.add_field(name="히스토리", value=history, inline=False)
-            if text == "":
-                embed.add_field(name="커리어", value="기록 없음", inline=False)
-            else:
-                embed.add_field(name="커리어", value=text, inline=False)
-            embed.set_thumbnail(url=ctx.author.display_avatar.url)
-
-
-            embed2_msg = await ctx.reply(embed=embed)
-
-        else:
-            await ctx.reply(config.notJoinText)
-
+        self.season = ""
+        self.teamCount = ""
+        self.teamSequence = []
+        self.season2 = "24-1"
+        self.teamCount2 = "13"
+        self.teamSequence2 = ["RMA", "ESP", "FRA", "B04", "IPD", "ARG", "ITA", "BVB", "BHA", "TOT", "GER", "EVE", "LIV"]
 
     @commands.command(name='토츠', pass_context=True,
                       help="권한 : 스태프\n"
-                           "해당 하는 인원의 발롱도르 정보를 추가합니다.",
-                      brief="$토츠 '시즌' '@멘션'")
-    async def _awardTots(self, ctx):
+                           "토츠 정보를 추가합니다.",
+                      brief="$토츠")
+    async def _awardTots(self, ctx) :
         # ID, Season, FW_Tots, FW_Nomi, MF_Tots, MF_Nomi, DF_Tots, DF_Nomi, GK_Tots, GK_Nomi
         role_names = [role.name for role in ctx.author.roles]
         if "스태프" in role_names :
@@ -100,9 +58,9 @@ class Career(commands.Cog):
                                                       f"GK - {t_nomiGK}```")
             ann_msg = await ctx.send(content=f"{tots} {position} 수상자 명단을 멘션으로 입력하세요.")
             i = 0
-            while i < 8:
+            while i < 8 :
                 temp = divmod(i, 4)
-                if temp[0] == 0:
+                if temp[0] == 0 :
                     tots = "토츠"
                     if temp[1] == 0 :
                         position = "FW"
@@ -112,7 +70,7 @@ class Career(commands.Cog):
                         position = "DF"
                     elif temp[1] == 3 :
                         position = "GK"
-                elif temp[0] == 1:
+                elif temp[0] == 1 :
                     tots = "노미"
                     if temp[1] == 0 :
                         position = "FW"
@@ -124,15 +82,15 @@ class Career(commands.Cog):
                         position = "GK"
 
                 await totsInsertResult.edit(content=f"```<토츠 입력 현황>\n"
-                                                      f"FW - {t_totsFW}\n"
-                                                      f"MF - {t_totsMF}\n"
-                                                      f"DF - {t_totsDF}\n"
-                                                      f"GK - {t_totsGK}\n\n"
-                                                      f"<노미 입력 현황>\n"
-                                                      f"FW - {t_nomiFW}\n"
-                                                      f"MF - {t_nomiMF}\n"
-                                                      f"DF - {t_nomiDF}\n"
-                                                      f"GK - {t_nomiGK}```")
+                                                    f"FW - {t_totsFW}\n"
+                                                    f"MF - {t_totsMF}\n"
+                                                    f"DF - {t_totsDF}\n"
+                                                    f"GK - {t_totsGK}\n\n"
+                                                    f"<노미 입력 현황>\n"
+                                                    f"FW - {t_nomiFW}\n"
+                                                    f"MF - {t_nomiMF}\n"
+                                                    f"DF - {t_nomiDF}\n"
+                                                    f"GK - {t_nomiGK}```")
                 await ann_msg.edit(content=f"{tots} {position} 수상자 명단을 멘션으로 입력하세요.")
                 try :
                     msg = await self.bot.wait_for("message",
@@ -153,35 +111,35 @@ class Career(commands.Cog):
                     for id in tempList :
                         member_obj = await self.bot.fetch_user(id)
                         totsList[i].append(member_obj)
-                        if i == 0:
+                        if i == 0 :
                             t_totsFW = t_totsFW + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 1:
+                        elif i == 1 :
                             t_totsMF = t_totsMF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 2:
+                        elif i == 2 :
                             t_totsDF = t_totsDF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 3:
+                        elif i == 3 :
                             t_totsGK = t_totsGK + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 4:
+                        elif i == 4 :
                             t_nomiFW = t_nomiFW + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 5:
+                        elif i == 5 :
                             t_nomiMF = t_nomiMF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 6:
+                        elif i == 6 :
                             t_nomiDF = t_nomiDF + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
-                        elif i == 7:
+                        elif i == 7 :
                             t_nomiGK = t_nomiGK + myfun.getNickFromDisplayname2(member_obj.display_name) + ", "
                     i += 1
             await totsInsertResult.delete()
             totsInsertResult2 = await ctx.send(content=f"``` <토츠 입력 최종 결과>\n"
-                                                      f"FW - {t_totsFW}\n"
-                                                      f"MF - {t_totsMF}\n"
-                                                      f"DF - {t_totsDF}\n"
-                                                      f"GK - {t_totsGK}\n\n"
-                                                      f"<노미 입력 최종 결과>\n"
-                                                      f"FW - {t_nomiFW}\n"
-                                                      f"MF - {t_nomiMF}\n"
-                                                      f"DF - {t_nomiDF}\n"
-                                                      f"GK - {t_nomiGK}\n\n"
-                                                      f"다음 단계로 진행하기를 희망하면 1을 입력하세요.```")
+                                                       f"FW - {t_totsFW}\n"
+                                                       f"MF - {t_totsMF}\n"
+                                                       f"DF - {t_totsDF}\n"
+                                                       f"GK - {t_totsGK}\n\n"
+                                                       f"<노미 입력 최종 결과>\n"
+                                                       f"FW - {t_nomiFW}\n"
+                                                       f"MF - {t_nomiMF}\n"
+                                                       f"DF - {t_nomiDF}\n"
+                                                       f"GK - {t_nomiGK}\n\n"
+                                                       f"다음 단계로 진행하기를 희망하면 1을 입력하세요.```")
             try :
                 msg = await self.bot.wait_for("message",
                                               check=lambda m : m.author == ctx.author and m.channel == ctx.channel,
@@ -190,24 +148,24 @@ class Career(commands.Cog):
                 await ctx.send("시간이 초과되었습니다.\n"
                                f"다시 명령어를 입력해주세요\n"
                                f"해당 메시지는 10초 후 자동 삭제됩니다.", delete_after=10)
-            else:
-                if msg.content == "1":
+            else :
+                if msg.content == "1" :
                     print(totsList)
 
-                    for i in range(len(totsList)):
+                    for i in range(len(totsList)) :
                         print(i, totsList[i])
-                        for mem in totsList[i]:
+                        for mem in totsList[i] :
                             data = [mem.id, self.season, "", "", "", "", "", "", "", ""]
-                            data[i+2] = True
+                            data[i + 2] = True
                             try :
                                 conn = connectDB()
                                 cur = conn.cursor()
                                 cur.execute("INSERT INTO CAREER_TOTS VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                             data)
-                                #cur.execute("INSERT INTO CAREER_TOTS(ID, Season, FW_Tots, MF_Tots, DF_Tots, GK_Tots, "
+                                # cur.execute("INSERT INTO CAREER_TOTS(ID, Season, FW_Tots, MF_Tots, DF_Tots, GK_Tots, "
                                 #            "FW_Nomi, MF_Nomi, DF_Nomi, GK_Nomi) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
                                 #            (data, ))
-                            finally:
+                            finally :
                                 conn.commit()
                                 conn.close()
                             await ctx.send(f"{mem.display_name} - DB 업데이트 완료", delete_after=10)
@@ -229,13 +187,13 @@ class Career(commands.Cog):
                       help="권한 : 스태프\n"
                            "해당 하는 인원의 발롱도르 정보를 추가합니다.",
                       brief="$발롱도르 '@멘션'")
-    async def _awardValondor(self, ctx, member:discord.Member=None):
+    async def _awardValondor(self, ctx, member: discord.Member = None) :
         # ID, Season
         role_names = [role.name for role in ctx.author.roles]
         print(self.season)
         if "스태프" in role_names :
-            if self.season is not None:
-                if member is not None:
+            if self.season != "" :
+                if member is not None :
                     msg = await ctx.send(f"```{self.season} 시즌의 수상자 : {member.display_name}```\n"
                                          f"정상 입력되었으면 1, 잘못 입력되었으면 2를 입력하세요.")
                     try :
@@ -245,8 +203,8 @@ class Career(commands.Cog):
                                                        timeout=30.0)
                     except asyncio.TimeoutError :
                         await ctx.send("시간이 초과되었습니다.")
-                    else:
-                        if msg2.content == "1":
+                    else :
+                        if msg2.content == "1" :
                             # DB 업데이트
                             try :
                                 conn = connectDB()
@@ -256,7 +214,7 @@ class Career(commands.Cog):
                             finally :
                                 closeDB(conn)
 
-                        elif msg2.content == "2":
+                        elif msg2.content == "2" :
                             await ctx.send("다시 명령어를 입력해주세요.")
                 else :
                     await ctx.reply("```cs\n"
@@ -271,10 +229,10 @@ class Career(commands.Cog):
                                 "$시즌수정 명령어를 사용하여 시즌 정보를 업데이트 후 다시 시도해주세요.\n"
                                 "사용법 : $발롱도르 '@멘션'\n"
                                 "예시 - $발롱도르 @타임제이```")
-        else:
+        else :
             await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
 
-    @commands.command(name='리그순위입력', pass_context=True,
+    '''@commands.command(name='리그순위입력', pass_context=True,
                       help="권한 : 스태프\n"
                            "해당 역할의 인원들의 정보(시즌, 순위)를 DB에 추가합니다.",
                       brief="$리그순위입력 '시즌' '순위' '@팀_멘션'")
@@ -376,60 +334,107 @@ class Career(commands.Cog):
                             closeDB(conn)
                     await ctx.send(f"{selectRole.name} 팀의 시즌 순위 업데이트가 완료되었습니다.", delete_after=30)
                 elif msg3.content == "2":
-                    await ctx.send("처음부터 다시 시도해주세요.")
+                    await ctx.send("처음부터 다시 시도해주세요.")'''
 
-    @commands.command(name='시즌정보수정', pass_context=True,
+    @commands.command(name='리그정보입력', pass_context=True,
                       help="권한 : 스태프\n"
-                           "현재 봇에 내장된 시즌 정보를 변경합니다.",
-                      brief="$시즌정보수정 '시즌'")
-    async def _editSeason(self, ctx):
-        role_names = [role.name for role in ctx.author.roles]
-        if "스태프" in role_names :
-            msg = await ctx.send(f"예시와 같은 형태로 시즌 정보를 입력해주세요.\n"
-                                 f"예시) 24-1, 24-2, 24-3")
-            switch = True
-            while True:
-                try :
-                    msg1 = await self.bot.wait_for("message",
-                                                  check=lambda
-                                                      m : m.author == ctx.author and m.channel == ctx.channel,
-                                                  timeout=30.0)
-                except asyncio.TimeoutError :
-                    await ctx.send("시간이 초과되었습니다.")
-                else :
-                    msg2 = await ctx.send(f"기존 정보 : {self.season}"
-                                          f"입력한 시즌 : {msg1.content}\n"
-                                          f"입력한 시즌으로 업데이트하려면 1, 다시 입력하려면 2를 입력하세요.")
-                    try:
-                        msg3 = await self.bot.wait_for("message",
-                                                      check=lambda
-                                                          m : m.author == ctx.author and m.channel == ctx.channel,
-                                                      timeout=30.0)
-                    except asyncio.TimeoutError :
-                        await ctx.send("시간이 초과되었습니다.")
-                    else:
-                        if msg3.content == "1":
-                            self.season = msg1.content
-                            await ctx.send(f"{self.season}으로 업데이트되었습니다.", delete_after=10)
+                           "해당 역할의 인원들의 정보(시즌, 순위)를 DB에 추가합니다.",
+                      brief="$리그순위입력 '시즌' '순위' '@팀_멘션'")
+    async def _insertLeagueInfo2(self, ctx) :
+
+        teamSequence = []
+        ann_msg = await ctx.send(f"```리그 순위를 입력합니다.\n"
+                                 f"시즌 정보 : {self.season}\n"
+                                 f"참가팀 수 : {self.teamCount}```")
+        seasonInsertMessage = await ctx.send("시즌 정보를 입력해주세요.\n"
+                                             "예시) 24-1, 24-2")
+        try :
+            msg1 = await self.bot.wait_for("message",
+                                           check=lambda
+                                               m : m.author == ctx.author and m.channel == ctx.channel,
+                                           timeout=30.0)
+        except asyncio.TimeoutError :
+            await ctx.send("시간이 초과되었습니다.")
+        else :
+            self.season = msg1.content
+            await seasonInsertMessage.delete()
+            await ctx.message.channel.purge(limit=1)
+            await ann_msg.edit(content=f"```리그 순위를 입력합니다.\n"
+                                       f"시즌 정보 : {self.season}\n"
+                                       f"참가팀 수 : {self.teamCount}```")
+        seasonInsertMessage = await ctx.send(f"참가팀 수의 정보가 없습니다.\n"
+                                             f"{self.season}의 참가 팀 수를 숫자로 입력해주세요.\n"
+                                             f"예시) 11, 13, 15")
+        try :
+            msg2 = await self.bot.wait_for("message",
+                                           check=lambda
+                                               m : m.author == ctx.author and m.channel == ctx.channel,
+                                           timeout=30.0)
+        except asyncio.TimeoutError :
+            await ctx.send("시간이 초과되었습니다.")
+        else :
+            self.teamCount = int(msg2.content)
+            await seasonInsertMessage.delete()
+            await ctx.message.channel.purge(limit=1)
+            await ann_msg.edit(content=f"```리그 순위를 입력합니다.\n"
+                                       f"시즌 정보 : {self.season}\n"
+                                       f"참가팀 수 : {self.teamCount}```")
+        temp_txt = ''
+        insertTeamName = await ctx.send(f"1위 팀의 약자를 입력하세요.")
+        for i in range(self.teamCount) :
+            rank = i + 1
+            await insertTeamName.edit(content=f"{str(rank)}위 팀의 약자를 입력하세요.")
+            try :
+                msg3 = await self.bot.wait_for("message",
+                                               check=lambda
+                                                   m : m.author == ctx.author and m.channel == ctx.channel,
+                                               timeout=30.0)
+            except asyncio.TimeoutError :
+                await ctx.send("시간이 초과되었습니다.")
+            else :
+                self.teamSequence.append(msg3.content.upper())
+                temp_txt = temp_txt + str(i + 1) + " - " + msg3.content.upper() + "\n"
+                await ann_msg.edit(content=f"```리그 순위를 입력합니다.\n"
+                                           f"시즌 정보 : {self.season}\n"
+                                           f"참가팀 수 : {self.teamCount}```\n"
+                                           f"```<순위별 팀 정보 입력 현황>\n"
+                                           f"{temp_txt}```")
+                print(self.teamSequence)
+
+    @commands.command(name='리그순위입력', pass_context=True,
+                      help="권한 : 스태프\n"
+                           "해당 역할의 인원들의 정보(시즌, 순위)를 DB에 추가합니다.",
+                      brief="$리그순위입력 '팀약자' '@유저멘션 '포지션' ")
+    async def _insertLeagueInfo(self, ctx, team, member: discord.Member, position) :
+        if position.upper() in config.positionList :
+            if checkFun.checkStaff(ctx) :
+                if self.season2 != "" :
+                    rank = 0
+                    myTeam = team.upper()
+                    myPosition = position.upper()
+                    myJob = getRankFromUserInfoWithID(member.id)
+                    for i, team in enumerate(self.teamSequence2) :
+                        if myTeam == team :
+                            rank = i + 1
                             break
-                        elif msg3.content == "2":
-                            await ctx.send("예시와 같은 형태로 시즌 정보를 다시 입력해주세요.\n"
-                                           f"예시) 24-1, 24-2, 24-3")
-                        else:
-                            await ctx.send("잘못 입력하였습니다.", delete_after=10)
-
-        else:
-            await ctx.reply("```해당 명령어는 스태프만 사용 가능합니다.```", delete_after=30)
-
-    @commands.command(name='시즌정보보기', pass_context=True,
-                      help="권한 : 스태프\n"
-                           "현재 봇에 내장된 시즌 정보를 출력합니다.",
-                      brief="$시즌수정 '시즌'")
-    async def _showSeason(self, ctx) :
-        await ctx.send(f"현재 봇에 저장된 시즌 정보는 {self.season}입니다.")
+                    try :
+                        conn = sqlite3.connect("CEF.db")
+                        cur = conn.cursor()
+                        cur.execute("INSERT INTO SEASON_USER_HISTORY VALUES(?, ?, ?, ?, ?, ?)",
+                                    (member.id, self.season2, myTeam, myJob, myPosition, rank))
+                    finally :
+                        conn.commit()
+                        conn.close()
+                        await ctx.reply(f"```{getNicknameFromUserInfoWithID(member.id)} - 시즌 정보 업데이트 완료\n"
+                                        f"입력된 정보는 $내정보 명령어를 통해 확인 가능합니다.```")
+                else :
+                    await ctx.reply("$리그정보입력 명령어를 먼저 사용해서 정보를 등록한 후 다시 시도해주세요.")
+            else :
+                await ctx.send("스태프 전용")
+        else :
+            await ctx.reply("포지션을 잘못 입력하였습니다.")
 
     async def cog_command_error(self, ctx, error) :
-        await ctx.send(f"An error occurred in the career cog: {error}")
-
-async def setup(bot):
-    await bot.add_cog(Career(bot))
+        await ctx.send(f"스태프전용_커리어 : {error}")
+async def setup(bot) :
+    await bot.add_cog(스태프전용_커리어(bot))

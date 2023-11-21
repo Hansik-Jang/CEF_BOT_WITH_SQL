@@ -312,6 +312,16 @@ def getTeamList():
     result.sort()
     return result
 
+def getMyTeam(ctx):
+    myRoles = [role.name for role in ctx.author.roles]
+    teamList = getTeamList()
+    myTeam = ''
+    for team in teamList:
+        for role in myRoles:
+            if team == role:
+                myTeam = team
+    return myTeam
+
 
 def getTeammateList(abbName):
     conn = connectDB()

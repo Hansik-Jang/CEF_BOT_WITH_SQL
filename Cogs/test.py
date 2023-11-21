@@ -3,7 +3,6 @@ from discord.ext import commands
 from discord.utils import get
 from discord import app_commands
 import random
-import myfun
 import config
 import sqlite3
 import asyncio
@@ -27,13 +26,13 @@ class Test(commands.Cog):
     @commands.command(name='테스트', pass_context=True,
                       help="설명서", brief="사용법")
     async def _test1(self, ctx):
-        li = [(1, "A"), (2, "B"), (3, "C")]
-        for i, name in li:
-            print(i, name)
+        await ctx.send("1")
+
+        
 
     @commands.command(name='직책동기화', pass_context=True,
                       help="설명서", brief="사용법")
-    async def _test5(self, ctx) :
+    async def _test1(self, ctx) :
         roleAbbNameList = getTeamList()
         for abbName in roleAbbNameList:
             if abbName != "FA":

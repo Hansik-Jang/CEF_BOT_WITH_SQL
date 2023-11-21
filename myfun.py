@@ -57,6 +57,17 @@ def getBupoFromDisplayname(ctx):
         return '없음'
 
 
+# display_name으로부터 부포지션 정보 얻기
+def getBupoFromDisplayname2(name):
+    if '/' in name:
+        a = name.split('/')
+        temp = a[1]
+        b = temp.split(']')
+        bupo = b[0].upper()
+        return bupo
+    else:
+        return '없음'
+
 # display_name으로부터 이모지 정보 얻기
 def getImojiFromDisplayname(ctx):
     temp = ctx.author.display_name.split(']')

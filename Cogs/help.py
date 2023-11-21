@@ -3,7 +3,7 @@ from discord.ext import commands
 import config
 
 
-class Help(commands.Cog):
+class 도움말(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -42,4 +42,4 @@ class Help(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Help(bot))
+    await bot.add_cog(도움말(bot))
