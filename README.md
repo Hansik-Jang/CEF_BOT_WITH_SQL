@@ -4,5 +4,5 @@
 
 #### CEF 카페 : https://cafe.naver.com/cyberearlyfootballc
 #### CEF 디스코드 : https://discord.com/invite/cef
-#### 
-###### 4
+
+##### 제작자 : 장한식 (TimeJ)
